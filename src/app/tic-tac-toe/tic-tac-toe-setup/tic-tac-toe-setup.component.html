@@ -1,0 +1,11 @@
+<div class="setup">
+    <p>Tic Tac Toe</p>
+    <form (ngSubmit)="onStartGame()">
+        <label for="boardSize">Board size:</label>
+        <input id="boardSize" type="number" name="boardSize" [(ngModel)]="boardSize" min='1' max="20" required>
+        <label for="numberPlayers">Number players:</label>
+        <input id="numberPlayers" type="number" name="numberPlayers" [(ngModel)]="numberPlayers" min='1' max="20" required>
+        <div class="errorsOfForm">{{ errorsOfForm }} </div>
+        <button type='submit'>Start game</button>
+    </form>
+</div>

@@ -1,0 +1,63 @@
+.setup {
+    width: 400px;
+    height: 230px;
+    margin-top: 25vh;
+    background-color: #666767;
+    border: 3px solid black;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+   
+}
+p {
+    font-size: 30px;
+    color: #7fccbe;
+    margin-bottom: 20px;
+    margin: 0 20px;
+    text-align: center;
+}
+form {
+    display: flex;
+    flex-direction: column;
+}
+label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin: 0 20px;
+}
+
+input[type="number"] {
+    border: 2px solid #365d55;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 0 20px;
+}
+button {
+    width: 40%;
+    margin: 20px auto 0 auto;
+    padding: 10px 20px;
+    background-color: #365d55;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid #1d322e;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button:hover {
+    background-color: #58978b;
+}
+  
+button:active {
+    background-color: #1a7462;
+}
+.errorsOfForm {
+    margin-top: 10px;
+    height: 10px;
+    color: rgb(99, 0, 0);
+    text-align: center;
+}
+  

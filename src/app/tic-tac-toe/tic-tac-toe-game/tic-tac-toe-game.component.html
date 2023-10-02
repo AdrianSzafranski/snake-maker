@@ -1,0 +1,26 @@
+<div class="game">
+    <div class="topPanel" [ngStyle]="{'width': screenWidth}">
+        {{ gameParameters.players[playerTurn][0] }} turn
+    </div>
+    <div class="centerPanel" [ngStyle]="getSizeCenterPanel()">
+        <div class="board">
+            <ng-container *ngFor="let rowNumber of gameParameters.generateBoard">
+                <div class="boardRow">
+                    <ng-container *ngFor="let columnNumber of gameParameters.generateBoard" >
+                        <div 
+                            class="boardField" 
+                            [ngClass]="{winningField: isWinningField(rowNumber, columnNumber)}"
+                            (click)="onSelectCurrentField(rowNumber, columnNumber, boardField)" #boardField>
+                        </div>
+                        <div class="verticalLineBetweenFields"></div>
+                    </ng-container>
+                </div>
+                <div class="horizontalLineBetweenFields"></div>
+            </ng-container>
+        </div>
+        <div *ngIf="gameResult !== ''" class="result">
+                {{ gameResult }}
+        </div>
+      
+    </div>
+</div>
