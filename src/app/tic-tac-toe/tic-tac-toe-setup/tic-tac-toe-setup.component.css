@@ -1,7 +1,7 @@
 .setup {
-    width: 400px;
-    height: 230px;
-    margin-top: 25vh;
+    width: 450px;
+    height: 550px;
+    margin-top: 10vh;
     background-color: #666767;
     border: 3px solid black;
     border-radius: 25px;
@@ -9,21 +9,21 @@
     flex-direction: column;
    
 }
-p {
+#setupTitle {
     font-size: 30px;
     color: #7fccbe;
-    margin-bottom: 20px;
-    margin: 0 20px;
+    margin: 5px 20px 0 20px;
     text-align: center;
 }
 form {
     display: flex;
     flex-direction: column;
+    margin: 0 20px;
 }
 label {
     margin-top: 10px;
     margin-bottom: 5px;
-    margin: 0 20px;
+   
 }
 
 input[type="number"] {
@@ -31,9 +31,46 @@ input[type="number"] {
     padding: 3px;
     border-radius: 5px;
     font-size: 16px;
-    margin: 0 20px;
+    
 }
-button {
+.separationLine {
+   margin: 10px auto;
+   width: 90%;
+   height: 2px;
+   background-color: #BDBDBD;
+
+}
+#detailsTitle {
+    font-size: 22px;
+    color: #7fccbe;
+    margin-bottom: 5px;
+    
+
+}
+.editPlayerDetails{
+    border: 4px dashed #BDBDBD;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.playerColorPanel {
+    display: flex;
+    justify-content: space-between; 
+}
+#playerColorSelector {
+    width: 90%;
+
+}
+#playerColorDemonstrator {
+    aspect-ratio: 1;
+  
+    border: 2px solid black;
+}
+#playerNavigationGroup {
+    display: flex;
+}
+
+button, .playerNavigation {
     width: 40%;
     margin: 20px auto 0 auto;
     padding: 10px 20px;
@@ -46,6 +83,20 @@ button {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+.playerNavigation {
+    width: 30%;
+    background-color: #94c5e3;
+    border: 1px solid #1d2b32;
+    color: black;
+    padding: 5px 10px;
+}
+.playerNavigation:hover {
+    background-color: #384c58;
+}
+  
+.playerNavigation:active {
+    background-color: #3ba7eb;
 }
 button:hover {
     background-color: #58978b;
@@ -60,4 +111,7 @@ button:active {
     color: rgb(99, 0, 0);
     text-align: center;
 }
-  
+
+
+
+

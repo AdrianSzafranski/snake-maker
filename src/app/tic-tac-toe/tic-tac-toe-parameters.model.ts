@@ -1,3 +1,5 @@
+import { TicTacToePlayer } from "./tic-tac-toe-player.model";
+
 export interface TicTacToeParameters { 
     boardSize: number;
     numberPlayers: number;
@@ -6,5 +8,5 @@ export interface TicTacToeParameters {
     rowsThatEnableWin: boolean[][];
     columnsThatEnableWin: boolean[][];
     diagonalsThatEnableWin: boolean[][];
-    players: string[][];
+    players: TicTacToePlayer[];
 }

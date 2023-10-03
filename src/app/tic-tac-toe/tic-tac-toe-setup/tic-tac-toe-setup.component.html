@@ -1,11 +1,37 @@
 <div class="setup">
-    <p>Tic Tac Toe</p>
+    <p id="setupTitle">Tic Tac Toe</p>
     <form (ngSubmit)="onStartGame()">
         <label for="boardSize">Board size:</label>
         <input id="boardSize" type="number" name="boardSize" [(ngModel)]="boardSize" min='1' max="20" required>
         <label for="numberPlayers">Number players:</label>
-        <input id="numberPlayers" type="number" name="numberPlayers" [(ngModel)]="numberPlayers" min='1' max="20" required>
+        <input id="numberPlayers" type="number" name="numberPlayers" [(ngModel)]="numberPlayers" (ngModelChange)="changePlayersArray($event)" min='1' max="10" required>
+        <div class='separationLine'></div>
+        <p id="detailsTitle">Players details</p>
+        <div class="editPlayerDetails">
+            <label for="playerName">Name:</label>
+            <input type="text" name="playerName" [(ngModel)]="players[selectedPlayerId].name" required>
+            <label for="playerSymbol">Symbol:</label>
+            <select name="playerSymbol" [(ngModel)]="players[selectedPlayerId].symbol">
+                <option value="O">O</option>
+                <option value="X">X</option>
+            </select>
+            <label for="playerColor">Color:</label>
+            <div class="playerColorPanel">
+                <select id="playerColorSelector" name="playerColor" [(ngModel)]="players[selectedPlayerId].color.name" (ngModelChange)="changeColorOwner($event)">
+                    <ng-container *ngFor="let color of colorList; let i = index">
+                    <option *ngIf="color.owner === undefined || color.owner === selectedPlayerId" [ngValue]="color.name">{{ color.name }}</option>
+                    </ng-container>
+                </select>
+                <div id="playerColorDemonstrator" [ngStyle]="{'background-color': players[selectedPlayerId].color.hexValue}"></div>
+            </div>
+            <div id="playerNavigationGroup">
+                <div class='playerNavigation' (click)="onSelectPreviousPlayer()">Previous</div>
+                <div class='playerNavigation' (click)="onSelectNextPlayer()">Next</div>
+            </div>
+        </div>
+        
         <div class="errorsOfForm">{{ errorsOfForm }} </div>
         <button type='submit'>Start game</button>
+       
     </form>
 </div>

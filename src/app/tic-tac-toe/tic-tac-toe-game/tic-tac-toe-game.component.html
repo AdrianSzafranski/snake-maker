@@ -1,6 +1,6 @@
 <div class="game">
     <div class="topPanel" [ngStyle]="{'width': screenWidth}">
-        {{ gameParameters.players[playerTurn][0] }} turn
+        {{ gameParameters.players[playerTurn].name }} turn
     </div>
     <div class="centerPanel" [ngStyle]="getSizeCenterPanel()">
         <div class="board">

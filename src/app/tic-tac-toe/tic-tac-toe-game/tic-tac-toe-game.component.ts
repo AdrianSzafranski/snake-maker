@@ -10,8 +10,8 @@ export class TicTacToeGameComponent implements OnInit{
   
   @ViewChild('winningLine') winningLine!: ElementRef;
 
-  screenWidth: number = 90;
-  screenHeight: number = 90;
+  screenWidth: number = 80;
+  screenHeight: number = 80;
   screenUnit: string = 'vh';
   gameParameters!: TicTacToeParameters;
 
@@ -27,7 +27,7 @@ export class TicTacToeGameComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.gameParameters = this.ticTacToeService.gameParameters;
+    this.gameParameters = this.ticTacToeService.getGameParameters();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -52,21 +52,21 @@ export class TicTacToeGameComponent implements OnInit{
     let isFieldUsed = this.gameParameters.boardState[rowNumber][columnNumber] !== "";
     if(isFieldUsed) return;
 
-    this.gameParameters.boardState[rowNumber][columnNumber] = this.gameParameters.players[this.playerTurn][1];
+    this.gameParameters.boardState[rowNumber][columnNumber] = this.gameParameters.players[this.playerTurn].symbol;
 
-    let isDrawCircle = this.gameParameters.players[this.playerTurn][1] === 'O';
+    let isDrawCircle = this.gameParameters.players[this.playerTurn].symbol === 'O';
     if(isDrawCircle) {
 
       const circleDiv = this.renderer.createElement('div');
       this.renderer.addClass(circleDiv, 'circle');
-      this.renderer.setStyle(circleDiv, 'border', `2px solid ${this.gameParameters.players[this.playerTurn][2]}`);
+      this.renderer.setStyle(circleDiv, 'border', `2px solid ${this.gameParameters.players[this.playerTurn].color.hexValue}`);
       this.renderer.appendChild(boardFieldElement, circleDiv);
     } else {
       const crossDiv = this.renderer.createElement('div');
       const lineDiv = this.renderer.createElement('div');
       this.renderer.addClass(crossDiv, 'cross');
       this.renderer.addClass(lineDiv, 'line');
-      this.renderer.setStyle(lineDiv, 'background-color', this.gameParameters.players[this.playerTurn][2]);
+      this.renderer.setStyle(lineDiv, 'background-color', this.gameParameters.players[this.playerTurn].color.hexValue);
       this.renderer.appendChild(crossDiv, lineDiv);
 
       const secondLineDiv = lineDiv.cloneNode(true);
@@ -93,7 +93,7 @@ export class TicTacToeGameComponent implements OnInit{
       let halfBoardFieldSizeInUnit =  boardFieldSizeInPercent / 2;
       let topOrLeftLinePosition = 
         singleEmptyOutsideArea + 
-        boardSizeInPercent * this.winningElement.index + 
+        boardFieldSizeInPercent * this.winningElement.index + 
         halfBoardFieldSizeInUnit - 
         lineWidthInPercent / 2;
       
@@ -116,14 +116,19 @@ export class TicTacToeGameComponent implements OnInit{
           left = topOrLeftLinePosition;
           break;
         case 'firstDiagonal': 
-          width = 100;
+          width = 95 * Math.sqrt(2);
           height = lineWidthInPercent;
           top = singleEmptyOutsideArea + boardSizeInPercent /2;
-          left = 0;
+          left = singleEmptyOutsideArea - (95 * Math.sqrt(2) - 95) /2;
           this.renderer.setStyle(this.winningLine.nativeElement, 'transform', `rotate(45deg)`);
           break;
         case 'secondDiagonal': 
-         
+          width = 95 * Math.sqrt(2);
+          height = lineWidthInPercent;
+          top = singleEmptyOutsideArea + boardSizeInPercent /2;
+          left = singleEmptyOutsideArea - (95 * Math.sqrt(2) - 95) /2;
+          this.renderer.setStyle(this.winningLine.nativeElement, 'transform', `rotate(-45deg)`);
+          break;
         
       }
 
@@ -210,7 +215,7 @@ export class TicTacToeGameComponent implements OnInit{
 
   setWinnerAndWinnerFields(typeOfBoardElement: string, elementIndex: number) {
     this.winningElement = {type: typeOfBoardElement, index: elementIndex};
-    this.gameResult = this.gameParameters.players[this.playerTurn][0] + "  won!";
+    this.gameResult = this.gameParameters.players[this.playerTurn].name + "  won!";
   }
 
   isDraw() {
