@@ -16,10 +16,16 @@
     border: 3px solid black;
 }
 .board {
-    width:100%;
+    width: 100%;
     position: absolute;
     z-index: 1;
-    padding: 20px;
+    padding: 2.5%;
+}
+.winningLine {
+    position: absolute;
+    background-color: rgb(235, 158, 146);
+    z-index: 2;
+    visibility: hidden;
 }
 .boardRow {
     display: flex;
@@ -44,7 +50,7 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    z-index: 2;
+    z-index: 3;
 
 }
 .boardField {
@@ -60,9 +66,6 @@
     display: flex;
     justify-content: center; /* Wyśrodkowanie w poziomie */
     align-items: center; /* Wyśrodkowanie w pionie */
-}
-.winningField {
-    background-color: rgb(140, 105, 90);
 }
 .circle {
     width: 90%;

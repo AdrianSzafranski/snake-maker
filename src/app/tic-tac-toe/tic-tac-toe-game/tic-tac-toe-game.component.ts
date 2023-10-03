@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, Renderer2 } from '@angular/core';
+import { Component, OnInit, HostListener, Renderer2, ViewChild, ElementRef } from '@angular/core';
 import { TicTacToeService } from '../tic-tac-toe.service';
 import { TicTacToeParameters } from '../tic-tac-toe-parameters.model';
 @Component({
@@ -8,8 +8,11 @@ import { TicTacToeParameters } from '../tic-tac-toe-parameters.model';
 })
 export class TicTacToeGameComponent implements OnInit{
   
-  screenWidth: string = '400px';
-  screenHeight: string = '400px';
+  @ViewChild('winningLine') winningLine!: ElementRef;
+
+  screenWidth: number = 90;
+  screenHeight: number = 90;
+  screenUnit: string = 'vh';
   gameParameters!: TicTacToeParameters;
 
   playerTurn = 0;
@@ -30,19 +33,17 @@ export class TicTacToeGameComponent implements OnInit{
   @HostListener('window:resize', ['$event'])
   getScreenSize(event?: Event): void {
     if(window.innerHeight >= window.innerWidth) {
-      this.screenWidth = '90vw';
-      this.screenHeight = '90vw';
+      this.screenUnit = 'vw';
     } else {
-      this.screenWidth = '90vh';
-      this.screenHeight = '90vh';
+      this.screenUnit = 'vh';
     }
 
   }
 
   getSizeCenterPanel() {
     return {
-      'width': `${this.screenWidth}`,
-      'height': `${this.screenHeight}`
+      'width': `${this.screenWidth}${this.screenUnit}`,
+      'height': `${this.screenHeight}${this.screenUnit}`
     }
   }
  
@@ -77,6 +78,62 @@ export class TicTacToeGameComponent implements OnInit{
 
     this.isWinner(rowNumber, columnNumber);
     this.isDraw();
+
+    const isGameOver = this.gameResult !== '';
+    if(isGameOver) {
+
+      // board has 5% padding
+      // centerPanel = '2.5% empty area' + board(95%) + '2.5% empty area'
+      let boardSizeInPercent = 95;
+      let paddingInPercent = 5;
+      let singleEmptyOutsideArea = paddingInPercent / 2;
+      let lineWidthInPercent = 0.5;
+
+      let boardFieldSizeInPercent = boardSizeInPercent / this.gameParameters.boardSize;
+      let halfBoardFieldSizeInUnit =  boardFieldSizeInPercent / 2;
+      let topOrLeftLinePosition = 
+        singleEmptyOutsideArea + 
+        boardSizeInPercent * this.winningElement.index + 
+        halfBoardFieldSizeInUnit - 
+        lineWidthInPercent / 2;
+      
+      let width = 0;
+      let height = 0;
+      let top = 0;
+      let left = 0;
+
+      switch(this.winningElement.type) {
+        case 'row': 
+          width = boardSizeInPercent;
+          height = lineWidthInPercent;
+          top = topOrLeftLinePosition;
+          left = singleEmptyOutsideArea;
+          break;
+        case 'column': 
+          width = lineWidthInPercent;
+          height = boardSizeInPercent;
+          top =  singleEmptyOutsideArea;
+          left = topOrLeftLinePosition;
+          break;
+        case 'firstDiagonal': 
+          width = 100;
+          height = lineWidthInPercent;
+          top = singleEmptyOutsideArea + boardSizeInPercent /2;
+          left = 0;
+          this.renderer.setStyle(this.winningLine.nativeElement, 'transform', `rotate(45deg)`);
+          break;
+        case 'secondDiagonal': 
+         
+        
+      }
+
+      this.renderer.setStyle(this.winningLine.nativeElement, 'width', `${width}%`);
+      this.renderer.setStyle(this.winningLine.nativeElement, 'height', `${height}%`);
+      this.renderer.setStyle(this.winningLine.nativeElement, 'top', `${top}%`);
+      this.renderer.setStyle(this.winningLine.nativeElement, 'left', `${left}%`);
+      this.renderer.setStyle(this.winningLine.nativeElement, 'visibility', `visible`);
+      
+    }
 
     this.playerTurn = this.playerTurn + 1 <  this.gameParameters.players.length ? this.playerTurn + 1 : 0; 
   }
@@ -154,22 +211,6 @@ export class TicTacToeGameComponent implements OnInit{
   setWinnerAndWinnerFields(typeOfBoardElement: string, elementIndex: number) {
     this.winningElement = {type: typeOfBoardElement, index: elementIndex};
     this.gameResult = this.gameParameters.players[this.playerTurn][0] + "  won!";
-  }
-
-  isWinningField(rowNumber: number, columnNumber: number) {
-
-    switch(this.winningElement.type) {
-      case 'row': 
-        if(rowNumber == this.winningElement.index) return true; break;
-      case 'column': 
-        if(columnNumber == this.winningElement.index) return true; break;
-      case 'firstDiagonal': 
-        if(columnNumber == rowNumber) return true; break;
-      case 'secondDiagonal': 
-        if(columnNumber + rowNumber === this.gameParameters.boardSize - 1) return true; break;
-     
-    }
-    return false;
   }
 
   isDraw() {
