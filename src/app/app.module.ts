@@ -7,13 +7,15 @@ import { TicTacToeComponent } from './tic-tac-toe/tic-tac-toe.component';
 import { TicTacToeSetupComponent } from './tic-tac-toe/tic-tac-toe-setup/tic-tac-toe-setup.component';
 import { TicTacToeGameComponent } from './tic-tac-toe/tic-tac-toe-game/tic-tac-toe-game.component';
 import { FormsModule } from '@angular/forms';
+import { SnakeComponent } from './snake/snake.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TicTacToeComponent,
     TicTacToeSetupComponent,
-    TicTacToeGameComponent
+    TicTacToeGameComponent,
+    SnakeComponent
   ],
   imports: [
     BrowserModule,
