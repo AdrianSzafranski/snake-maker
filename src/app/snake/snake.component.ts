@@ -27,7 +27,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   isGameOver!: boolean;
   time = 1000/30;
   l: DOMHighResTimeStamp = 0.0;
-  timeToPassOneElementInSeconds = 0.09; //0.07
+  timeToPassOneElementInSeconds = 0.13; //0.07
   timeElapsedInSeconds = 0;
   backgroundColor = "#111738";
   constructor() {}
@@ -63,13 +63,13 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     
 
     let initYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
-    this.yellowFood = new SnakeFoodModel(initYellowFoodCoord, 'yellow', 1);
+    this.yellowFood = new SnakeFoodModel(initYellowFoodCoord, 'rgb(243, 245, 108)', 1);
 
     let initOrangeFoodCoord = this.board.setItemToRandElement('orangeFood');
-    this.orangeFood = new SnakeFoodModel(initOrangeFoodCoord, 'orange', 2);
+    this.orangeFood = new SnakeFoodModel(initOrangeFoodCoord, 'rgb(245, 195, 108)', 2);
 
     let initRedFoodCoord = this.board.setItemToRandElement('redFood')
-    this.redFood = new SnakeFoodModel(initRedFoodCoord, 'red', 3);
+    this.redFood = new SnakeFoodModel(initRedFoodCoord, 'rgb(245, 108, 108)', 3);
 
     this.obstacles = this.board.setObstaclesToRandElements({ ...initSnakeCoord });
   }
@@ -177,6 +177,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let snakeBody = this.snake.getBody();
    
     let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    
     for(let i= 0; i< snakeLength; i++) {
       
       this.drawRect(
@@ -189,15 +190,20 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       
 
     }
+   
+    
+     let cc = (Math.floor(lastPartOfSnakeBody.x/2)+Math.floor(lastPartOfSnakeBody.y/2)) % 2 == 0 ? '#212c6d' :  this.backgroundColor
+
 
     // remove part of the snake's body
     // The last two parts of the snake are the same when it has eaten the food.
     // Then the snake should grow so that it doesn't lose the last part.
     if(penultimatePartOfSnakeBody == null || !SnakeComponent.isEqualCoordinates(lastPartOfSnakeBody, penultimatePartOfSnakeBody)) {
-      this.drawSnakeShiftHelper({ ...lastPartOfSnakeBody }, directionLastPartOfSnakeBody, shiftFactor,  this.backgroundColor);
+      this.drawSnakeShiftHelper({ ...lastPartOfSnakeBody }, directionLastPartOfSnakeBody, shiftFactor,  cc);
     } 
    
-   
+  
+  
   
     let snakeDestination = this.snake.destination;
     let directionSnakeDestination = snakeHistory[snakeHistory.length - 1];
@@ -205,8 +211,10 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.drawSnakeShiftHelper({ ...snakeDestination }, directionSnakeDestination, shiftFactor, this.snake.getColor(snakeLength));
    
    }
-  
+
   drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: string, shiftFactor: number, color: string) {
+
+    if(!this.canvasContext) return;
     let boardElementLenInPixels = this.board.getElementLengthInPixels();
     let startX, startY, endX, endY;
     switch(direction) {
@@ -242,11 +250,24 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   drawBoard() {
-
     if(!this.canvasContext) return;
-    this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.canvasContext.clearRect(0,0, this.canvas.width, this.canvas.height); 
 
-    this.drawRect(0,0, this.canvas.width, this.canvas.height, this.backgroundColor); 
+    let boardLenInElements = this.board.getLengthInElements();
+    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let isRed = true;
+    for(let i = 0; i < boardLenInElements; i +=2) {
+       isRed = !isRed;
+      for(let j = 0; j < boardLenInElements; j += 2) {
+        let color = isRed ? this.backgroundColor : '#212c6d';
+        console.log(color);
+        this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 2*boardElementLenInPixels, 2*boardElementLenInPixels, color);
+        isRed = !isRed;
+      }
+    }
+    //this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    //this.drawRect(0,0, this.canvas.width, this.canvas.height, this.backgroundColor); 
     this.drawFoods();
     this.drawObstacles();
     this.drawScoreText();

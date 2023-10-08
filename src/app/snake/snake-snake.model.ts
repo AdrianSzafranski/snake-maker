@@ -5,7 +5,7 @@ export class SnakeSnakeModel {
     private body: SnakeCoordinateModel[] = [];
     private historyOfDirections: string[] = [];
     private direction: SnakeCoordinateModel = {x: 0, y: 1};
-    private color = {r: 44, g: 203, b: 60};
+    private color = {r: 131, g: 245, b: 108};
     private directionOfColorChange = {r: 5, g: 3, b: 7};
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
