@@ -69,7 +69,7 @@ export class SnakeSnakeModel {
     }
 
     eat(foodCoordinate: SnakeCoordinateModel) {
-        this.body.splice(1, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
+        this.body.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
     }
 
     setDirection(currentDirection: string) {
@@ -126,14 +126,14 @@ export class SnakeSnakeModel {
 
     getColor(index: number) {
 
-        let r = (this.color.r + 1*index < 255) ? (this.color.r + 1*index) : 255 - ((this.color.r + 1*index) - 255)
-        let g = (this.color.g + 2*index < 255) ? (this.color.g + 2*index) : 255 - ((this.color.g + 2*index) - 255)
-        let b = (this.color.b + 1*index < 255) ? (this.color.b + 1*index) : 255 - ((this.color.b + 1*index) - 255)
+       // let r = (this.color.r + 1*index < 255) ? (this.color.r + 1*index) : 255 - ((this.color.r + 1*index) - 255)
+       // let g = (this.color.g + 2*index < 255) ? (this.color.g + 2*index) : 255 - ((this.color.g + 2*index) - 255)
+       // let b = (this.color.b + 1*index < 255) ? (this.color.b + 1*index) : 255 - ((this.color.b + 1*index) - 255)
 
        
 
         
-        return `rgb(${r}, ${g}, ${b})`;
+        return `rgb(${this.color.r}, ${this.color.g}, ${this.color.b})`;
     }
 
 

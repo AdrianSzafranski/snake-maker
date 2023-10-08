@@ -27,7 +27,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   isGameOver!: boolean;
   time = 1000/30;
   l: DOMHighResTimeStamp = 0.0;
-  timeToPassOneElementInSeconds = 0.13; //0.07
+  timeToPassOneElementInSeconds = 0.3; //0.07
   timeElapsedInSeconds = 0;
   backgroundColor = "#111738";
   constructor() {}
@@ -36,7 +36,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
     this.currentDirection = 'ArrowDown';
     this.score = 0;
-    this.board = new SnakeBoardModel(400, 20);
+    this.board = new SnakeBoardModel(400, 15);
     this.isGameOver = false;
 
     this.setScreenSize();
@@ -81,7 +81,15 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     return false;
 }
   
-  
+  updateSpeed() {
+    let snakeLength = this.snake.getSnakeLength();
+    if(snakeLength <= 10) {
+      this.timeToPassOneElementInSeconds = 0.3 - snakeLength*0.01;
+    } else if(snakeLength < 35) {
+      this.timeToPassOneElementInSeconds = 0.2 - (snakeLength-10)*0.005;
+    }
+   
+  }
 
   update(currentTime: DOMHighResTimeStamp) {
   
@@ -90,7 +98,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     
     this.timeElapsedInSeconds += deltaTime;
     while(this.timeElapsedInSeconds >= this.timeToPassOneElementInSeconds) {
-
+      
       this.drawBoard();
       this.drawSnakeShift(1);
       
@@ -110,6 +118,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       if(this.isGameOver) return;
 
       this.timeElapsedInSeconds -= this.timeToPassOneElementInSeconds;
+      this.updateSpeed();
       this.drawScoreText();
     }
     
@@ -192,7 +201,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     }
    
     
-     let cc = (Math.floor(lastPartOfSnakeBody.x/2)+Math.floor(lastPartOfSnakeBody.y/2)) % 2 == 0 ? '#212c6d' :  this.backgroundColor
+     let cc = (lastPartOfSnakeBody.x+lastPartOfSnakeBody.y) % 2 == 0 ? '#212c6d' :  this.backgroundColor
 
 
     // remove part of the snake's body
@@ -209,7 +218,13 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let directionSnakeDestination = snakeHistory[snakeHistory.length - 1];
     // add part of the snake's body
     this.drawSnakeShiftHelper({ ...snakeDestination }, directionSnakeDestination, shiftFactor, this.snake.getColor(snakeLength));
+    
    
+    for(let i = 0; i <  this.board.getLengthInElements(); i +=1) {
+     for(let j = 0; j <  this.board.getLengthInElements(); j += 1) {
+      this.drawRectBorder2(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels);
+     }
+   }
    }
 
   drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: string, shiftFactor: number, color: string) {
@@ -256,12 +271,13 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let boardLenInElements = this.board.getLengthInElements();
     let boardElementLenInPixels = this.board.getElementLengthInPixels();
     let isRed = true;
-    for(let i = 0; i < boardLenInElements; i +=2) {
-       isRed = !isRed;
-      for(let j = 0; j < boardLenInElements; j += 2) {
-        let color = isRed ? this.backgroundColor : '#212c6d';
+    for(let i = 0; i < boardLenInElements; i +=1) {
+     
+      for(let j = 0; j < boardLenInElements; j += 1) {
+        let color = !isRed ? this.backgroundColor : '#212c6d';
         console.log(color);
-        this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 2*boardElementLenInPixels, 2*boardElementLenInPixels, color);
+        this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels, color);
+        this.drawRectBorder2(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels);
         isRed = !isRed;
       }
     }
@@ -290,6 +306,13 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.canvasContext.strokeStyle = "#616161";
     this.canvasContext.lineWidth = 2;
     this.canvasContext.strokeRect(x+1, y+1, width-2, height-2);
+}
+
+drawRectBorder2(x: number, y: number, width: number, height: number) {
+  if(!this.canvasContext) return;
+  this.canvasContext.strokeStyle = "black";
+  this.canvasContext.lineWidth = 1;
+  this.canvasContext.strokeRect(x, y, width-1, height-1);
 }
 
 
@@ -335,13 +358,13 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
         obstacle.y * boardElementLenInPixels,
         boardElementLenInPixels,
         boardElementLenInPixels,
-        "#c4c3c2");
+        "black");
 
-      this.drawRectBorder(
+      /*this.drawRectBorder(
         obstacle.x * boardElementLenInPixels,
         obstacle.y * boardElementLenInPixels,
         boardElementLenInPixels,
-        boardElementLenInPixels);
+        boardElementLenInPixels);*/
         
     };
   }
