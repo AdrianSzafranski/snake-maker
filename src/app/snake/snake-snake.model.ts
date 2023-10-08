@@ -5,16 +5,17 @@ export class SnakeSnakeModel {
     private body: SnakeCoordinateModel[] = [];
     private historyOfDirections: string[] = [];
     private direction: SnakeCoordinateModel = {x: 0, y: 1};
-    private color = {r: 127, g: 204, b: 190};
-     
+    private color = {r: 44, g: 203, b: 60};
+    private directionOfColorChange = {r: 5, g: 3, b: 7};
+    destination: SnakeCoordinateModel = {x: 0, y:0};
+
     constructor(private coordinate: SnakeCoordinateModel, direction: string) {
         this.body = [{x: this.coordinate.x, y: this.coordinate.y}];
-       
+     
         this.historyOfDirections.push(direction);
        
     }
-    destination: SnakeCoordinateModel = {x: 0, y:0};
-
+  
     move(direction: string) {
        
         this.body.shift();
@@ -121,10 +122,20 @@ export class SnakeSnakeModel {
         return {x: this.body[this.body.length - 1].x, y: this.body[this.body.length - 1].y};
     }
 
-    getColor() {
-        const colorCopy = JSON.parse(JSON.stringify(this.color));
-        return colorCopy;
+    
+
+    getColor(index: number) {
+
+        let r = (this.color.r + 1*index < 255) ? (this.color.r + 1*index) : 255 - ((this.color.r + 1*index) - 255)
+        let g = (this.color.g + 2*index < 255) ? (this.color.g + 2*index) : 255 - ((this.color.g + 2*index) - 255)
+        let b = (this.color.b + 1*index < 255) ? (this.color.b + 1*index) : 255 - ((this.color.b + 1*index) - 255)
+
+       
+
+        
+        return `rgb(${r}, ${g}, ${b})`;
     }
+
 
     addDirectionToHistory(direction: string) {
         this.historyOfDirections.push(direction);
