@@ -25,7 +25,10 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   board!: SnakeBoardModel;
   gameIntervalId!: number;
   isGameOver!: boolean;
-
+  time = 1000/30;
+  l: DOMHighResTimeStamp = 0.0;
+  timeToPassOneElementInSeconds = 0.07;
+  timeElapsedInSeconds = 0;
   constructor() {}
 
   ngOnInit(): void {
@@ -42,13 +45,20 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   ngAfterViewInit() {
     this.canvas = this.canvasRef.nativeElement;
     this.canvasContext = this.canvas.getContext('2d');
-
-    this.gameIntervalId = window.setInterval(() => this.game(), 1000/30);
+    this.drawBoard();
+    this.l = performance.now();
+    this.snake.getDestination(this.board.getLengthInElements());
+    requestAnimationFrame((currentTime) => {
+      
+      this.update(currentTime);
+     
+    });
   }
 
   setInitialItems() {
     let initSnakeCoord = this.board.setItemToRandElement('snake');
-    this.snake = new SnakeSnakeModel(initSnakeCoord);
+    this.board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
+    this.snake = new SnakeSnakeModel(initSnakeCoord, this.currentDirection);
 
     let initYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
     this.yellowFood = new SnakeFoodModel(initYellowFoodCoord, 'yellow', 1);
@@ -62,56 +72,180 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.obstacles = this.board.setObstaclesToRandElements({ ...initSnakeCoord });
   }
 
-  game() {
-    this.update();
-    this.draw();
-  }
+  static isEqualCoordinates(firstCoordinate: SnakeCoordinateModel, secondCoordinate: SnakeCoordinateModel) {
+    if(firstCoordinate.x === secondCoordinate.x && firstCoordinate.y === secondCoordinate.y) {
+        return true;
+    }
+    return false;
+}
+  
+  
 
-  update() {
+  update(currentTime: DOMHighResTimeStamp) {
+  
+    const deltaTime = (currentTime - this.l) / 1000;
+  
+    
+    this.timeElapsedInSeconds += deltaTime;
+    console.log("delta: " + deltaTime, "timeElapsedInSeconds: " + this.timeElapsedInSeconds, "timeToPassOneElementInSeconds: " + this.timeToPassOneElementInSeconds )
+    while(this.timeElapsedInSeconds >= this.timeToPassOneElementInSeconds) {
 
-    this.snake.setDirection(this.currentDirection);
-    const locations = this.snake.move(this.board.getLengthInElements());
-    this.checkNewSnakeCoord(locations.newSnakeCoord);
-    this.board.editSnakeCoordinate(locations);
+
+      this.drawSnakeShift(1);
+      this.currentDirection = this.snake.setDirection(this.currentDirection);
+      let newPartOfSnakeBody = this.snake.move(this.currentDirection);
+      let lastPartOfSnakeBody = this.snake.getBodyPart(0);
+      this.isFood(newPartOfSnakeBody, lastPartOfSnakeBody);
+    
+      let snakeLength = this.snake.getSnakeLength();
+      let newSnakeBodyPart = this.snake.getBodyPart(snakeLength-1);
+      let penultimatePartOfSnakeBody = snakeLength > 1 ? this.snake.getBodyPart(1) : null;
+
+      this.board.editSnakeCoordinate(lastPartOfSnakeBody, penultimatePartOfSnakeBody, newSnakeBodyPart);
+
+      let snakeDestination = this.snake.getDestination(this.board.getLengthInElements());
+      this.isGameOver = this.board.isGameOver(snakeDestination);
+      if(this.isGameOver) return;
+
+      this.timeElapsedInSeconds -= this.timeToPassOneElementInSeconds;
+      this.drawScoreText();
+    }
+    
+   
+    this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
+   
+    this.l = currentTime;
+    setTimeout(() => {
+      requestAnimationFrame((currentTime) => {
+      
+        this.update(currentTime);
+       
+      });;
+    }, this.time);
+  
+    
   } 
 
-  checkNewSnakeCoord(newCoord: SnakeCoordinateModel) {
-    let boardElement = this.board.getElement(newCoord.x, newCoord.y);
-
+  isFood(newPartOfSnakeBody: SnakeCoordinateModel, lastPartOfSnakeBody: SnakeCoordinateModel) {
+    let boardElement = this.board.getElement(newPartOfSnakeBody.x, newPartOfSnakeBody.y);
+  
     switch(boardElement) {
       case 'yellowFood': 
-        this.snake.eat(newCoord);
+        this.snake.eat(lastPartOfSnakeBody);
         let newYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
         this.yellowFood.setCoordinate(newYellowFoodCoord);
+        this.drawFood(newYellowFoodCoord, this.yellowFood.getColor());
         this.score++;
         break;
       case 'orangeFood': 
-        this.snake.eat(newCoord);
+        this.snake.eat(lastPartOfSnakeBody);
         let newOrangeFoodCoord = this.board.setItemToRandElement('orangeFood');
         this.orangeFood.setCoordinate(newOrangeFoodCoord);
+        this.drawFood(newOrangeFoodCoord, this.orangeFood.getColor());
         this.score += 2;
       
         break;
       case 'redFood': 
-        this.snake.eat(newCoord);
+        this.snake.eat(lastPartOfSnakeBody);
         let newRedFoodCoord = this.board.setItemToRandElement('redFood');
         this.redFood.setCoordinate(newRedFoodCoord);
+        this.drawFood(newRedFoodCoord, this.redFood.getColor());
         this.score += 3;
         break;
-      case 'snake': 
-        this.gameOver();
+    }
+
+
+    
+  }
+
+
+
+  drawSnakeShift(shiftFactor: number) {
+    
+    let snakeHistory = this.snake.getHistoryOfDirections();
+  
+    let snakeLength = this.snake.getSnakeLength();
+    let lastPartOfSnakeBody = this.snake.getBody()[0];
+    let penultimatePartOfSnakeBody = snakeLength > 1 ? this.snake.getBodyPart(1) : null;
+    let directionLastPartOfSnakeBody = snakeHistory[snakeHistory.length - snakeLength];
+
+    // remove part of the snake's body
+    // The last two parts of the snake are the same when it has eaten the food.
+    // Then the snake should grow so that it doesn't lose the last part.
+    if(penultimatePartOfSnakeBody == null || !SnakeComponent.isEqualCoordinates(lastPartOfSnakeBody, penultimatePartOfSnakeBody)) {
+      this.drawSnakeShiftHelper({ ...lastPartOfSnakeBody }, directionLastPartOfSnakeBody, shiftFactor, "#424242");
+    } 
+   
+    
+    let snakeDestination = this.snake.destination;
+    let directionSnakeDestination = snakeHistory[snakeHistory.length - 1];
+    // add part of the snake's body
+    this.drawSnakeShiftHelper({ ...snakeDestination }, directionSnakeDestination, shiftFactor, "#00FF00");
+  
+   }
+  
+  drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: string, shiftFactor: number, color: string) {
+    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let startX, startY, endX, endY;
+    switch(direction) {
+      case 'ArrowUp':
+        startX = drawCoord.x * boardElementLenInPixels;
+        startY = drawCoord.y * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+        endX = boardElementLenInPixels
+        endY = boardElementLenInPixels * shiftFactor;
+        this.drawRect(startX, startY, endX, endY, color);
         break;
-      case 'obstacle':
-        this.gameOver();
+      case 'ArrowRight':
+        startX = drawCoord.x * boardElementLenInPixels;
+        startY = drawCoord.y * boardElementLenInPixels;
+        endX = boardElementLenInPixels * shiftFactor;
+        endY = boardElementLenInPixels;
+        this.drawRect(startX, startY, endX, endY, color);
+        break;
+      case 'ArrowDown':
+        startX = drawCoord.x * boardElementLenInPixels;
+        startY = drawCoord.y * boardElementLenInPixels;
+        endX = boardElementLenInPixels
+        endY = boardElementLenInPixels * shiftFactor;
+        this.drawRect(startX, startY, endX, endY, color);
+        break;
+      case 'ArrowLeft':
+        startX = drawCoord.x * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+        startY = drawCoord.y * boardElementLenInPixels; ;
+        endX = boardElementLenInPixels * shiftFactor;
+        endY = boardElementLenInPixels;
+        this.drawRect(startX, startY, endX, endY, color);
         break;
     }
   }
 
-  draw() {
+  drawBoard() {
 
     if(!this.canvasContext) return;
     this.canvasContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawRect(0,0, this.canvas.width, this.canvas.height, "#424242");
+
+    //background
+    this.drawRect(0,0, this.canvas.width, this.canvas.height, "#424242"); 
+    
+    this.drawSnake();
+    this.drawFoods();
+    this.drawObstacles();
+    this.drawScoreText();
+   
+    if(this.isGameOver) {
+      this.drawGameOverText();
+    }
+  }
+
+
+  drawRect(x: number, y: number, width: number, height: number, color: string) {
+      if(!this.canvasContext) return;
+      this.canvasContext.fillStyle = color;
+      this.canvasContext.fillRect(x, y, width, height);
+  }
+
+
+  drawSnake() {
     let snakeBody = this.snake.getBody();
     let snakeColor = this.snake.getColor();
     let boardElementLenInPixels = this.board.getElementLengthInPixels();
@@ -136,16 +270,24 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       }
 
     });
+  }
 
-    let foods = [this.yellowFood, this.orangeFood, this.redFood];
+  drawScoreText() {
+    let boardElementLenInPixels = this.board.getElementLengthInPixels();
 
-    for(let food of foods) {
-      let foodCoordinate = food.getCoordinate();
-      let centerX = foodCoordinate.x * boardElementLenInPixels + boardElementLenInPixels / 2;
-      let centerY = foodCoordinate.y * boardElementLenInPixels + boardElementLenInPixels / 2;
-      let radius =  boardElementLenInPixels / 2 - 2.5;
-      this.drawCircle(centerX, centerY, radius, food.getColor());
-    }
+    if(!this.canvasContext) return;
+    this.canvasContext.font = `${boardElementLenInPixels}px Arial`;
+    this.canvasContext.fillStyle = "#7fccbe";
+    this.canvasContext.fillText(
+      "Score: " + this.score, 
+      0, 
+      boardElementLenInPixels);
+   
+  }
+
+  drawObstacles() {
+
+    let boardElementLenInPixels = this.board.getElementLengthInPixels();
 
     for(let obstacle of this.obstacles) {
       
@@ -155,29 +297,28 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
         boardElementLenInPixels,
         boardElementLenInPixels,
         'black');
-
     };
+  }
 
-    this.canvasContext.font = `${boardElementLenInPixels}px Arial`;
-    this.canvasContext.fillStyle = "#7fccbe";
-    this.canvasContext.fillText(
-      "Score: " + this.score, 
-      0, 
-      boardElementLenInPixels);
-   
-    if(this.isGameOver) {
-      this.drawGameOverInfo();
+  drawFoods() {
+
+    let foods = [this.yellowFood, this.orangeFood, this.redFood];
+
+    for(let food of foods) {
+      let foodCoordinate = food.getCoordinate();
+      let foodColor = food.getColor();
+      this.drawFood( { ...foodCoordinate}, foodColor);
     }
   }
 
-  drawRect(x: number, y: number, width: number, height: number, color: string) {
-      if(!this.canvasContext) return;
-      this.canvasContext.fillStyle = color;
-      this.canvasContext.fillRect(x, y, width, height);
-  }
+  drawFood(foodCoordinate: SnakeCoordinateModel, color: string) {
 
-  drawCircle(centerX: number, centerY: number, radius: number, color: string) {
+    let boardElementLenInPixels = this.board.getElementLengthInPixels();
 
+    let centerX = foodCoordinate.x * boardElementLenInPixels + boardElementLenInPixels / 2;
+    let centerY = foodCoordinate.y * boardElementLenInPixels + boardElementLenInPixels / 2;
+    let radius =  boardElementLenInPixels / 2 - 2.5;
+   
     if(!this.canvasContext) return;
     this.canvasContext.fillStyle = color;
     this.canvasContext.beginPath();
@@ -185,18 +326,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.canvasContext.fill();
   }
 
-  gameOver() {
-    // Zatrzymywanie setInterval w innej metodzie
-    if (this.gameIntervalId) {
-      clearInterval(this.gameIntervalId);
-    }
-    this.isGameOver = true;
-  }
-
-  drawGameOverInfo() {
+  drawGameOverText() {
     if(!this.canvasContext) return;
    
-    console.log('ff');
     let boardElementLenInPixels = this.board.getElementLengthInPixels();
 
     this.canvasContext.font = `${boardElementLenInPixels*3}px Arial`;
@@ -219,7 +351,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.board.setLengthInPixels(newBoardLengthInPixels);
     
     if(this.isGameOver) {
-      this.draw();
+      this.drawBoard();
     }
   }
 

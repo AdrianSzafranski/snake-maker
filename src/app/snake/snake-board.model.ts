@@ -1,4 +1,5 @@
 import { SnakeCoordinateModel } from "./snake-coordinate.model";
+import { SnakeComponent } from "./snake.component";
 
 export class SnakeBoardModel {
 
@@ -50,7 +51,7 @@ export class SnakeBoardModel {
         }
         this.elements[randCoord.x][randCoord.y] = item;
     
-        return {x: randCoord.x, y: randCoord.y};
+        return { ...randCoord };
     }
 
     setObstaclesToRandElements(snakeCoord: SnakeCoordinateModel) {
@@ -132,16 +133,32 @@ export class SnakeBoardModel {
         return {x: x, y: y};
     }
 
-    editSnakeCoordinate(locations: { oldSnakeCoord: SnakeCoordinateModel, newSnakeCoord: SnakeCoordinateModel}) {
-        
-        let oldSnakeCoord = locations.oldSnakeCoord;
-        let newSnakeCoord = locations.newSnakeCoord;
-
-        if( this.elements[oldSnakeCoord.x][oldSnakeCoord.y] === 'snake') {
-            this.elements[oldSnakeCoord.x][oldSnakeCoord.y] = '';
-        }
+    editSnakeCoordinate(lastPartOfSnakeBody: SnakeCoordinateModel, penultimatePartOfSnakeBody: SnakeCoordinateModel | null, newSnakeCoord: SnakeCoordinateModel) {
+   
         this.elements[newSnakeCoord.x][newSnakeCoord.y] = 'snake';
+        
+        // The last two parts of the snake are the same when it has eaten the food.
+        // Then the snake should grow so that it doesn't lose the last part.
+        if(penultimatePartOfSnakeBody !==null && SnakeComponent.isEqualCoordinates(lastPartOfSnakeBody, penultimatePartOfSnakeBody)) {
+            return;
+        }
+
+        this.elements[lastPartOfSnakeBody.x][lastPartOfSnakeBody.y] = '';
     }
+
+ 
+
+    
+  isGameOver(snakeDestination: SnakeCoordinateModel) {
+    let destinationElement = this.elements[snakeDestination.x][snakeDestination.y];
+    console.log(destinationElement);
+    if(destinationElement === 'snake' || destinationElement === 'obstacle') {
+        return true;
+    }
+    return false;
+  }
+
+   
 
 }
 
