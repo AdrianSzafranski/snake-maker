@@ -1,6 +1,17 @@
-<canvas 
-    id="canvas" 
-    [width]='board.getLengthInPixels()' 
-    [height]='board.getLengthInPixels()' 
-    #canvas>
-</canvas>
+<div id='container'>
+    <canvas 
+        id="canvas" 
+        [width]='board.getLengthInPixels()' 
+        [height]='board.getLengthInPixels()' 
+        #canvas>
+    </canvas>
+    <div id='sidePanel'>
+        <p class='currentScore'>Current Score: {{ score }} </p>
+        <p class='bestScore'>Best Score: {{ bestScore }} </p>
+        <div id="buttonGroup">
+            <button (click)="restartMap()">Restart Map</button>
+            <button (click)="generateMap()">Generate map</button>
+        </div>
+       
+    </div>
+</div>

@@ -1,4 +1,64 @@
-#canvas {
+#container {
     margin-top: 2%;
-    border: 5px solid black;
+    display: flex;
+    width: 100%;
 }
+#canvas {
+   
+    border: 5px solid rgb(72, 72, 72);
+}
+#sidePanel {
+    
+    text-align: center;
+    margin-left: 20px;
+    min-width: 30%;
+    max-height: 200px;
+    background-color: #111738;
+    border: 5px solid black;
+    padding: 5px;
+}
+.currentScore, .bestScore {
+    font-size:1.5em;
+    margin-bottom: 20px;
+}
+
+#buttonGroup {
+    display: flex;
+}
+button {
+    width: 40%;
+    margin: 20px auto 0 auto;
+    padding: 10px 20px;
+    background-color: #365d55;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid #1d322e;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button {
+    background-color: #94c5e3;
+    border: 1px solid #1d2b32;
+    color: black;
+    padding: 5px 10px;
+}
+button:hover {
+    background-color: #497c9c;
+}
+  
+button:active {
+    background-color: #6eadd4;
+}
+@media (max-width: 768px) {
+    #container {
+      flex-direction: column;
+    }
+    #sidePanel {
+        margin-top: 10px;
+        margin-left: 0px;
+     
+    }
+  }

@@ -22,6 +22,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   obstacles!: SnakeCoordinateModel[];
   currentDirection!: string
   score!: number;
+  bestScore = 0;
   board!: SnakeBoardModel;
   gameIntervalId!: number;
   isGameOver!: boolean;
@@ -30,6 +31,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   timeToPassOneElementInSeconds = 0.3; //0.07
   timeElapsedInSeconds = 0;
   backgroundColor = "#111738";
+  initSnakeCoord !: SnakeCoordinateModel;
   constructor() {}
 
   ngOnInit(): void {
@@ -57,9 +59,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   setInitialItems() {
-    let initSnakeCoord = this.board.setItemToRandElement('snake');
-    this.board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
-    this.snake = new SnakeSnakeModel(initSnakeCoord, this.currentDirection);
+    this.initSnakeCoord = this.board.setItemToRandElement('snake');
+    this.board.setElement(this.initSnakeCoord.x, this.initSnakeCoord.y, '');
+    this.snake = new SnakeSnakeModel( {...this.initSnakeCoord}, this.currentDirection);
     
 
     let initYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
@@ -71,7 +73,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let initRedFoodCoord = this.board.setItemToRandElement('redFood')
     this.redFood = new SnakeFoodModel(initRedFoodCoord, 'rgb(245, 108, 108)', 3);
 
-    this.obstacles = this.board.setObstaclesToRandElements({ ...initSnakeCoord });
+    this.obstacles = this.board.setObstaclesToRandElements({ ...this.initSnakeCoord });
   }
 
   static isEqualCoordinates(firstCoordinate: SnakeCoordinateModel, secondCoordinate: SnakeCoordinateModel) {
@@ -115,16 +117,18 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
       let snakeDestination = this.snake.getDestination(this.board.getLengthInElements());
       this.isGameOver = this.board.isGameOver(snakeDestination);
-      if(this.isGameOver) return;
-
+      if(this.isGameOver) {
+        if(this.bestScore < this.score) {
+          this.bestScore = this.score;
+        } 
+        return;
+      }
       this.timeElapsedInSeconds -= this.timeToPassOneElementInSeconds;
       this.updateSpeed();
-      this.drawScoreText();
     }
     
    
     this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
-   
     this.l = currentTime;
     setTimeout(() => {
       requestAnimationFrame((currentTime) => {
@@ -275,7 +279,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
      
       for(let j = 0; j < boardLenInElements; j += 1) {
         let color = !isRed ? this.backgroundColor : '#212c6d';
-        console.log(color);
+        
         this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels, color);
         this.drawRectBorder2(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels);
         isRed = !isRed;
@@ -286,9 +290,11 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     //this.drawRect(0,0, this.canvas.width, this.canvas.height, this.backgroundColor); 
     this.drawFoods();
     this.drawObstacles();
-    this.drawScoreText();
+
    
     if(this.isGameOver) {
+     
+      this.score = 0;
       this.drawGameOverText();
     }
   }
@@ -332,19 +338,6 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
       
 
     });
-  }
-
-  drawScoreText() {
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
-
-    if(!this.canvasContext) return;
-    this.canvasContext.font = `${boardElementLenInPixels}px Arial`;
-    this.canvasContext.fillStyle = "#7fccbe";
-    this.canvasContext.fillText(
-      "Score: " + this.score, 
-      0, 
-      boardElementLenInPixels);
-   
   }
 
   drawObstacles() {
@@ -406,6 +399,49 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
       "You lost!", 
       this.canvas.width / 5, 
       this.canvas.height / 2);
+  }
+
+  generateMap() {
+    this.timeElapsedInSeconds = 0;
+    this.currentDirection = 'ArrowDown';
+    this.score = 0;
+    this.board = new SnakeBoardModel(400, 15);
+    this.isGameOver = false;
+    
+    this.setScreenSize();
+
+    
+    this.setInitialItems();
+    this.snake.getDestination(this.board.getLengthInElements());
+  }
+
+  restartMap() {
+    this.timeElapsedInSeconds = 0;
+    this.isGameOver = false;
+    this.score = 0;
+    this.board = new SnakeBoardModel(400, 15);
+    
+    console.log(this.initSnakeCoord.x)
+    this.setScreenSize();
+   
+    this.board.setElement(this.initSnakeCoord.x, this.initSnakeCoord.y, '');
+    this.snake = new SnakeSnakeModel({ ...this.initSnakeCoord }, this.currentDirection);
+    this.snake.destination = {x: this.initSnakeCoord.x, y: this.initSnakeCoord.y};
+    this.currentDirection = "ArrowDown";
+    for(let obstacle of this.obstacles) {
+      this.board.setElement(obstacle.x, obstacle.y, 'obstacle');
+    }
+
+    let initYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
+    this.yellowFood = new SnakeFoodModel(initYellowFoodCoord, 'rgb(243, 245, 108)', 1);
+
+    let initOrangeFoodCoord = this.board.setItemToRandElement('orangeFood');
+    this.orangeFood = new SnakeFoodModel(initOrangeFoodCoord, 'rgb(245, 195, 108)', 2);
+
+    let initRedFoodCoord = this.board.setItemToRandElement('redFood')
+    this.redFood = new SnakeFoodModel(initRedFoodCoord, 'rgb(245, 108, 108)', 3);
+    
+   
   }
 
   @HostListener('window:resize', ['$event'])
