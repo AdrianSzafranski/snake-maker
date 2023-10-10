@@ -68,8 +68,10 @@ export class SnakeSnakeModel {
         
     }
 
-    eat(foodCoordinate: SnakeCoordinateModel) {
-        this.body.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
+    eat(foodCoordinate: SnakeCoordinateModel, elongationNumber: number) {
+        for(let i = 0; i < elongationNumber; i++) {
+            this.body.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
+        }
     }
 
     setDirection(currentDirection: string) {

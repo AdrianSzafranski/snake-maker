@@ -2,8 +2,63 @@ import { SnakeCoordinateModel } from "./snake-coordinate.model";
 
 export class SnakeFoodModel {
 
-
-    constructor(private coordinate: SnakeCoordinateModel, private color: string, private value: number){ }
+    speedModifier: number;
+    elongationNumber: number;
+    value: number;
+    sign: string;
+    color: string;
+    constructor(private coordinate: SnakeCoordinateModel, private type: string){ 
+        switch(this.type) {
+            case 'normal':
+                this.speedModifier = 1;
+                this.elongationNumber = 1;
+                this.value = 1;
+                this.sign = 'N';
+                this.color = 'rgb(243, 245, 108)';
+                break;
+            case 'speed':
+                this.speedModifier = 2;
+                this.elongationNumber = 0;
+                this.value = 1;
+                this.sign = 'S';
+                this.color = 'rgb(245, 108, 108)';
+                break;
+            case 'length':
+                this.speedModifier = 0;
+                this.elongationNumber = 2;
+                this.value = 1;
+                this.sign = 'L';
+                this.color = 'rgb(245, 195, 108)';
+                break;
+            case 'fortune':
+                this.speedModifier = 0;
+                this.elongationNumber = 0;
+                this.value = 5;
+                this.sign = 'F';
+                this.color = 'rgb(245, 108, 238)';
+                break;
+            case 'waste':
+                this.speedModifier = 0;
+                this.elongationNumber = 0;
+                this.value = -5;
+                this.sign = 'W';
+                this.color = 'rgb(245, 108, 238)';
+                break;
+            case 'casino':
+                this.speedModifier = 0;
+                this.elongationNumber = 0;
+                this.value = Math.floor(Math.random() * 11) - 5;
+                this.sign = '$';
+                this.color = 'rgb(245, 108, 238)';
+                break;
+            default: 
+                this.speedModifier = 1;
+                this.elongationNumber = 1;
+                this.value = 1;
+                this.sign = 'N';
+                this.color = 'rgb(243, 245, 108)';
+        }
+    }
 
     setCoordinate(coordinate: SnakeCoordinateModel) {
         this.coordinate = {x: coordinate.x, y: coordinate.y};
@@ -15,5 +70,21 @@ export class SnakeFoodModel {
 
     getColor() {
         return this.color;
+    }
+
+    getElongationNumber() {
+        return this.elongationNumber;
+    }
+
+    getSpeedModifier() {
+        return this.speedModifier;
+    }
+
+    getValue() {
+        return this.value;
+    }
+
+    getSign() {
+        return this.sign;
     }
 }
