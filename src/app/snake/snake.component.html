@@ -1,17 +1,25 @@
 <div id='container'>
+    <div id='topPanel'>
+        <p class='bestScore'>Best Score: {{ bestScore }} </p>
+        <p class='currentScore'>Current Score: {{ score }} </p>
+        <div class="optionsContainer">
+            <li class="options">
+                <div class="optionsTitle">
+                    <div class="optionsTitleText">Options</div>
+                    <div class="optionsTitleArrow">&#9662;</div>
+                </div>  
+                <ul class="dropDownOptions">
+                    <li class="option">Restart game</li>
+                    <li class="option">Generate new map</li>
+                </ul>
+            </li>
+        </div>    
+    </div>
     <canvas 
         id="canvas" 
         [width]='board.getLengthInPixels()' 
         [height]='board.getLengthInPixels()' 
         #canvas>
     </canvas>
-    <div id='sidePanel'>
-        <p class='currentScore'>Current Score: {{ score }} </p>
-        <p class='bestScore'>Best Score: {{ bestScore }} </p>
-        <div id="buttonGroup">
-            <button (click)="restartMap()">Restart Map</button>
-            <button (click)="generateMap()">Generate map</button>
-        </div>
-       
-    </div>
+   
 </div>

@@ -10,9 +10,11 @@ import { SnakeBoardModel } from './snake-board.model';
   styleUrls: ['./snake.component.css']
 })
 export class SnakeComponent implements OnInit, AfterViewInit  {
-  
+
+  @ViewChild('hamburgerMenu') hamburgerMenu?: ElementRef;
   @ViewChild('canvas') canvasRef!: ElementRef;
 
+  isHamburgerMenuOpen = false;
   canvas!: HTMLCanvasElement;
   canvasContext!: CanvasRenderingContext2D | null;
   snake!: SnakeSnakeModel;
@@ -34,6 +36,11 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   backgroundColor = "#111738";
   initSnakeCoord !: SnakeCoordinateModel;
   constructor() {}
+
+  onCloseHamburgerMenu() {
+    this.isHamburgerMenuOpen = false;
+  }
+
 
   ngOnInit(): void {
 
@@ -444,8 +451,8 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   @HostListener('window:resize', ['$event'])
   setScreenSize(event?: Event): void {
     let newBoardLengthInPixels = (window.innerHeight >= window.innerWidth)
-      ? Math.floor(window.innerWidth * 0.9)
-      : Math.floor(window.innerHeight * 0.9);
+      ? Math.floor(window.innerWidth * 0.85)
+      : Math.floor(window.innerHeight * 0.85);
 
     // give the largest number less than "newLengthInPixels" divisible by "this.getLengthInElements"
     newBoardLengthInPixels = newBoardLengthInPixels - newBoardLengthInPixels % this.board.getLengthInElements();
@@ -464,5 +471,13 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
       if(possibleDirection.includes(event.key)) {
         this.currentDirection = event.key;
       }
+  }
+
+  @HostListener('document:click', ['$event']) navOpen(event: Event) {
+    let isHamburgerMenuDefined = this.hamburgerMenu;
+    let isClickedOutsideHamburgerMenu = isHamburgerMenuDefined && !this.hamburgerMenu!.nativeElement.contains(event.target);
+    if (isClickedOutsideHamburgerMenu) {
+      this.isHamburgerMenuOpen = false;
+    } 
   }
 }
