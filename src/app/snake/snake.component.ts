@@ -18,9 +18,8 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   canvas!: HTMLCanvasElement;
   canvasContext!: CanvasRenderingContext2D | null;
   snake!: SnakeSnakeModel;
-  redFood!: SnakeFoodModel;
-  yellowFood!: SnakeFoodModel;
   foods!: SnakeFoodModel[];
+  specialFood!: SnakeFoodModel | null;
   orangeFood!: SnakeFoodModel;
   obstacles!: SnakeCoordinateModel[];
   currentDirection!: SnakeCoordinateModel;
@@ -66,6 +65,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   setInitialItems(keepMap = false) {
+    this.specialFood = null;
     this.isGamePaused = false;
     this.deadSegmentCount = 0;
     this.isGameOver = false;
@@ -128,7 +128,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       let newPartOfSnakeBody = this.snake.move(this.currentDirection);
       let lastPartOfSnakeBody = this.snake.getBodyPart(0);
       this.isFood(newPartOfSnakeBody, lastPartOfSnakeBody);
-    
+      this.isSpecialFood(newPartOfSnakeBody);
       let snakeLength = this.snake.getSnakeLength();
       let newSnakeBodyPart = this.snake.getBodyPart(snakeLength-1);
       let penultimatePartOfSnakeBody = snakeLength > 1 ? this.snake.getBodyPart(1) : null;
@@ -212,9 +212,49 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.drawFood(newfoodCoord, eatenFood.getColor(), eatenFood.getSign());
     this.score += eatenFood.getValue();
     this.updateSpeed(eatenFood.getSpeedModifier());
+
+    this.manageSpecialFood();
   }
 
+  isSpecialFood(newSnakeSegment: SnakeCoordinateModel) {
+    let boardElement = this.board.getElement(newSnakeSegment.y, newSnakeSegment.x);
+    
+    if(boardElement !== 'specialFood' || this.specialFood === null) return;
+    
+    let specialFoodCoord = this.specialFood.getCoordinate();
+    if(!SnakeComponent.isEqualCoordinates(specialFoodCoord, newSnakeSegment)) return;
 
+    this.score = this.specialFood.getValue();
+    this.specialFood = null;
+  }
+
+  manageSpecialFood() {
+   
+    const randomNumber = Math.random();
+    const isManageSpecialFood = randomNumber < 0.15;
+    if(!isManageSpecialFood) return;
+
+    if(this.specialFood !== null) {
+      let specialFoodCoord = this.specialFood.getCoordinate();
+      this.board.setElement(specialFoodCoord.x, specialFoodCoord.y, '');
+      this.specialFood = null;
+      return;
+    }
+
+    let specialFoodType;
+    if(randomNumber < 0.05) {
+      specialFoodType = 'fortune';
+    } else if(randomNumber < 0.10) {
+      specialFoodType = 'curse';
+    } else {
+      specialFoodType = 'unknown';
+    }
+  
+    let specialFoodCoord = this.board.setItemToRandElement('specialFood');
+    this.specialFood = new SnakeFoodModel(specialFoodCoord, specialFoodType);
+    this.drawFood( { ...specialFoodCoord}, this.specialFood.getColor(), this.specialFood.getSign());
+    
+  }
 
   drawSnakeShift(shiftFactor: number = 1) {
     
@@ -401,11 +441,19 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     //let foods = [this.yellowFood, this.orangeFood, this.redFood];
 
     for(let food of this.foods) {
-      let foodCoordinate = food.getCoordinate();
+      let foodCoord = food.getCoordinate();
       let foodColor = food.getColor();
       let foodSign = food.getSign();
-      this.drawFood( { ...foodCoordinate}, foodColor, foodSign);
+      this.drawFood( { ...foodCoord}, foodColor, foodSign);
     }
+
+    if(this.specialFood !== null) {
+      let specialFoodCoord = this.specialFood.getCoordinate();
+      let specialFoodColor = this.specialFood.getColor();
+      let specialFoodSign = this.specialFood.getSign();
+      this.drawFood( { ...specialFoodCoord}, specialFoodColor, specialFoodSign);
+    }
+
   }
 
   drawFood(foodCoordinate: SnakeCoordinateModel, color: string, sign: string) {
@@ -427,7 +475,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     this.canvasContext.fillStyle = (foodCoordinate.x+foodCoordinate.y) % 2 == 0 ? '#212c6d' :  this.backgroundColor;
     const x = this.canvasContext.measureText(sign).width;
     let centeringcorrection = 4;
-    if(sign === 'N') {
+    if(sign === 'N' || sign === 'F' || sign === 'C' || sign === '?') {
       centeringcorrection = 3;
     } else if(sign === 'S' || sign === 'L') {
       centeringcorrection = 4;

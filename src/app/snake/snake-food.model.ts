@@ -37,18 +37,18 @@ export class SnakeFoodModel {
                 this.sign = 'F';
                 this.color = 'rgb(245, 108, 238)';
                 break;
-            case 'waste':
+            case 'curse':
                 this.speedModifier = 0;
                 this.elongationNumber = 0;
                 this.value = -5;
-                this.sign = 'W';
+                this.sign = 'C';
                 this.color = 'rgb(245, 108, 238)';
                 break;
-            case 'casino':
+            case 'unknown':
                 this.speedModifier = 0;
                 this.elongationNumber = 0;
-                this.value = Math.floor(Math.random() * 11) - 5;
-                this.sign = '$';
+                this.value = Math.floor(Math.random() * (21)) - 10;
+                this.sign = '?';
                 this.color = 'rgb(245, 108, 238)';
                 break;
             default: 
@@ -81,10 +81,18 @@ export class SnakeFoodModel {
     }
 
     getValue() {
+        if(this.type === 'unknown') {
+            return Math.floor(Math.random() * (21)) - 10;
+        }
+
         return this.value;
     }
 
     getSign() {
         return this.sign;
+    }
+
+    getType() {
+        return this.type;
     }
 }
