@@ -36,6 +36,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   backgroundColor = "#111738";
   initSnakeCoord!: SnakeCoordinateModel;
   deadSegmentCount!: number;
+  isGamePaused!: boolean;
 
   constructor() {}
 
@@ -65,6 +66,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   setInitialItems(keepMap = false) {
+    this.isGamePaused = false;
     this.deadSegmentCount = 0;
     this.isGameOver = false;
     this.score = 0;
@@ -105,6 +107,14 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
   update(currentTime: DOMHighResTimeStamp) {
   
+    if(this.isGamePaused) {
+      this.drawBoard();
+      this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
+      this.drawTextInBoardCenter('Paused');
+      this.triggerUpdateFunction(currentTime);
+      return;
+    } 
+
     const deltaTime = (currentTime - this.l) / 1000;
   
     
@@ -141,17 +151,22 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     
    
     this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
-    this.l = currentTime;
-    setTimeout(() => {
-      requestAnimationFrame((currentTime) => {
-      
-        this.update(currentTime);
-       
-      });;
-    }, this.time);
+    
+
+    this.triggerUpdateFunction(currentTime);
   
     
   } 
+
+  triggerUpdateFunction(currentTime: number) {
+    this.l = currentTime;
+    setTimeout(() => {
+      requestAnimationFrame((currentTime) => {
+        this.update(currentTime);
+        
+      });;
+    }, this.time);
+  }
 
   displayEndGame() {
     this.drawBoard();
@@ -315,7 +330,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     if(this.isGameOver) {
      
       this.score = 0;
-      this.drawGameOverText();
+      this.drawTextInBoardCenter('You lost!');
     }
   }
 
@@ -423,16 +438,16 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
       centerY + boardElementLenInPixels * 0.6 / centeringcorrection);
   }
 
-  drawGameOverText() {
+  drawTextInBoardCenter(text: string) {
     if(!this.canvasContext) return;
    
     let boardElementLenInPixels = this.board.getElementSizeInPixels();
 
     this.canvasContext.font = `${boardElementLenInPixels*3}px Arial`;
     this.canvasContext.fillStyle = "rgb(188, 192, 213)";
-    const x = this.canvasContext.measureText("You lost!").width;
+    const x = this.canvasContext.measureText(text).width;
     this.canvasContext.fillText(
-      "You lost!", 
+      text, 
       this.canvas.width / 2 - x / 2, 
       this.canvas.height / 2 + boardElementLenInPixels*3 / 8);
   }
@@ -491,8 +506,12 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   handleKeyboardEvent(event: KeyboardEvent) {
   
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
-      if(possibleDirection.includes(event.key)) {
+      if(possibleDirection.includes(event.key) && !this.isGamePaused) {
         this.currentDirection = this.convertDirectionValue(event.key);
+      }
+
+      if(event.key.toUpperCase() === 'P') {
+        this.isGamePaused = !this.isGamePaused;
       }
   }
 
