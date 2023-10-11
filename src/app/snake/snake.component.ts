@@ -34,7 +34,8 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   timeToPassOneElementInSeconds!: number;
   timeElapsedInSeconds!: number;
   backgroundColor = "#111738";
-  initSnakeCoord !: SnakeCoordinateModel;
+  initSnakeCoord!: SnakeCoordinateModel;
+  deadSegmentCount!: number;
 
   constructor() {}
 
@@ -64,6 +65,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   setInitialItems(keepMap = false) {
+    this.deadSegmentCount = 0;
     this.isGameOver = false;
     this.score = 0;
     this.board = new SnakeBoardModel(400, 240, 25, 15);
@@ -128,7 +130,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       if(this.isGameOver) {
         if(this.bestScore < this.score) {
           this.bestScore = this.score;
+          
         } 
+        this.displayEndGame();
         return;
       }
       this.timeElapsedInSeconds -= this.timeToPassOneElementInSeconds;
@@ -148,6 +152,32 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   
     
   } 
+
+  displayEndGame() {
+    this.drawBoard();
+    let deadSnakeColor = 'rgb(112, 112, 112)';
+    this.drawSnake(deadSnakeColor);
+    this.markEndGameElement();
+    setTimeout(() => {
+      this.displayEndGame();
+    }, this.time);
+  }
+
+  markEndGameElement() {
+    if(!this.canvasContext) return;
+    let boardElementSizeInPixels = this.board.getElementSizeInPixels();
+    let snakeDestination = this.snake.destination;
+
+    this.canvasContext.font = `${boardElementSizeInPixels * 1.1}px Arial`;
+    this.canvasContext.fillStyle = 'red';
+    const x = this.canvasContext.measureText("X").width;
+    
+    console.log(snakeDestination);
+    this.canvasContext.fillText(
+      'X', 
+      snakeDestination.x * boardElementSizeInPixels + boardElementSizeInPixels/2 - x / 2, 
+      snakeDestination.y * boardElementSizeInPixels + boardElementSizeInPixels/2 + boardElementSizeInPixels * 1.1 / 3);
+  }
 
   isFood(newSnakeSegment: SnakeCoordinateModel, lastSnakeSegment: SnakeCoordinateModel) {
     let boardElement = this.board.getElement(newSnakeSegment.y, newSnakeSegment.x);
@@ -195,9 +225,6 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
         boardElementLenInPixels,
         boardElementLenInPixels,
         this.snake.getColor(i));
-
-      
-
     }
    
     
@@ -315,9 +342,8 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 }
 
 
-  drawSnake() {
+  drawSnake(snakeColor: string) {
     let snakeBody = this.snake.getBody();
-    let snakeColor = this.snake.getColor(0);
     let boardElementLenInPixels = this.board.getElementSizeInPixels();
     snakeBody.forEach((bodyPart: SnakeCoordinateModel, index: number) => {
       
@@ -403,11 +429,12 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     let boardElementLenInPixels = this.board.getElementSizeInPixels();
 
     this.canvasContext.font = `${boardElementLenInPixels*3}px Arial`;
-    this.canvasContext.fillStyle = "#e6a69ebe";
+    this.canvasContext.fillStyle = "rgb(188, 192, 213)";
+    const x = this.canvasContext.measureText("You lost!").width;
     this.canvasContext.fillText(
       "You lost!", 
-      this.canvas.width / 5, 
-      this.canvas.height / 2);
+      this.canvas.width / 2 - x / 2, 
+      this.canvas.height / 2 + boardElementLenInPixels*3 / 8);
   }
 
   generateMap() {
@@ -448,9 +475,6 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     this.board.setWidthInPixels(boardWidthInPixels);
     this.board.setHeightPixels(boardHeightInPixels);
     this.board.setElementSizeInPixels(boardWidthInPixels / boardWidthInElements);
-    if(this.isGameOver) {
-      this.drawBoard();
-    }
   }
 
   convertDirectionValue(directionString: String) {
