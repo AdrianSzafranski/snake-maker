@@ -36,7 +36,8 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   initSnakeCoord!: SnakeCoordinateModel;
   deadSegmentCount!: number;
   isGamePaused!: boolean;
-
+  isRestartMap!: boolean;
+  isGenerateNewMap!: boolean;
   constructor() {}
 
   onCloseHamburgerMenu() {
@@ -44,7 +45,8 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   ngOnInit(): void {
-
+    this.isRestartMap = false;
+    this.isGenerateNewMap = false;
     this.setInitialItems();
     this.setScreenSize();
   }
@@ -91,6 +93,10 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
    
     if(!keepMap) {
       this.obstacles = this.board.setObstaclesToRandElements({ ...this.initSnakeCoord });
+    } else {
+      for(let obstacle of this.obstacles) {
+        this.board.setElement(obstacle.x, obstacle.y, 'obstacle');
+      }
     }
   }
 
@@ -107,6 +113,18 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
   update(currentTime: DOMHighResTimeStamp) {
   
+    if(this.isRestartMap) {
+      this.isRestartMap = false;
+      this.restartMap();
+      return;
+    }
+
+    if(this.isGenerateNewMap) {
+      this.isGenerateNewMap = false;
+      this.generateMap();
+      return;
+    }
+
     if(this.isGamePaused) {
       this.drawBoard();
       this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
@@ -169,6 +187,17 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   displayEndGame() {
+    if(this.isRestartMap) {
+      this.isRestartMap = false;
+      this.restartMap();
+      return;
+    }
+
+    if(this.isGenerateNewMap) {
+      this.isGenerateNewMap = false;
+      this.generateMap();
+      return;
+    }
     this.drawBoard();
     let deadSnakeColor = 'rgb(112, 112, 112)';
     this.drawSnake(deadSnakeColor);
@@ -500,12 +529,21 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
       this.canvas.height / 2 + boardElementLenInPixels*3 / 8);
   }
 
+  onGenerateMap() {
+    this.isGenerateNewMap = true;
+  }
+
   generateMap() {
     this.setInitialItems();
     this.setScreenSize();
     this.startGame();
   }
 
+  onRestartMap() {
+    this.isRestartMap = true;
+  }
+
+  
   restartMap() {
     this.setInitialItems(true);
     this.setScreenSize();
