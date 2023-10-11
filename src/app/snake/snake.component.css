@@ -18,7 +18,14 @@
     font-size:26px;
     
 }
+.bestScore {
+    flex: flex-start;
+}
+.currentScore {
+    flex: center;
+}
 .optionsContainer {
+    flex: flex-end;
     list-style-type: none;
     padding: 0;
     margin: 0;
