@@ -3,25 +3,24 @@ import { SnakeCoordinateModel } from "./snake-coordinate.model";
 export class SnakeSnakeModel {
 
     private body: SnakeCoordinateModel[] = [];
-    private historyOfDirections: string[] = [];
-    private direction: SnakeCoordinateModel = {x: 0, y: 1};
+    private historyOfDirections: SnakeCoordinateModel[] = [];
+    private direction: SnakeCoordinateModel;
     private color = {r: 131, g: 245, b: 108};
-    private directionOfColorChange = {r: 5, g: 3, b: 7};
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
-    constructor(private coordinate: SnakeCoordinateModel, direction: string) {
+    constructor(private coordinate: SnakeCoordinateModel, direction: SnakeCoordinateModel) {
         this.body = [{x: this.coordinate.x, y: this.coordinate.y}];
-     
-        this.historyOfDirections.push(direction);
+        this.direction = direction;
+        this.historyOfDirections.push( { ...direction });
        
     }
   
-    move(direction: string) {
+    move(direction: SnakeCoordinateModel) {
        
         this.body.shift();
         this.body.push({ ...this.destination });
        
-        this.historyOfDirections.push(direction);
+        this.historyOfDirections.push({ ...direction });
 
         return { ...this.destination };
         
@@ -74,30 +73,16 @@ export class SnakeSnakeModel {
         }
     }
 
-    setDirection(currentDirection: string) {
+    setDirection(currentDirection: SnakeCoordinateModel) {
     
-        switch(currentDirection) {
-          case 'ArrowDown':
-            if(this.direction.y == -1) return 'ArrowUp';
-            this.direction = {x: 0, y: 1};
-            break;
-          case 'ArrowLeft':
-            if(this.direction.x == 1) return 'ArrowRight';
-            this.direction = {x: -1, y: 0};
-            break;
-          case 'ArrowUp':
-            if(this.direction.y == 1) return 'ArrowDown';
-            this.direction = {x: 0, y: -1};
-            break;
-          case 'ArrowRight':
-            if(this.direction.x == -1) return 'ArrowLeft';
-            this.direction = {x: 1, y: 0};
-            break;
-        }
+        if(this.direction.x != 0 && currentDirection.x != 0) return this.direction;
+        if(this.direction.y != 0 && currentDirection.y != 0) return this.direction;
 
-        return currentDirection;
-       
-      }
+        this.direction.x = currentDirection.x;
+        this.direction.y = currentDirection.y;
+    
+        return this.direction;
+    }
 
     getDirection() {
         return {x: this.direction.x, y: this.direction.y};
@@ -139,7 +124,7 @@ export class SnakeSnakeModel {
     }
 
 
-    addDirectionToHistory(direction: string) {
+    addDirectionToHistory(direction: SnakeCoordinateModel) {
         this.historyOfDirections.push(direction);
     }
 

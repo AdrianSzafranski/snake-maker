@@ -38,6 +38,7 @@
 .optionsTitle {
     position: relative;
     display: inline-block;
+    cursor: pointer;
 } 
 .optionsTitleArrow {
     position: absolute;
@@ -70,6 +71,7 @@
     padding: 10px;
     display: block;
     transition: background-color 0.3s;
+    cursor: pointer;
 } 
 @media (max-width: 768px) or (max-height: 600px) {
     #topPanel {

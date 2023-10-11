@@ -20,57 +20,64 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   snake!: SnakeSnakeModel;
   redFood!: SnakeFoodModel;
   yellowFood!: SnakeFoodModel;
-  foods: SnakeFoodModel[] = [];
+  foods!: SnakeFoodModel[];
   orangeFood!: SnakeFoodModel;
   obstacles!: SnakeCoordinateModel[];
-  currentDirection!: string
+  currentDirection!: SnakeCoordinateModel;
   score!: number;
   bestScore = 0;
   board!: SnakeBoardModel;
   gameIntervalId!: number;
   isGameOver!: boolean;
   time = 1000/30;
-  l: DOMHighResTimeStamp = 0.0;
-  timeToPassOneElementInSeconds = 0.3; //0.07
-  timeElapsedInSeconds = 0;
+  l!: number;
+  timeToPassOneElementInSeconds!: number;
+  timeElapsedInSeconds!: number;
   backgroundColor = "#111738";
   initSnakeCoord !: SnakeCoordinateModel;
+
   constructor() {}
 
   onCloseHamburgerMenu() {
     this.isHamburgerMenuOpen = false;
   }
 
-
   ngOnInit(): void {
 
-    this.currentDirection = 'ArrowDown';
-    this.score = 0;
-    this.board = new SnakeBoardModel(400, 240, 25, 15);
-    this.isGameOver = false;
-
-    this.setScreenSize();
     this.setInitialItems();
+    this.setScreenSize();
   }
 
   ngAfterViewInit() {
     this.canvas = this.canvasRef.nativeElement;
     this.canvasContext = this.canvas.getContext('2d');
+    this.startGame();
+  }
+
+  startGame() {
     this.drawBoard();
     this.l = performance.now();
     this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
     requestAnimationFrame((currentTime) => {
-      
       this.update(currentTime);
-     
     });
   }
 
-  setInitialItems() {
-    this.initSnakeCoord = this.board.setItemToRandElement('snake');
-    this.board.setElement(this.initSnakeCoord.x, this.initSnakeCoord.y, '');
+  setInitialItems(keepMap = false) {
+    this.isGameOver = false;
+    this.score = 0;
+    this.board = new SnakeBoardModel(400, 240, 25, 15);
+    this.timeElapsedInSeconds = 0;
+    this.timeToPassOneElementInSeconds = 0.3;
+    this.l = 0;
+    this.currentDirection = {x: 0, y: 1};
+    if(!keepMap) {
+      this.initSnakeCoord = this.board.setItemToRandElement('snake');
+    }
     this.snake = new SnakeSnakeModel( {...this.initSnakeCoord}, this.currentDirection);
+    this.board.setElement(this.initSnakeCoord.x, this.initSnakeCoord.y, '');
     
+    this.foods = [];
     let initFoodTypes = ['normal', 'speed', 'length'];
     for(let initFoodType of initFoodTypes) {
       let initFoodCoord = this.board.setItemToRandElement('food');
@@ -78,7 +85,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       this.foods.push(food);
     }
    
-    this.obstacles = this.board.setObstaclesToRandElements({ ...this.initSnakeCoord });
+    if(!keepMap) {
+      this.obstacles = this.board.setObstaclesToRandElements({ ...this.initSnakeCoord });
+    }
   }
 
   static isEqualCoordinates(firstCoordinate: SnakeCoordinateModel, secondCoordinate: SnakeCoordinateModel) {
@@ -218,41 +227,38 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
    }
    }
 
-  drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: string, shiftFactor: number, color: string) {
-
+  drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: SnakeCoordinateModel, shiftFactor: number, color: string) {
+    
     if(!this.canvasContext) return;
     let boardElementLenInPixels = this.board.getElementSizeInPixels();
     let startX, startY, endX, endY;
-    switch(direction) {
-      case 'ArrowUp':
-        startX = drawCoord.x * boardElementLenInPixels;
-        startY = drawCoord.y * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
-        endX = boardElementLenInPixels
-        endY = boardElementLenInPixels * shiftFactor;
-        this.drawRect(startX, startY, endX, endY, color);
-        break;
-      case 'ArrowRight':
-        startX = drawCoord.x * boardElementLenInPixels;
-        startY = drawCoord.y * boardElementLenInPixels;
-        endX = boardElementLenInPixels * shiftFactor;
-        endY = boardElementLenInPixels;
-        this.drawRect(startX, startY, endX, endY, color);
-        break;
-      case 'ArrowDown':
-        startX = drawCoord.x * boardElementLenInPixels;
-        startY = drawCoord.y * boardElementLenInPixels;
-        endX = boardElementLenInPixels;
-        endY = boardElementLenInPixels * shiftFactor;
-        this.drawRect(startX, startY, endX, endY, color);
-        break;
-      case 'ArrowLeft':
-        startX = drawCoord.x * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
-        startY = drawCoord.y * boardElementLenInPixels;
-        endX = boardElementLenInPixels * shiftFactor;
-        endY = boardElementLenInPixels;
-        this.drawRect(startX, startY, endX, endY, color);
-        break;
+    if(direction.x === 0 && direction.y === -1) {
+      startX = drawCoord.x * boardElementLenInPixels;
+      startY = drawCoord.y * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+      endX = boardElementLenInPixels
+      endY = boardElementLenInPixels * shiftFactor;
+      this.drawRect(startX, startY, endX, endY, color);
+    } else if(direction.x === 1 && direction.y === 0) { 
+      startX = drawCoord.x * boardElementLenInPixels;
+      startY = drawCoord.y * boardElementLenInPixels;
+      endX = boardElementLenInPixels * shiftFactor;
+      endY = boardElementLenInPixels;
+      this.drawRect(startX, startY, endX, endY, color);
+    } else if(direction.x === 0 && direction.y === 1) { 
+      startX = drawCoord.x * boardElementLenInPixels;
+      startY = drawCoord.y * boardElementLenInPixels;
+      endX = boardElementLenInPixels;
+      endY = boardElementLenInPixels * shiftFactor;
+      this.drawRect(startX, startY, endX, endY, color);
+    } else if(direction.x === -1 && direction.y === 0) {
+      startX = drawCoord.x * boardElementLenInPixels + boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+      startY = drawCoord.y * boardElementLenInPixels;
+      endX = boardElementLenInPixels * shiftFactor;
+      endY = boardElementLenInPixels;
+      this.drawRect(startX, startY, endX, endY, color);
     }
+
+    
   }
 
   drawBoard() {
@@ -405,47 +411,15 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   }
 
   generateMap() {
-    /*
-    this.timeElapsedInSeconds = 0;
-    this.currentDirection = 'ArrowDown';
-    this.score = 0;
-    this.board = new SnakeBoardModel(400, 15);
-    this.isGameOver = false;
-    
-    this.setScreenSize();
-
-    
     this.setInitialItems();
-    this.snake.getDestination(this.board.getLengthInElements());*/
+    this.setScreenSize();
+    this.startGame();
   }
 
   restartMap() {
-    /*
-    this.timeElapsedInSeconds = 0;
-    this.isGameOver = false;
-    this.score = 0;
-    this.board = new SnakeBoardModel(400, 15);
-    
-    console.log(this.initSnakeCoord.x)
+    this.setInitialItems(true);
     this.setScreenSize();
-   
-    this.board.setElement(this.initSnakeCoord.x, this.initSnakeCoord.y, '');
-    this.snake = new SnakeSnakeModel({ ...this.initSnakeCoord }, this.currentDirection);
-    this.snake.destination = {x: this.initSnakeCoord.x, y: this.initSnakeCoord.y};
-    this.currentDirection = "ArrowDown";
-    for(let obstacle of this.obstacles) {
-      this.board.setElement(obstacle.x, obstacle.y, 'obstacle');
-    }
-    
-    let initYellowFoodCoord = this.board.setItemToRandElement('yellowFood');
-    this.yellowFood = new SnakeFoodModel(initYellowFoodCoord, 'rgb(243, 245, 108)', 1);
-
-    let initOrangeFoodCoord = this.board.setItemToRandElement('orangeFood');
-    this.orangeFood = new SnakeFoodModel(initOrangeFoodCoord, 'rgb(245, 195, 108)', 2);
-
-    let initRedFoodCoord = this.board.setItemToRandElement('redFood')
-    this.redFood = new SnakeFoodModel(initRedFoodCoord, 'rgb(245, 108, 108)', 3);
-    */
+    this.startGame();
    
   }
 
@@ -479,12 +453,22 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     }
   }
 
+  convertDirectionValue(directionString: String) {
+    switch(directionString) {
+      case 'ArrowDown': return {x: 0, y: 1};
+      case 'ArrowLeft': return {x: -1, y: 0};
+      case 'ArrowUp': return {x: 0, y: -1};
+      case 'ArrowRight': return {x: 1, y: 0};
+      default: return {x: 0, y: 0};
+    }
+  }
+
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
   
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
       if(possibleDirection.includes(event.key)) {
-        this.currentDirection = event.key;
+        this.currentDirection = this.convertDirectionValue(event.key);
       }
   }
 
