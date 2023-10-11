@@ -253,7 +253,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let specialFoodCoord = this.specialFood.getCoordinate();
     if(!SnakeComponent.isEqualCoordinates(specialFoodCoord, newSnakeSegment)) return;
 
-    this.score = this.specialFood.getValue();
+    this.score += this.specialFood.getValue();
     this.specialFood = null;
   }
 
