@@ -27,7 +27,7 @@ export class SnakeSnakeModel {
         
     }
 
-    getDestination(boardLenInElements: number) {
+    getDestination(boardHorizontalLenInElements: number, boardVerticalLenInElements: number) {
        
     
            
@@ -39,24 +39,24 @@ export class SnakeSnakeModel {
            
             if(this.direction.x == 1) {
                 newCoord.x = 
-                    (newCoord.x + 1 < boardLenInElements)
+                    (newCoord.x + 1 < boardHorizontalLenInElements)
                     ? newCoord.x + 1
                     : 0;
             } else if(this.direction.x == -1) {
                 newCoord.x = 
                     (newCoord.x - 1 >= 0)
                 ? newCoord.x - 1
-                : boardLenInElements - 1;
+                : boardHorizontalLenInElements - 1;
             } else if(this.direction.y == 1) {
                 newCoord.y = 
-                    (newCoord.y + 1 < boardLenInElements)
+                    (newCoord.y + 1 < boardVerticalLenInElements)
                     ? newCoord.y + 1
                     : 0;newCoord
             } else if(this.direction.y == -1) {
                 newCoord.y = 
                     (newCoord.y - 1 >= 0)
                     ? newCoord.y - 1
-                    : boardLenInElements - 1;
+                    : boardVerticalLenInElements - 1;
             }
 
             this.destination = { ...newCoord };

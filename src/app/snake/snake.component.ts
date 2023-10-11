@@ -46,7 +46,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
     this.currentDirection = 'ArrowDown';
     this.score = 0;
-    this.board = new SnakeBoardModel(400, 15);
+    this.board = new SnakeBoardModel(400, 240, 25, 15);
     this.isGameOver = false;
 
     this.setScreenSize();
@@ -58,7 +58,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.canvasContext = this.canvas.getContext('2d');
     this.drawBoard();
     this.l = performance.now();
-    this.snake.getDestination(this.board.getLengthInElements());
+    this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
     requestAnimationFrame((currentTime) => {
       
       this.update(currentTime);
@@ -114,7 +114,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
       this.board.editSnakeCoordinate(lastPartOfSnakeBody, penultimatePartOfSnakeBody, newSnakeBodyPart);
 
-      let snakeDestination = this.snake.getDestination(this.board.getLengthInElements());
+      let snakeDestination = this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
       this.isGameOver = this.board.isGameOver(snakeDestination);
       if(this.isGameOver) {
         if(this.bestScore < this.score) {
@@ -141,7 +141,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   } 
 
   isFood(newSnakeSegment: SnakeCoordinateModel, lastSnakeSegment: SnakeCoordinateModel) {
-    let boardElement = this.board.getElement(newSnakeSegment.x, newSnakeSegment.y);
+    let boardElement = this.board.getElement(newSnakeSegment.y, newSnakeSegment.x);
     
     if(boardElement !== 'food') return;
     
@@ -176,7 +176,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
     let snakeBody = this.snake.getBody();
    
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
     
     for(let i= 0; i< snakeLength; i++) {
       
@@ -210,9 +210,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     // add part of the snake's body
     this.drawSnakeShiftHelper({ ...snakeDestination }, directionSnakeDestination, shiftFactor, this.snake.getColor(snakeLength));
     
-   
-    for(let i = 0; i <  this.board.getLengthInElements(); i +=1) {
-     for(let j = 0; j <  this.board.getLengthInElements(); j += 1) {
+
+    for(let i = 0; i <  this.board.getHeightInElements(); i +=1) {
+     for(let j = 0; j <  this.board.getWidthInElements(); j += 1) {
       this.drawRectBorder2(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels);
      }
    }
@@ -221,7 +221,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   drawSnakeShiftHelper(drawCoord: SnakeCoordinateModel, direction: string, shiftFactor: number, color: string) {
 
     if(!this.canvasContext) return;
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
     let startX, startY, endX, endY;
     switch(direction) {
       case 'ArrowUp':
@@ -259,12 +259,12 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     if(!this.canvasContext) return;
     this.canvasContext.clearRect(0,0, this.canvas.width, this.canvas.height); 
 
-    let boardLenInElements = this.board.getLengthInElements();
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
     let isRed = true;
-    for(let i = 0; i < boardLenInElements; i +=1) {
+    for(let i = 0; i < this.board.getHeightInElements(); i +=1) {
      
-      for(let j = 0; j < boardLenInElements; j += 1) {
+      for(let j = 0; j < this.board.getWidthInElements(); j += 1) {
         let color = !isRed ? this.backgroundColor : '#212c6d';
         
         this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels, color);
@@ -312,7 +312,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   drawSnake() {
     let snakeBody = this.snake.getBody();
     let snakeColor = this.snake.getColor(0);
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
     snakeBody.forEach((bodyPart: SnakeCoordinateModel, index: number) => {
       
       this.drawRect(
@@ -329,7 +329,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 
   drawObstacles() {
 
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
 
     for(let obstacle of this.obstacles) {
       
@@ -363,7 +363,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 
   drawFood(foodCoordinate: SnakeCoordinateModel, color: string, sign: string) {
 
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
 
     let centerX = foodCoordinate.x * boardElementLenInPixels + boardElementLenInPixels / 2;
     let centerY = foodCoordinate.y * boardElementLenInPixels + boardElementLenInPixels / 2;
@@ -394,7 +394,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   drawGameOverText() {
     if(!this.canvasContext) return;
    
-    let boardElementLenInPixels = this.board.getElementLengthInPixels();
+    let boardElementLenInPixels = this.board.getElementSizeInPixels();
 
     this.canvasContext.font = `${boardElementLenInPixels*3}px Arial`;
     this.canvasContext.fillStyle = "#e6a69ebe";
@@ -405,6 +405,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   }
 
   generateMap() {
+    /*
     this.timeElapsedInSeconds = 0;
     this.currentDirection = 'ArrowDown';
     this.score = 0;
@@ -415,7 +416,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 
     
     this.setInitialItems();
-    this.snake.getDestination(this.board.getLengthInElements());
+    this.snake.getDestination(this.board.getLengthInElements());*/
   }
 
   restartMap() {
@@ -450,15 +451,29 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 
   @HostListener('window:resize', ['$event'])
   setScreenSize(event?: Event): void {
-    let newBoardLengthInPixels = (window.innerHeight >= window.innerWidth)
-      ? Math.floor(window.innerWidth * 0.85)
-      : Math.floor(window.innerHeight * 0.85);
+      let boardWidthInElements = this.board.getWidthInElements();
+      let boardHeightInElements = this.board.getHeightInElements();
+   
+      const boardAspectRatio = boardWidthInElements / boardHeightInElements;
 
-    // give the largest number less than "newLengthInPixels" divisible by "this.getLengthInElements"
-    newBoardLengthInPixels = newBoardLengthInPixels - newBoardLengthInPixels % this.board.getLengthInElements();
+      const multiplier = (window.innerHeight < 650) ? 0.75 : 0.80;
+      let awailableWidthInPixels = (window.innerWidth < 450) ? 450 * multiplier : window.innerWidth * multiplier;
+      let awailableHeightInPixels =(window.innerHeight < 450) ? 450 * multiplier : window.innerHeight * multiplier;
 
-    this.board.setLengthInPixels(newBoardLengthInPixels);
-    
+      let boardWidthInPixels;
+      let boardHeightInPixels;
+  
+      if (awailableWidthInPixels / boardAspectRatio > awailableHeightInPixels) {
+        boardWidthInPixels = awailableHeightInPixels * boardAspectRatio;
+        boardHeightInPixels = awailableHeightInPixels;
+      } else {
+        boardWidthInPixels = awailableWidthInPixels;
+        boardHeightInPixels = boardWidthInPixels / boardAspectRatio;
+      }
+  
+    this.board.setWidthInPixels(boardWidthInPixels);
+    this.board.setHeightPixels(boardHeightInPixels);
+    this.board.setElementSizeInPixels(boardWidthInPixels / boardWidthInElements);
     if(this.isGameOver) {
       this.drawBoard();
     }

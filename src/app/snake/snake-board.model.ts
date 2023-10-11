@@ -3,35 +3,52 @@ import { SnakeComponent } from "./snake.component";
 
 export class SnakeBoardModel {
 
-    private elementLengthInPixels;
+    private elementSizeInPixels;
     private elements;
-
+    
     constructor(
-        private lengthInPixels: number,
-        private lengthInElements: number) {
-            this.elementLengthInPixels = this.lengthInPixels / this.lengthInElements;
-            this.elements = Array.from({ length: this.lengthInElements }, () => Array(this.lengthInElements).fill(''));
+        private widthInPixels: number,
+        private heightInPixels: number,
+        private widthInElements: number,
+        private heightInElements: number) {
+            this.elementSizeInPixels = this.widthInPixels / this.widthInElements;
+            this.elements = Array.from({ length: this.heightInElements }, () => Array(this.widthInElements).fill(''));
     }
 
-    getLengthInPixels() {
-        return this.lengthInPixels;
+    getWidthInPixels() {
+        return this.widthInPixels;
     }
 
-    getLengthInElements() {
-        return this.lengthInElements;
+    getHeightInPixels() {
+        return this.heightInPixels;
     }
 
-    getElementLengthInPixels() {
-        return this.elementLengthInPixels;
+    getWidthInElements() {
+        return this.widthInElements;
+    }
+
+    getHeightInElements() {
+        return this.heightInElements;
+    }
+
+    getElementSizeInPixels() {
+        return this.elementSizeInPixels;
     }
 
     getElements() {
         return this.elements.slice();
     }
 
-    setLengthInPixels(newLengthInPixels: number) {
-        this.lengthInPixels = newLengthInPixels;
-        this.elementLengthInPixels = this.lengthInPixels / this.lengthInElements;
+    setWidthInPixels(newWidthInPixels: number) {
+        this.widthInPixels = newWidthInPixels;
+    }
+
+    setHeightPixels(newHeightInPixels: number) {
+        this.heightInPixels = newHeightInPixels;
+    }
+    
+    setElementSizeInPixels(newElementSizeInPixels: number) {
+        this.elementSizeInPixels = newElementSizeInPixels;
     }
 
     getElement(x: number, y:number) {
@@ -39,17 +56,17 @@ export class SnakeBoardModel {
     }
 
     setElement(x: number, y:number, value: string) {
-        this.elements[x][y] = value;
+        this.elements[y][x] = value;
     }
 
     setItemToRandElement(item: string) {
     
         let randCoord = this.getRandCoord();
 
-        while(this.elements[randCoord.x][randCoord.y] !== '') {
+        while(this.elements[randCoord.y][randCoord.x] !== '') {
             randCoord = this.getRandCoord();
         }
-        this.elements[randCoord.x][randCoord.y] = item;
+        this.elements[randCoord.y][randCoord.x] = item;
     
         return { ...randCoord };
     }
@@ -58,7 +75,7 @@ export class SnakeBoardModel {
         
         let obstacleCoords: SnakeCoordinateModel[] = [];
 
-        let numberOfObstacles = Math.floor(this.lengthInElements / 5);
+        let numberOfObstacles = Math.floor(this.widthInElements / 5);
 
         for(let i = 0; i < numberOfObstacles; i++) {
 
@@ -67,17 +84,17 @@ export class SnakeBoardModel {
                 randCoord = this.getRandCoord();
             } 
             
-            this.elements[randCoord.x][randCoord.y] = 'obstacle';
+            this.elements[randCoord.y][randCoord.x] = 'obstacle';
             obstacleCoords.push({ ...randCoord });
         }
 
 
-        let maxLengthOfHorizontalObstacle = Math.floor(this.lengthInElements / 3);
+        let maxLengthOfHorizontalObstacle = Math.floor(this.widthInElements / 3);
         for(let i = 1; i < maxLengthOfHorizontalObstacle; i++) {
             
             let newX = obstacleCoords[0].x + i;
-            if(newX >= this.lengthInElements) {
-                newX -= this.lengthInElements;
+            if(newX >= this.widthInElements) {
+                newX -= this.widthInElements;
             }
         
             let newCoord = {x: newX, y: obstacleCoords[0].y}
@@ -86,17 +103,17 @@ export class SnakeBoardModel {
                break;
             }
 
-            this.elements[newCoord.x][newCoord.y] = 'obstacle';
+            this.elements[newCoord.y][newCoord.x] = 'obstacle';
             obstacleCoords.push({ ...newCoord });
             
         }
 
-        let maxLengthOfVerticalObstacle = Math.floor(this.lengthInElements / 2);
+        let maxLengthOfVerticalObstacle = Math.floor(this.widthInElements / 2);
         for(let i = 1; i < maxLengthOfVerticalObstacle; i++) {
             
             let newY = obstacleCoords[0].y + i;
-            if(newY >= this.lengthInElements) {
-                newY -= this.lengthInElements;
+            if(newY >= this.heightInElements) {
+                newY -= this.heightInElements;
             }
         
             let newCoord = { x: obstacleCoords[0].x, y: newY}
@@ -105,7 +122,7 @@ export class SnakeBoardModel {
                break;
             }
 
-            this.elements[newCoord.x][newCoord.y] = 'obstacle';
+            this.elements[newCoord.y][newCoord.x] = 'obstacle';
             obstacleCoords.push({ ...newCoord });
             
         }
@@ -118,7 +135,7 @@ export class SnakeBoardModel {
        
         let isSnakeRow = snakeCoord.x == testCoord.x;
         let isSnakeColumn = snakeCoord.y == testCoord.y;
-        let isEmptyElement = this.elements[testCoord.x][testCoord.y] === '';
+        let isEmptyElement = this.elements[testCoord.y][testCoord.x] === '';
 
         if(isSnakeRow || isSnakeColumn || !isEmptyElement) {
             return false;
@@ -127,15 +144,15 @@ export class SnakeBoardModel {
     }
 
     getRandCoord() {
-        let x = Math.floor(Math.random() * this.lengthInElements);
-        let y = Math.floor(Math.random() * this.lengthInElements);
+        let x = Math.floor(Math.random() * this.widthInElements);
+        let y = Math.floor(Math.random() * this.heightInElements);
 
         return {x: x, y: y};
     }
 
     editSnakeCoordinate(lastPartOfSnakeBody: SnakeCoordinateModel, penultimatePartOfSnakeBody: SnakeCoordinateModel | null, newSnakeCoord: SnakeCoordinateModel) {
    
-        this.elements[newSnakeCoord.x][newSnakeCoord.y] = 'snake';
+        this.elements[newSnakeCoord.y][newSnakeCoord.x] = 'snake';
         
         // The last two parts of the snake are the same when it has eaten the food.
         // Then the snake should grow so that it doesn't lose the last part.
@@ -143,14 +160,14 @@ export class SnakeBoardModel {
             return;
         }
 
-        this.elements[lastPartOfSnakeBody.x][lastPartOfSnakeBody.y] = '';
+        this.elements[lastPartOfSnakeBody.y][lastPartOfSnakeBody.x] = '';
     }
 
  
 
     
   isGameOver(snakeDestination: SnakeCoordinateModel) {
-    let destinationElement = this.elements[snakeDestination.x][snakeDestination.y];
+    let destinationElement = this.elements[snakeDestination.y][snakeDestination.x];
     console.log(destinationElement);
     if(destinationElement === 'snake' || destinationElement === 'obstacle') {
         return true;
