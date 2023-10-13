@@ -3,6 +3,7 @@ import { SnakeFoodModel } from './snake-food.model';
 import { SnakeSnakeModel } from './snake-snake.model';
 import { SnakeCoordinateModel } from './snake-coordinate.model';
 import { SnakeBoardModel } from './snake-board.model';
+import { SnakeGameStateModel } from './snake-game-state.model';
 
 @Component({
   selector: 'app-snake',
@@ -19,12 +20,11 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   canvasContext!: CanvasRenderingContext2D | null;
   snake!: SnakeSnakeModel;
   foods!: SnakeFoodModel[];
+  gameState: SnakeGameStateModel;
   specialFood!: SnakeFoodModel | null;
   orangeFood!: SnakeFoodModel;
   obstacles!: SnakeCoordinateModel[];
   currentDirection!: SnakeCoordinateModel;
-  score!: number;
-  bestScore = 0;
   board!: SnakeBoardModel;
   gameIntervalId!: number;
   isGameOver!: boolean;
@@ -38,7 +38,9 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   isGamePaused!: boolean;
   isRestartMap!: boolean;
   isGenerateNewMap!: boolean;
-  constructor() {}
+  constructor() {
+    this.gameState = new SnakeGameStateModel(0);
+  }
 
   onCloseHamburgerMenu() {
     this.isHamburgerMenuOpen = false;
@@ -71,7 +73,6 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.isGamePaused = false;
     this.deadSegmentCount = 0;
     this.isGameOver = false;
-    this.score = 0;
     this.board = new SnakeBoardModel(400, 240, 25, 15);
     this.timeElapsedInSeconds = 0;
     this.timeToPassOneElementInSeconds = 0.3;
@@ -156,10 +157,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       let snakeDestination = this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
       this.isGameOver = this.board.isGameOver(snakeDestination);
       if(this.isGameOver) {
-        if(this.bestScore < this.score) {
-          this.bestScore = this.score;
-          
-        } 
+        this.gameState.determineBestScore();
         this.displayEndGame();
         return;
       }
@@ -239,7 +237,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let newfoodCoord = this.board.setItemToRandElement('food');
     eatenFood.setCoordinate(newfoodCoord);
     this.drawFood(newfoodCoord, eatenFood.getColor(), eatenFood.getSign());
-    this.score += eatenFood.getValue();
+    this.gameState.currentScore += eatenFood.getValue();
     this.updateSpeed(eatenFood.getSpeedModifier());
 
     this.manageSpecialFood();
@@ -253,7 +251,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     let specialFoodCoord = this.specialFood.getCoordinate();
     if(!SnakeComponent.isEqualCoordinates(specialFoodCoord, newSnakeSegment)) return;
 
-    this.score += this.specialFood.getValue();
+    this.gameState.currentScore += this.specialFood.getValue();
     this.specialFood = null;
   }
 
@@ -398,7 +396,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
    
     if(this.isGameOver) {
      
-      this.score = 0;
+      this.gameState.currentScore = 0;
       this.drawTextInBoardCenter('You lost!');
     }
   }
@@ -534,6 +532,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   }
 
   generateMap() {
+    this.gameState.setInitGameState();
     this.setInitialItems();
     this.setScreenSize();
     this.startGame();
@@ -545,6 +544,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
 
   
   restartMap() {
+    this.gameState.setInitGameState();
     this.setInitialItems(true);
     this.setScreenSize();
     this.startGame();
