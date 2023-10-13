@@ -22,24 +22,12 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   foods!: SnakeFoodModel[];
   gameState: SnakeGameStateModel;
   specialFood!: SnakeFoodModel | null;
-  orangeFood!: SnakeFoodModel;
   obstacles!: SnakeCoordinateModel[];
   currentDirection!: SnakeCoordinateModel;
   board!: SnakeBoardModel;
-  gameIntervalId!: number;
-  isGameOver!: boolean;
-  time = 1000/30;
-  l!: number;
-  timeToPassOneElementInSeconds!: number;
-  timeElapsedInSeconds!: number;
-  backgroundColor = "#111738";
   initSnakeCoord!: SnakeCoordinateModel;
-  deadSegmentCount!: number;
-  isGamePaused!: boolean;
-  isRestartMap!: boolean;
-  isGenerateNewMap!: boolean;
   constructor() {
-    this.gameState = new SnakeGameStateModel(0);
+    this.gameState = new SnakeGameStateModel();
   }
 
   onCloseHamburgerMenu() {
@@ -47,8 +35,6 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   }
 
   ngOnInit(): void {
-    this.isRestartMap = false;
-    this.isGenerateNewMap = false;
     this.setInitialItems();
     this.setScreenSize();
   }
@@ -61,7 +47,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
   startGame() {
     this.drawBoard();
-    this.l = performance.now();
+    this.gameState.lastFrameTime = performance.now();
     this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
     requestAnimationFrame((currentTime) => {
       this.update(currentTime);
@@ -70,13 +56,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 
   setInitialItems(keepMap = false) {
     this.specialFood = null;
-    this.isGamePaused = false;
-    this.deadSegmentCount = 0;
-    this.isGameOver = false;
     this.board = new SnakeBoardModel(400, 240, 25, 15);
-    this.timeElapsedInSeconds = 0;
-    this.timeToPassOneElementInSeconds = 0.3;
-    this.l = 0;
     this.currentDirection = {x: 0, y: 1};
     if(!keepMap) {
       this.initSnakeCoord = this.board.setItemToRandElement('snake');
@@ -109,36 +89,36 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
 }
   
   updateSpeed(speedModifier: number) {
-    this.timeToPassOneElementInSeconds -= speedModifier * 0.005;
+    this.gameState.timeToPassOneElementInSeconds -= speedModifier * 0.005;
   }
 
   update(currentTime: DOMHighResTimeStamp) {
   
-    if(this.isRestartMap) {
-      this.isRestartMap = false;
+    if(this.gameState.isRestartMap) {
+      this.gameState.isRestartMap = false;
       this.restartMap();
       return;
     }
 
-    if(this.isGenerateNewMap) {
-      this.isGenerateNewMap = false;
+    if(this.gameState.isGenerateNewMap) {
+      this.gameState.isGenerateNewMap = false;
       this.generateMap();
       return;
     }
 
-    if(this.isGamePaused) {
+    if(this.gameState.isGamePaused) {
       this.drawBoard();
-      this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
+      this.drawSnakeShift(this.gameState.timeElapsedInSeconds / this.gameState.timeToPassOneElementInSeconds);
       this.drawTextInBoardCenter('Paused');
       this.triggerUpdateFunction(currentTime);
       return;
     } 
 
-    const deltaTime = (currentTime - this.l) / 1000;
+    const deltaTime = (currentTime - this.gameState.lastFrameTime) / 1000;
   
     
-    this.timeElapsedInSeconds += deltaTime;
-    while(this.timeElapsedInSeconds >= this.timeToPassOneElementInSeconds) {
+    this.gameState.timeElapsedInSeconds += deltaTime;
+    while(this.gameState.timeElapsedInSeconds >= this.gameState.timeToPassOneElementInSeconds) {
       
       this.drawBoard();
       this.drawSnakeShift(1);
@@ -155,18 +135,18 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
       this.board.editSnakeCoordinate(lastPartOfSnakeBody, penultimatePartOfSnakeBody, newSnakeBodyPart);
 
       let snakeDestination = this.snake.getDestination(this.board.getWidthInElements(), this.board.getHeightInElements());
-      this.isGameOver = this.board.isGameOver(snakeDestination);
-      if(this.isGameOver) {
+      this.gameState.isGameOver = this.board.isGameOver(snakeDestination);
+      if(this.gameState.isGameOver) {
         this.gameState.determineBestScore();
         this.displayEndGame();
         return;
       }
-      this.timeElapsedInSeconds -= this.timeToPassOneElementInSeconds;
+      this.gameState.timeElapsedInSeconds -= this.gameState.timeToPassOneElementInSeconds;
     
     }
     
    
-    this.drawSnakeShift(this.timeElapsedInSeconds / this.timeToPassOneElementInSeconds);
+    this.drawSnakeShift(this.gameState.timeElapsedInSeconds / this.gameState.timeToPassOneElementInSeconds);
     
 
     this.triggerUpdateFunction(currentTime);
@@ -175,24 +155,24 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   } 
 
   triggerUpdateFunction(currentTime: number) {
-    this.l = currentTime;
+    this.gameState.lastFrameTime = currentTime;
     setTimeout(() => {
       requestAnimationFrame((currentTime) => {
         this.update(currentTime);
         
       });;
-    }, this.time);
+    }, this.gameState.frameInterval);
   }
 
   displayEndGame() {
-    if(this.isRestartMap) {
-      this.isRestartMap = false;
+    if(this.gameState.isRestartMap) {
+      this.gameState.isRestartMap = false;
       this.restartMap();
       return;
     }
 
-    if(this.isGenerateNewMap) {
-      this.isGenerateNewMap = false;
+    if(this.gameState.isGenerateNewMap) {
+      this.gameState.isGenerateNewMap = false;
       this.generateMap();
       return;
     }
@@ -202,7 +182,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.markEndGameElement();
     setTimeout(() => {
       this.displayEndGame();
-    }, this.time);
+    }, this.gameState.frameInterval);
   }
 
   markEndGameElement() {
@@ -310,7 +290,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     }
    
     
-     let cc = (lastPartOfSnakeBody.x+lastPartOfSnakeBody.y) % 2 == 0 ? '#212c6d' :  this.backgroundColor
+     let cc = (lastPartOfSnakeBody.x+lastPartOfSnakeBody.y) % 2 == 0 ?  this.board.firstBgColor :  this.board.secondBgColor;
 
 
     // remove part of the snake's body
@@ -380,7 +360,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     for(let i = 0; i < this.board.getHeightInElements(); i +=1) {
      
       for(let j = 0; j < this.board.getWidthInElements(); j += 1) {
-        let color = !isRed ? this.backgroundColor : '#212c6d';
+        let color = isRed ? this.board.firstBgColor :  this.board.secondBgColor;
         
         this.drawRect(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels, color);
         this.drawRectBorder2(j*boardElementLenInPixels, i*boardElementLenInPixels, 1*boardElementLenInPixels, 1*boardElementLenInPixels);
@@ -394,7 +374,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.drawObstacles();
 
    
-    if(this.isGameOver) {
+    if(this.gameState.isGameOver) {
      
       this.gameState.currentScore = 0;
       this.drawTextInBoardCenter('You lost!');
@@ -499,7 +479,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
     this.canvasContext.fill();
 
     this.canvasContext.font = `${boardElementLenInPixels * 0.6}px Kristen ITC`;
-    this.canvasContext.fillStyle = (foodCoordinate.x+foodCoordinate.y) % 2 == 0 ? '#212c6d' :  this.backgroundColor;
+    this.canvasContext.fillStyle = (foodCoordinate.x+foodCoordinate.y) % 2 == 0 ? this.board.firstBgColor :  this.board.secondBgColor;
     const x = this.canvasContext.measureText(sign).width;
     let centeringcorrection = 4;
     if(sign === 'N' || sign === 'F' || sign === 'C' || sign === '?') {
@@ -528,7 +508,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   }
 
   onGenerateMap() {
-    this.isGenerateNewMap = true;
+    this.gameState.isGenerateNewMap = true;
   }
 
   generateMap() {
@@ -539,7 +519,7 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   }
 
   onRestartMap() {
-    this.isRestartMap = true;
+    this.gameState.isRestartMap = true;
   }
 
   
@@ -592,12 +572,12 @@ drawRectBorder2(x: number, y: number, width: number, height: number) {
   handleKeyboardEvent(event: KeyboardEvent) {
   
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
-      if(possibleDirection.includes(event.key) && !this.isGamePaused) {
+      if(possibleDirection.includes(event.key) && !this.gameState.isGamePaused) {
         this.currentDirection = this.convertDirectionValue(event.key);
       }
 
       if(event.key.toUpperCase() === 'P') {
-        this.isGamePaused = !this.isGamePaused;
+        this.gameState.isGamePaused = !this.gameState.isGamePaused;
       }
   }
 

@@ -5,7 +5,9 @@ export class SnakeBoardModel {
 
     private elementSizeInPixels;
     private elements;
-    
+    private _firstBgColor = "#212c6d";
+    private _secondBgColor = "#111738";
+
     constructor(
         private widthInPixels: number,
         private heightInPixels: number,
@@ -175,7 +177,13 @@ export class SnakeBoardModel {
     return false;
   }
 
-   
+   get firstBgColor() {
+    return this._firstBgColor;
+   }
+
+   get secondBgColor() {
+    return this._secondBgColor;
+   }
 
 }
 
