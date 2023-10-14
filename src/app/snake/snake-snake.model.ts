@@ -5,7 +5,8 @@ export class SnakeSnakeModel {
     private body: SnakeCoordinateModel[] = [];
     private historyOfDirections: SnakeCoordinateModel[] = [];
     private direction: SnakeCoordinateModel;
-    private color = {r: 131, g: 245, b: 108};
+    private _liveSnakeColor = "rgb(131, 245, 108)";
+    private _deadSnakeColor = "rgb(112, 112, 112)";
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
     constructor(private coordinate: SnakeCoordinateModel, direction: SnakeCoordinateModel) {
@@ -28,9 +29,6 @@ export class SnakeSnakeModel {
 
     getDestination(boardHorizontalLenInElements: number, boardVerticalLenInElements: number) {
        
-    
-           
-          
             let newCoord = {
                 x: this.body[this.body.length - 1].x, 
                 y: this.body[this.body.length - 1].y
@@ -59,12 +57,9 @@ export class SnakeSnakeModel {
             }
 
             this.destination = { ...newCoord };
-           
-        
-           
+               
        return { ...this.destination };
-        
-        
+      
     }
 
     eat(foodCoordinate: SnakeCoordinateModel, elongationNumber: number) {
@@ -109,26 +104,19 @@ export class SnakeSnakeModel {
         return {x: this.body[this.body.length - 1].x, y: this.body[this.body.length - 1].y};
     }
 
-    
-
-    getColor(index: number) {
-
-       // let r = (this.color.r + 1*index < 255) ? (this.color.r + 1*index) : 255 - ((this.color.r + 1*index) - 255)
-       // let g = (this.color.g + 2*index < 255) ? (this.color.g + 2*index) : 255 - ((this.color.g + 2*index) - 255)
-       // let b = (this.color.b + 1*index < 255) ? (this.color.b + 1*index) : 255 - ((this.color.b + 1*index) - 255)
-
-       
-
-        
-        return `rgb(${this.color.r}, ${this.color.g}, ${this.color.b})`;
-    }
-
-
     addDirectionToHistory(direction: SnakeCoordinateModel) {
         this.historyOfDirections.push(direction);
     }
 
     getHistoryOfDirections() {
         return this.historyOfDirections.slice();
+    }
+
+    get liveSnakeColor() {
+        return this._liveSnakeColor;
+    }
+
+    get deadSnakeColor() {
+        return this._deadSnakeColor;
     }
 }
