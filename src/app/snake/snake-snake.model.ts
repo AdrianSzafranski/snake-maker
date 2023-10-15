@@ -2,7 +2,7 @@ import { SnakeCoordinateModel } from "./snake-coordinate.model";
 
 export class SnakeSnakeModel {
 
-    private body: SnakeCoordinateModel[] = [];
+    private _segments: SnakeCoordinateModel[] = [];
     private historyOfDirections: SnakeCoordinateModel[] = [];
     private direction: SnakeCoordinateModel;
     private _liveSnakeColor = "rgb(131, 245, 108)";
@@ -10,7 +10,7 @@ export class SnakeSnakeModel {
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
     constructor(private coordinate: SnakeCoordinateModel, direction: SnakeCoordinateModel) {
-        this.body = [{x: this.coordinate.x, y: this.coordinate.y}];
+        this._segments = [{x: this.coordinate.x, y: this.coordinate.y}];
         this.direction = direction;
         this.historyOfDirections.push( { ...direction });
        
@@ -18,8 +18,8 @@ export class SnakeSnakeModel {
   
     move(direction: SnakeCoordinateModel) {
        
-        this.body.shift();
-        this.body.push({ ...this.destination });
+        this._segments.shift();
+        this._segments.push({ ...this.destination });
        
         this.historyOfDirections.push({ ...direction });
 
@@ -30,8 +30,8 @@ export class SnakeSnakeModel {
     getDestination(boardHorizontalLenInElements: number, boardVerticalLenInElements: number) {
        
             let newCoord = {
-                x: this.body[this.body.length - 1].x, 
-                y: this.body[this.body.length - 1].y
+                x: this._segments[this._segments.length - 1].x, 
+                y: this._segments[this._segments.length - 1].y
             };
            
             if(this.direction.x == 1) {
@@ -64,7 +64,7 @@ export class SnakeSnakeModel {
 
     eat(foodCoordinate: SnakeCoordinateModel, elongationNumber: number) {
         for(let i = 0; i < elongationNumber; i++) {
-            this.body.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
+            this._segments.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
         }
     }
 
@@ -83,25 +83,25 @@ export class SnakeSnakeModel {
         return {x: this.direction.x, y: this.direction.y};
     }
 
-    getBody() {
-        const bodyCopy = JSON.parse(JSON.stringify(this.body));
-        return bodyCopy;
+    get segments() {
+        const segmentsCopy = JSON.parse(JSON.stringify(this._segments));
+        return segmentsCopy;
     }
 
     getSnakeLength() {
-        return this.body.length;
+        return this._segments.length;
     }
 
     getBodyPart(index: number) {
-        return { ...this.body[index] };
+        return { ...this._segments[index] };
     }
 
     setCoordinateOfSnakeHead(x: number, y: number) {
-        this.body[this.body.length - 1] = {x: x, y: y};
+        this._segments[this._segments.length - 1] = {x: x, y: y};
     }
 
     getCoordinateOfSnakeHead() {
-        return {x: this.body[this.body.length - 1].x, y: this.body[this.body.length - 1].y};
+        return {x: this._segments[this._segments.length - 1].x, y: this._segments[this._segments.length - 1].y};
     }
 
     addDirectionToHistory(direction: SnakeCoordinateModel) {

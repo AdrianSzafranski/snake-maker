@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { SnakeGameStateModel } from './snake-game-state.model';
 
 @Component({
@@ -6,24 +6,31 @@ import { SnakeGameStateModel } from './snake-game-state.model';
   templateUrl: './snake.component.html',
   styleUrls: ['./snake.component.css']
 })
-export class SnakeComponent implements OnInit  {
+export class SnakeComponent implements OnInit, AfterViewInit  {
 
-  @ViewChild('hamburgerMenu') hamburgerMenu?: ElementRef;
-  @ViewChild('canvas', {static: true}) canvasRef!: ElementRef;
+  @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
+  @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
+  @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
 
   gameState!: SnakeGameStateModel;
  
   constructor() {}
 
   ngOnInit(): void {
-    this.gameState = new SnakeGameStateModel(this.canvasRef.nativeElement);
+    this.gameState = new SnakeGameStateModel(
+      this.gameCanvasRef.nativeElement,
+      this.bgCanvasRef.nativeElement,
+      this.gridCanvasRef.nativeElement,
+    );
     this.changeScreenSize();
+  }
+
+  ngAfterViewInit(): void {
     this.gameState.startGame();
   }
 
   onRestart(isChangeMap: boolean) {
-    this.gameState.isChangeMap = isChangeMap;
-    this.gameState.isRestartGame = true;
+    this.gameState.restartGame(isChangeMap);
   }
 
   convertDirectionValue(directionString: String) {
@@ -43,14 +50,13 @@ export class SnakeComponent implements OnInit  {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-  
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
       if(possibleDirection.includes(event.key) && !this.gameState.isGamePaused) {
         this.gameState.currentDirection = this.convertDirectionValue(event.key);
       }
 
       if(event.key.toUpperCase() === 'P') {
-        this.gameState.isGamePaused = !this.gameState.isGamePaused;
+        this.gameState.pauseGame();
       }
   }
 }

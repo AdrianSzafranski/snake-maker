@@ -1,14 +1,36 @@
 #container {
     margin-top: 2%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-#canvas {
-   
+#bgCanvas {
+    z-index: 0;
     border: 5px solid black;
+}
+#gameCanvas {
+   z-index: 1;
+    border: 5px solid black;
+}
+#gridCanvas {
+    z-index: 3;
+    border: 5px solid black;
+}
+.canvas-container {
+    position: relative;
+   /* width: 500px; Szerokość płótna 
+    height: 500px; * Wysokość płótna 
+    //background-color: red;*/
+    background-color: red;
+}
+.canvas-layer {
+    position: absolute;
+    transform: translate(-50%, 0);
 }
 #topPanel {
     color: white;
-    width: 100%;
+  
     display: flex;
     justify-content: space-between;
     background-color: #090c1d;
@@ -29,6 +51,7 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    z-index: 10;
 }
 .optionsContainer li {
     display: inline-block;

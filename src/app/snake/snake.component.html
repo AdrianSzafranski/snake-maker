@@ -1,5 +1,5 @@
 <div id='container'>
-    <div id='topPanel'>
+    <div id='topPanel' [ngStyle]="{'width': gameState.getBoardWidthInPixels()+9+'px'}">
         <p class='bestScore'>Best Score: {{ gameState.bestScore }} </p>
         <p class='currentScore'>Current Score: {{ gameState.currentScore }} </p>
         <div class="optionsContainer">
@@ -15,11 +15,9 @@
             </li>
         </div>    
     </div>
-    <canvas 
-        id="canvas" 
-        [width]='gameState.getBoardWidthInPixels()' 
-        [height]='gameState.getBoardHeightInPixels()' 
-        #canvas>
-    </canvas>
-   
+    <div class='canvas-container'>
+        <canvas id="bgCanvas" class="canvas-layer" #bgCanvas></canvas>
+        <canvas id="gameCanvas" class="canvas-layer" #gameCanvas></canvas>
+        <canvas id="gridCanvas" class="canvas-layer" #gridCanvas></canvas>
+    </div>
 </div>

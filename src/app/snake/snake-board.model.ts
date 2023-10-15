@@ -24,9 +24,8 @@ export class SnakeBoardModel {
         maxHeight: number = 1) {
     
         let itemCoord = this.findAvailableElement(occupiedCoords);
-  
+        this._elements[itemCoord.y][itemCoord.x] = item; 
         if(maxWidth === 1 && maxHeight === 1) {
-            this._elements[itemCoord.y][itemCoord.x] = item; 
             return [{ ...itemCoord }];
         }
 
@@ -151,7 +150,6 @@ export class SnakeBoardModel {
 
     isGameOver(snakeDestination: SnakeCoordinateModel) {
         let destinationElement = this._elements[snakeDestination.y][snakeDestination.x];
-        console.log(destinationElement);
         if(destinationElement === 'snake' || destinationElement === 'obstacle') {
             return true;
         }

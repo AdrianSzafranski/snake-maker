@@ -12,7 +12,11 @@ export class SnakeCanvasDrawer {
     }
 
     clearCanvas() {
-        this._canvasContext.clearRect(0,0, this._canvas.width, this._canvas.height); 
+        this._canvasContext.clearRect(0, 0, this._canvas.width, this._canvas.height); 
+    }
+
+    clearRect(startX: number, startY: number, width: number, height: number) {
+        this._canvasContext.clearRect(startX, startY, width, height); 
     }
 
     drawRect(color: string, x: number, y: number, width: number, height = width) {
@@ -62,5 +66,10 @@ export class SnakeCanvasDrawer {
             this._canvas.width / 2 - textWidth / 2, 
             this._canvas.height / 2 + fontSize / 8
         );
+    }
+
+    changeCanvasSize(width: number, height: number) {
+        this._canvas.width = width;
+        this._canvas.height = height;
     }
 }
