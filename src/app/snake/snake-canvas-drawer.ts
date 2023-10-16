@@ -27,8 +27,8 @@ export class SnakeCanvasDrawer {
     drawRectBorder(color: string, x: number, y: number, width: number, height = width) {
        
         this._canvasContext.strokeStyle = color;
-        this._canvasContext.lineWidth = 1;
-        this._canvasContext.strokeRect(x, y, width-1, height-1);
+        this._canvasContext.lineWidth = 2;
+        this._canvasContext.strokeRect(x, y, width, height);
     }
 
     drawCircle(centerX: number, centerY: number, radius: number, color: string) {
