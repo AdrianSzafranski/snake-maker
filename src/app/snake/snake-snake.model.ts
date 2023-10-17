@@ -3,21 +3,20 @@ import { SnakeCoordinateModel } from "./snake-coordinate.model";
 export class SnakeSnakeModel {
 
     private _segments: SnakeCoordinateModel[] = [];
-    private historyOfDirections: SnakeCoordinateModel[] = [];
+    private _directionHistory: SnakeCoordinateModel[] = [];
     private direction: SnakeCoordinateModel;
     private _liveSnakeColor = "rgb(131, 245, 108)";
     private _deadSnakeColor = "rgb(112, 112, 112)";
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
-    constructor(private coords: SnakeCoordinateModel[], direction: SnakeCoordinateModel) {
+    constructor(coords: SnakeCoordinateModel[], direction: SnakeCoordinateModel) {
         for(let coord of coords) {
             this._segments.push({x: coord.x, y: coord.y});
         }
        
         this.direction = direction;
-        this.historyOfDirections.push( { ...direction });
-        this.historyOfDirections.push( { ...direction });
-       
+        this._directionHistory.push( { ...direction });
+        this._directionHistory.push( { ...direction });
     }
   
     move(direction: SnakeCoordinateModel) {
@@ -25,7 +24,7 @@ export class SnakeSnakeModel {
         this._segments.shift();
         this._segments.push({ ...this.destination });
        
-        this.historyOfDirections.push({ ...direction });
+        this._directionHistory.push({ ...direction });
         
 
         return { ...this.destination };
@@ -109,12 +108,13 @@ export class SnakeSnakeModel {
         return {x: this._segments[this._segments.length - 1].x, y: this._segments[this._segments.length - 1].y};
     }
 
-    addDirectionToHistory(direction: SnakeCoordinateModel) {
-        this.historyOfDirections.push(direction);
+    addDirectionHistory(direction: SnakeCoordinateModel) {
+        this._directionHistory.push(direction);
     }
-
-    getHistoryOfDirections() {
-        return this.historyOfDirections.slice();
+    
+    get directionHistory() {
+        const directionHistory = JSON.parse(JSON.stringify(this._directionHistory));
+        return directionHistory;
     }
 
     get liveSnakeColor() {

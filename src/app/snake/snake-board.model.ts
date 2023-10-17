@@ -7,12 +7,13 @@ export class SnakeBoardModel {
     private _elements;
     private _firstBgColor = "#212c6d";
     private _secondBgColor = "#111738";
-
+    
     constructor(
         private _widthInPixels: number,
         private _heightInPixels: number,
         private _widthInElements: number,
-        private _heightInElements: number) {
+        private _heightInElements: number,
+        private _snakeNarrowingFactor: number) {
             this._elementSizeInPixels = this._widthInPixels / this._widthInElements;
             this._elements = Array.from({ length: this._heightInElements }, () => Array(this._widthInElements).fill(''));
     }
@@ -226,6 +227,10 @@ export class SnakeBoardModel {
 
     setElement(x: number, y:number, value: string) {
         this.elements[y][x] = value;
+    }
+
+    getSnakeNarrowing() {
+        return Math.floor(this._elementSizeInPixels * this._snakeNarrowingFactor);
     }
 
 }

@@ -12,7 +12,7 @@ export class SnakeGameStateModel {
   private _isGameOver = false;
   private _frameInterval = 1000/30;
   private _lastFrameTime = 0;
-  private _timeToPassOneElementInSeconds = 0.1;
+  private _timeToPassOneElementInSeconds = 0.5;
   private _timeElapsedInSeconds = 0;
   private _currentDirection = {x: 0, y: 1};
   private _specialFood: SnakeFoodModel | null = null;
@@ -38,11 +38,11 @@ export class SnakeGameStateModel {
   }
 
   initBoardElements() {
-    this._board = new SnakeBoardModel(400, 240, 25, 15);
+    this._board = new SnakeBoardModel(400, 240, 25, 15, 0.2);
     
     this.initSnakeCoords = this._board.setItemInRandElement('snake', undefined, undefined, 2); //delete 'snake'?
-    this._snake = new SnakeSnakeModel(  this.initSnakeCoords, this._currentDirection);
-    
+    this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
+
     
         
     this._foods = [];
@@ -65,8 +65,8 @@ export class SnakeGameStateModel {
   }
 
   setInitBoardElements() {
-    this._board = new SnakeBoardModel(400, 240, 25, 15);
-    this._snake = new SnakeSnakeModel(  this.initSnakeCoords, this._currentDirection);
+    this._board = new SnakeBoardModel(400, 240, 25, 15, 0.2);
+    this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
     for(let initSnakeCoord of this.initSnakeCoords) {
       this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, 'snake'); //delete 'snake'?
     } 
@@ -181,33 +181,35 @@ export class SnakeGameStateModel {
       sign, fontSize, fontFamily, fontColor, centerX, centerY);
   }
   
-  drawSnake(snakeColor: string) {
-    let snakeHistory = this._snake.getHistoryOfDirections();
-    let snakeLength = this._snake.getSnakeLength();
-    let lastSnakeSegment = this._snake.segments[0];
-    let penultimateSnakeSegment = snakeLength > 1 ? this._snake.getBodyPart(1) : null;
-    let directionLastSnakeSegment = snakeHistory[snakeHistory.length - snakeLength];
-    let snakeDestination = this._snake.destination;
-    
-    
+  drawSnake(color: string) {
+    // dir - direction
+    let dirHistory = this._snake.directionHistory;
     let snakeSegments = this._snake.segments;
+    let snakeLength = this._snake.segments.length;
+    let lastSegmentDirIndex = dirHistory.length - snakeLength;
+    let narrowing = this._board.getSnakeNarrowing();
+
+    for(let i = 1; i < snakeSegments.length; i++) { 
+      let currentSegmentDir = dirHistory[lastSegmentDirIndex + i];
+      let previousSegmentDir = dirHistory[lastSegmentDirIndex + i - 1];
+      let isEqualDirs = this.isEqualCoords(currentSegmentDir, previousSegmentDir);
+      let choosenDir = isEqualDirs ? currentSegmentDir : previousSegmentDir;
+      this.drawSnakeNewSegment({ ...snakeSegments[i] }, choosenDir, 1, color, narrowing);  
+    }
+    
+    // draw snake last segment
     let boardElementLenInPixels = this._board.elementSizeInPixels;
-    let snakeNarrowing = Math.floor(boardElementLenInPixels * 0.2);
-    snakeSegments.forEach((segment: SnakeCoordinateModel, index: number) => {
-      if(index != 0) {
-      let directionSnakeDestination = snakeHistory[snakeHistory.length  - snakeLength  + index]; 
-      if(snakeHistory[snakeHistory.length  - snakeLength  - 1 + index])
-       directionSnakeDestination = (
-        snakeHistory[snakeHistory.length  - snakeLength  + index].x === snakeHistory[snakeHistory.length  - snakeLength  - 1 + index].x &&
-        snakeHistory[snakeHistory.length  - snakeLength  + index].y === snakeHistory[snakeHistory.length  - snakeLength  - 1 + index].y)
-        ? snakeHistory[snakeHistory.length  - snakeLength  + index]
-        : snakeHistory[snakeHistory.length  - snakeLength  - 1 + index]
-      this.drawSnakeNewSegment({ ...segment }, directionSnakeDestination, 1, `rgb(255,0${+index*80},0${+index*80})`, snakeNarrowing);    
-       }
-    });
-    this._gameCanvasDrawer.drawRect('orange', lastSnakeSegment.x*boardElementLenInPixels + snakeNarrowing, lastSnakeSegment.y*boardElementLenInPixels + snakeNarrowing, boardElementLenInPixels - 2*snakeNarrowing );
-    console.log(directionLastSnakeSegment)
-    //this.clearSnakeOldSegment(snakeSegments[0], directionLastSnakeSegment, 1, snakeNarrowing)
+    let snakeLastSegment = snakeSegments[0];
+    this._gameCanvasDrawer.drawRect(color, 
+      snakeLastSegment.x * boardElementLenInPixels + narrowing,
+      snakeLastSegment.y * boardElementLenInPixels + narrowing,
+      boardElementLenInPixels - 2 * narrowing );
+  }
+
+  isEqualCoords(firstCoord: SnakeCoordinateModel, secondCoord: SnakeCoordinateModel) {
+    return (firstCoord.x === secondCoord.x && firstCoord.y === secondCoord.y)
+     ? true 
+     : false;
   }
 
   restartGame(isChangeMap: boolean) {
@@ -237,7 +239,7 @@ export class SnakeGameStateModel {
   }
 
   drawSnakeShift(shiftFactor: number = 1) {
-    let snakeHistory = this._snake.getHistoryOfDirections();
+    let snakeHistory = this._snake.directionHistory;
     let snakeLength = this._snake.getSnakeLength();
     let lastSnakeSegment = this._snake.segments[0];
     let penultimateSnakeSegment = snakeLength > 1 ? this._snake.getBodyPart(1) : null;
