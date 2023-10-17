@@ -117,7 +117,6 @@ export class SnakeGameStateModel {
       this.drawTextInBoardCenter('Paused');
     } else {
       this._gridCanvasDrawer.clearCanvas();
-      this.drawBoardGrid();
       this._lastFrameTime = performance.now();
       requestAnimationFrame((currentTime) => {
         this.updateGame(currentTime);
@@ -209,20 +208,6 @@ export class SnakeGameStateModel {
     this._gameCanvasDrawer.drawRect('orange', lastSnakeSegment.x*boardElementLenInPixels + snakeNarrowing, lastSnakeSegment.y*boardElementLenInPixels + snakeNarrowing, boardElementLenInPixels - 2*snakeNarrowing );
     console.log(directionLastSnakeSegment)
     //this.clearSnakeOldSegment(snakeSegments[0], directionLastSnakeSegment, 1, snakeNarrowing)
-  }
-
-  drawBoardGrid() {
-   /* let boardElementSizeInPixels = this._board.elementSizeInPixels;
-    for(let rowNumber = 0; rowNumber <  this._board.heightInElements; rowNumber +=1) {
-      for(let columnNumber = 0; columnNumber <  this._board.widthInElements; columnNumber += 1) {
-        this._gridCanvasDrawer.drawRectBorder(
-          "black",
-          columnNumber * boardElementSizeInPixels, 
-          rowNumber * boardElementSizeInPixels,
-          boardElementSizeInPixels);
-      }
-    }*/
-
   }
 
   restartGame(isChangeMap: boolean) {
@@ -456,7 +441,6 @@ export class SnakeGameStateModel {
     this._bgCanvasDrawer.clearCanvas();
     this._gameCanvasDrawer.clearCanvas();
     this._gridCanvasDrawer.clearCanvas();
-    this.drawBoardGrid();
     this.drawBoard();
     this.drawSnake(this._snake.liveSnakeColor);
     this.drawFoods();
