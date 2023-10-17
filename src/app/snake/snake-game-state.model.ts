@@ -12,7 +12,7 @@ export class SnakeGameStateModel {
   private _isGameOver = false;
   private _frameInterval = 1000/30;
   private _lastFrameTime = 0;
-  private _timeToPassOneElementInSeconds = 1.3;
+  private _timeToPassOneElementInSeconds = 0.1;
   private _timeElapsedInSeconds = 0;
   private _currentDirection = {x: 0, y: 1};
   private _specialFood: SnakeFoodModel | null = null;
@@ -195,6 +195,7 @@ export class SnakeGameStateModel {
     let boardElementLenInPixels = this._board.elementSizeInPixels;
     let snakeNarrowing = Math.floor(boardElementLenInPixels * 0.2);
     snakeSegments.forEach((segment: SnakeCoordinateModel, index: number) => {
+      if(index != 0) {
       let directionSnakeDestination = snakeHistory[snakeHistory.length  - snakeLength  + index]; 
       if(snakeHistory[snakeHistory.length  - snakeLength  - 1 + index])
        directionSnakeDestination = (
@@ -202,10 +203,12 @@ export class SnakeGameStateModel {
         snakeHistory[snakeHistory.length  - snakeLength  + index].y === snakeHistory[snakeHistory.length  - snakeLength  - 1 + index].y)
         ? snakeHistory[snakeHistory.length  - snakeLength  + index]
         : snakeHistory[snakeHistory.length  - snakeLength  - 1 + index]
-      this.drawSnakeNewSegment({ ...segment }, directionSnakeDestination, 1, "red", snakeNarrowing);    
-      
+      this.drawSnakeNewSegment({ ...segment }, directionSnakeDestination, 1, `rgb(255,0${+index*80},0${+index*80})`, snakeNarrowing);    
+       }
     });
- 
+    this._gameCanvasDrawer.drawRect('orange', lastSnakeSegment.x*boardElementLenInPixels + snakeNarrowing, lastSnakeSegment.y*boardElementLenInPixels + snakeNarrowing, boardElementLenInPixels - 2*snakeNarrowing );
+    console.log(directionLastSnakeSegment)
+    //this.clearSnakeOldSegment(snakeSegments[0], directionLastSnakeSegment, 1, snakeNarrowing)
   }
 
   drawBoardGrid() {
@@ -354,27 +357,34 @@ export class SnakeGameStateModel {
     if(direction.x === 0 && direction.y === -1) {
       elementY -= snakeNarrowing;
       elementY += elementPart;
+    
       elementHeight *= shiftFactor;
+      //elementHeight += snakeNarrowing * 2;
     } else if(direction.x === 1 && direction.y === 0) { 
-      elementX += snakeNarrowing;
+      elementX -= snakeNarrowing;
       elementWidth *= shiftFactor;
+      elementWidth += snakeNarrowing * 2;
     } else if(direction.x === 0 && direction.y === 1) { 
-      elementY += snakeNarrowing;
+      elementY -= snakeNarrowing;
+    
       elementHeight *= shiftFactor;
+      elementHeight += snakeNarrowing * 2;
     } else if(direction.x === -1 && direction.y === 0) { 
       elementX -= snakeNarrowing;
       elementX += elementPart;
       elementWidth *= shiftFactor;
+    
     }
 
       this._gameCanvasDrawer.clearRect(elementX, elementY, elementWidth, elementHeight);
     
       if(drawCoord.x == (this._board.widthInElements-1) && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction.x === 1  ) {
-        this._gameCanvasDrawer.clearRect( 0, elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
+        this._gameCanvasDrawer.clearRect( -snakeNarrowing*2, elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
       } else if(drawCoord.x == 0 && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction.x === -1  ) {
         this._gameCanvasDrawer.clearRect( boardElementLenInPixels*(this._board.widthInElements) - (snakeNarrowing - (boardElementLenInPixels - elementWidth)), elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
       } else if(drawCoord.y == (this._board.heightInElements-1) && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction.y === 1  ) {
-        this._gameCanvasDrawer.clearRect( elementX, 0, elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
+        console.log("test")
+        this._gameCanvasDrawer.clearRect( elementX, -snakeNarrowing*2, elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
       } else if(drawCoord.y == 0 && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction.y === -1  ) {
         this._gameCanvasDrawer.clearRect( elementX, boardElementLenInPixels*(this._board.heightInElements) - (snakeNarrowing - (boardElementLenInPixels - elementHeight)), elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
       }
