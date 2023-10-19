@@ -33,15 +33,7 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
     this.gameState.restartGame(isChangeMap);
   }
 
-  convertDirectionValue(directionString: String) {
-    switch(directionString) {
-      case 'ArrowDown': return {x: 0, y: 1};
-      case 'ArrowLeft': return {x: -1, y: 0};
-      case 'ArrowUp': return {x: 0, y: -1};
-      case 'ArrowRight': return {x: 1, y: 0};
-      default: return {x: 0, y: 0};
-    }
-  }
+
 
   @HostListener('window:resize', ['$event'])
   changeScreenSize(event?: Event): void {
@@ -52,7 +44,8 @@ export class SnakeComponent implements OnInit, AfterViewInit  {
   handleKeyboardEvent(event: KeyboardEvent) {
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
       if(possibleDirection.includes(event.key) && !this.gameState.isGamePaused) {
-        this.gameState.currentDirection = this.convertDirectionValue(event.key);
+        let direction = event.key.replace("Arrow", "").toLowerCase();
+        this.gameState.currentDirection = direction;
       }
 
       if(event.key.toUpperCase() === 'P') {

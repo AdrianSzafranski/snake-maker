@@ -3,28 +3,28 @@ import { SnakeCoordinateModel } from "./snake-coordinate.model";
 export class SnakeSnakeModel {
 
     private _segments: SnakeCoordinateModel[] = [];
-    private _directionHistory: SnakeCoordinateModel[] = [];
-    private direction: SnakeCoordinateModel;
+    private _directionHistory: string[] = [];
+    private direction: string;
     private _liveSnakeColor = "rgb(131, 245, 108)";
     private _deadSnakeColor = "rgb(112, 112, 112)";
     destination: SnakeCoordinateModel = {x: 0, y:0};
 
-    constructor(coords: SnakeCoordinateModel[], direction: SnakeCoordinateModel) {
+    constructor(coords: SnakeCoordinateModel[], direction: string) {
         for(let coord of coords) {
             this._segments.push({x: coord.x, y: coord.y});
         }
        
         this.direction = direction;
-        this._directionHistory.push( { ...direction });
-        this._directionHistory.push( { ...direction });
+        this._directionHistory.push(direction);
+        this._directionHistory.push(direction);
     }
   
-    move(direction: SnakeCoordinateModel) {
+    move(direction: string) {
        
         this._segments.shift();
         this._segments.push({ ...this.destination });
        
-        this._directionHistory.push({ ...direction });
+        this._directionHistory.push(direction);
         
 
         return { ...this.destination };
@@ -37,29 +37,30 @@ export class SnakeSnakeModel {
                 x: this._segments[this._segments.length - 1].x, 
                 y: this._segments[this._segments.length - 1].y
             };
-           
-            if(this.direction.x == 1) {
-                newCoord.x = 
-                    (newCoord.x + 1 < boardHorizontalLenInElements)
-                    ? newCoord.x + 1
-                    : 0;
-            } else if(this.direction.x == -1) {
-                newCoord.x = 
-                    (newCoord.x - 1 >= 0)
-                ? newCoord.x - 1
-                : boardHorizontalLenInElements - 1;
-            } else if(this.direction.y == 1) {
-                newCoord.y = 
-                    (newCoord.y + 1 < boardVerticalLenInElements)
-                    ? newCoord.y + 1
-                    : 0;newCoord
-            } else if(this.direction.y == -1) {
-                newCoord.y = 
-                    (newCoord.y - 1 >= 0)
-                    ? newCoord.y - 1
-                    : boardVerticalLenInElements - 1;
-            }
 
+            switch(this.direction) {
+                case 'up': 
+                    newCoord.y = (newCoord.y - 1 >= 0)
+                     ? newCoord.y - 1
+                     : boardVerticalLenInElements - 1;
+                    break;
+                case 'right': 
+                    newCoord.x = (newCoord.x + 1 < boardHorizontalLenInElements)
+                     ? newCoord.x + 1
+                     : 0;
+                    break;
+                case 'down':
+                    newCoord.y = (newCoord.y + 1 < boardVerticalLenInElements)
+                     ? newCoord.y + 1
+                     : 0;
+                    break;
+                case 'left':
+                    newCoord.x = (newCoord.x - 1 >= 0)
+                     ? newCoord.x - 1
+                     : boardHorizontalLenInElements - 1;
+                    break;
+            }
+           
             this.destination = { ...newCoord };
                
        return { ...this.destination };
@@ -72,19 +73,20 @@ export class SnakeSnakeModel {
         }
     }
 
-    setDirection(currentDirection: SnakeCoordinateModel) {
+    setDirection(currentDirection: string) {
     
-        if(this.direction.x != 0 && currentDirection.x != 0) return this.direction;
-        if(this.direction.y != 0 && currentDirection.y != 0) return this.direction;
+        if(this.direction == 'up' && currentDirection == 'down') return this.direction;
+        if(this.direction == 'down' && currentDirection == 'up') return this.direction;
+        if(this.direction == 'left' && currentDirection == 'right') return this.direction;
+        if(this.direction == 'right' && currentDirection == 'left') return this.direction;
 
-        this.direction.x = currentDirection.x;
-        this.direction.y = currentDirection.y;
+        this.direction = currentDirection;
     
         return this.direction;
     }
 
     getDirection() {
-        return {x: this.direction.x, y: this.direction.y};
+        return this.direction;
     }
 
     get segments() {
@@ -108,7 +110,7 @@ export class SnakeSnakeModel {
         return {x: this._segments[this._segments.length - 1].x, y: this._segments[this._segments.length - 1].y};
     }
 
-    addDirectionHistory(direction: SnakeCoordinateModel) {
+    addDirectionHistory(direction: string) {
         this._directionHistory.push(direction);
     }
     

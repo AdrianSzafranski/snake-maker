@@ -5,7 +5,6 @@ import { SnakeFoodModel } from "./snake-food.model";
 import { SnakeSnakeModel } from "./snake-snake.model";
 
 export class SnakeGameStateModel {
-
   private _currentScore = 0; 
   private _bestScore = 0; 
   private _isGameInterrupted = false;
@@ -14,7 +13,7 @@ export class SnakeGameStateModel {
   private _lastFrameTime = 0;
   private _timeToPassOneElementInSeconds = 0.5;
   private _timeElapsedInSeconds = 0;
-  private _currentDirection = {x: 0, y: 1};
+  private _currentDirection = 'down';
   private _specialFood: SnakeFoodModel | null = null;
   private _board!: SnakeBoardModel;
   private _snake!: SnakeSnakeModel;
@@ -34,17 +33,15 @@ export class SnakeGameStateModel {
       this._bgCanvasDrawer = new SnakeCanvasDrawer(bgCanvas);
       this._gameCanvasDrawer = new SnakeCanvasDrawer(gameCanvas);
       this._gridCanvasDrawer = new SnakeCanvasDrawer(gidCanvas);
-      this.initBoardElements();gameCanvas
+      this.initBoardElements();
   }
 
   initBoardElements() {
     this._board = new SnakeBoardModel(400, 240, 25, 15, 0.2);
     
-    this.initSnakeCoords = this._board.setItemInRandElement('snake', undefined, undefined, 2); //delete 'snake'?
+    this.initSnakeCoords = this._board.setItemInRandElement('', undefined, undefined, 2);
     this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
-
-    
-        
+  
     this._foods = [];
         
     let initFoodTypes = ['normal', 'speed', 'length'];
@@ -60,18 +57,16 @@ export class SnakeGameStateModel {
     let newObstacle = this._board.setItemInRandElement(
       'obstacle', 
       [ ...this.initSnakeCoords, ...this.initFoodCoords, ...this._obstacles ], 2, 5);
-    this._obstacles.push(...newObstacle);
-            
+    this._obstacles.push(...newObstacle);    
   }
 
   setInitBoardElements() {
     this._board = new SnakeBoardModel(400, 240, 25, 15, 0.2);
     this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
     for(let initSnakeCoord of this.initSnakeCoords) {
-      this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, 'snake'); //delete 'snake'?
+      this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
     } 
-   
-        
+      
     this._foods = [];
     let initFoodTypes = ['normal', 'speed', 'length'];
     for(let i = 0; i < initFoodTypes.length; i++) {
@@ -93,7 +88,7 @@ export class SnakeGameStateModel {
     this._timeToPassOneElementInSeconds = 0.3;
     this._timeElapsedInSeconds = 0;
     this._specialFood = null;
-    this._currentDirection = {x: 0, y: 1};
+    this._currentDirection = 'down';
   }
 
   determineBestScore() {
@@ -187,23 +182,23 @@ export class SnakeGameStateModel {
     let snakeSegments = this._snake.segments;
     let snakeLength = this._snake.segments.length;
     let lastSegmentDirIndex = dirHistory.length - snakeLength;
-    let narrowing = this._board.getSnakeNarrowing();
 
     for(let i = 1; i < snakeSegments.length; i++) { 
       let currentSegmentDir = dirHistory[lastSegmentDirIndex + i];
       let previousSegmentDir = dirHistory[lastSegmentDirIndex + i - 1];
-      let isEqualDirs = this.isEqualCoords(currentSegmentDir, previousSegmentDir);
+      let isEqualDirs = currentSegmentDir === previousSegmentDir;
       let choosenDir = isEqualDirs ? currentSegmentDir : previousSegmentDir;
-      this.drawSnakeNewSegment({ ...snakeSegments[i] }, choosenDir, 1, color, narrowing);  
+      this.determineSnakeNewSegment({ ...snakeSegments[i] }, choosenDir, 1, color);  
     }
     
     // draw snake last segment
     let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let snakeNarrowing = this._board.getSnakeNarrowing();
     let snakeLastSegment = snakeSegments[0];
     this._gameCanvasDrawer.drawRect(color, 
-      snakeLastSegment.x * boardElementLenInPixels + narrowing,
-      snakeLastSegment.y * boardElementLenInPixels + narrowing,
-      boardElementLenInPixels - 2 * narrowing );
+      snakeLastSegment.x * boardElementLenInPixels + snakeNarrowing,
+      snakeLastSegment.y * boardElementLenInPixels + snakeNarrowing,
+      boardElementLenInPixels - 2 * snakeNarrowing );
   }
 
   isEqualCoords(firstCoord: SnakeCoordinateModel, secondCoord: SnakeCoordinateModel) {
@@ -248,91 +243,186 @@ export class SnakeGameStateModel {
     let directionSnakeDestination = snakeHistory[snakeHistory.length - 1];
     let snakeColor = this._snake.liveSnakeColor;
 
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
-    let snakeNarrowing = Math.floor(boardElementLenInPixels * 0.2);
-
     // The last two parts of the snake are the same when it has eaten the food.
     // Then the snake should grow so that it doesn't lose the last part.
     if(penultimateSnakeSegment == null || !this.isEqualCoordinates(lastSnakeSegment, penultimateSnakeSegment)) {
-      this.clearSnakeOldSegment({ ...lastSnakeSegment }, directionLastSnakeSegment, shiftFactor, snakeNarrowing)
+      this.clearSnakeOldSegment({ ...lastSnakeSegment }, directionLastSnakeSegment, shiftFactor)
     } 
        
     // add part of the snake's body
-    this.drawSnakeNewSegment({ ...snakeDestination }, directionSnakeDestination, shiftFactor, snakeColor, snakeNarrowing);       
+    this.determineSnakeNewSegment({ ...snakeDestination }, directionSnakeDestination, shiftFactor, snakeColor);       
   }
     
-  drawSnakeNewSegment(
-    drawCoord: SnakeCoordinateModel, 
-    direction: SnakeCoordinateModel, 
+  determineSnakeNewSegment(
+    boardElCoord: SnakeCoordinateModel, 
+    direction: string, 
     shiftFactor: number, 
-    color: string,
-    snakeNarrowing: number) {
+    color: string) {
         
     let boardElementLenInPixels = this._board.elementSizeInPixels;
-    
-    //element with drawCoord
-    let elementX = drawCoord.x * boardElementLenInPixels;
-    let elementY = drawCoord.y * boardElementLenInPixels;
-    let elementWidth = boardElementLenInPixels;
-    let elementHeight = boardElementLenInPixels;
-
-    let elementPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
-
-    if(direction.x === 0 && direction.y === -1) {
-      elementY += snakeNarrowing;
-      elementX += snakeNarrowing;
-      elementWidth -= 2* snakeNarrowing;
-      elementY += elementPart;
-      elementHeight *= shiftFactor;
-    } else if(direction.x === 1 && direction.y === 0) { 
-      elementY += snakeNarrowing;
-      elementX -= snakeNarrowing;
-      elementHeight -= snakeNarrowing * 2;
-      elementWidth *= shiftFactor;
-    } else if(direction.x === 0 && direction.y === 1) { 
-      elementY -= snakeNarrowing;
-      elementX += snakeNarrowing;
-      elementWidth -= snakeNarrowing * 2;
-      elementHeight *= shiftFactor;
-    } else if(direction.x === -1 && direction.y === 0) { 
-      elementY += snakeNarrowing;
-      elementX += snakeNarrowing;
-      elementHeight -= snakeNarrowing * 2;
-      elementX += elementPart;
-      elementWidth *= shiftFactor;
+    let segmentParams = {
+      x: boardElCoord.x * boardElementLenInPixels,
+      y: boardElCoord.y * boardElementLenInPixels,
+      width: boardElementLenInPixels,
+      height: boardElementLenInPixels
     }
 
-    if(elementX < 0 && elementWidth <= snakeNarrowing && direction.x === 1) {
-      this._gameCanvasDrawer.drawRect(color, (this._board.widthInElements)*boardElementLenInPixels - snakeNarrowing, elementY, elementWidth, elementHeight);
-    } else if(drawCoord.x ==(this._board.widthInElements-1) && elementWidth <= snakeNarrowing && direction.x === -1  ) {
-      this._gameCanvasDrawer.drawRect(color, snakeNarrowing - elementWidth, elementY, elementWidth, elementHeight); 
-    } else if(elementY < 0 && elementHeight <= snakeNarrowing  && direction.y === 1 ) {
-      this._gameCanvasDrawer.drawRect(color, elementX, (this._board.heightInElements)*boardElementLenInPixels - snakeNarrowing, elementWidth, elementHeight);
-    } else if(drawCoord.y ==(this._board.heightInElements-1) && elementHeight <= snakeNarrowing  && direction.y === -1 ) {
-      this._gameCanvasDrawer.drawRect(color, elementX, snakeNarrowing - elementHeight, elementWidth, elementHeight); 
-    } else {
-      this._gameCanvasDrawer.drawRect(color, elementX, elementY, elementWidth, elementHeight); 
-    }
-   
-    if(elementX < 0 && elementWidth >= snakeNarrowing && direction.x === 1) {
-      this._gameCanvasDrawer.drawRect(color, (this._board.widthInElements)*boardElementLenInPixels - snakeNarrowing, elementY, snakeNarrowing, elementHeight);
-    } else if(elementY < 0 && elementHeight >= snakeNarrowing && direction.y === 1) { 
-      this._gameCanvasDrawer.drawRect(color, elementX, (this._board.heightInElements)*boardElementLenInPixels - snakeNarrowing, elementWidth, snakeNarrowing);
-    } else if(drawCoord.x == this._board.widthInElements - 1  && elementWidth >= snakeNarrowing && direction.x === -1) { 
-      this._gameCanvasDrawer.drawRect(color, 0, elementY, snakeNarrowing, elementHeight);
-    } else if(drawCoord.y == this._board.heightInElements - 1  && elementHeight >= snakeNarrowing && direction.y === -1) {
-      this._gameCanvasDrawer.drawRect(color,elementX, 0, elementWidth, snakeNarrowing);
-    }
-
+    segmentParams = this.narrowSnakeSegment({ ...segmentParams }, direction);
+    segmentParams = this.trimSnakeSegment({ ...segmentParams }, direction, shiftFactor);
+    this.drawSnakeNewSegment({ ...segmentParams }, boardElCoord, direction, color);
   }
 
+  // Narrows the sides of the snake
+  // The snake is visually set back by the narrow value so that it is correctly displayed when changing direction
+  narrowSnakeSegment(segmentParams: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  }, direction: string) {
+    let snakeNarrowing = this._board.getSnakeNarrowing();
+
+    switch(direction) {
+      case 'up':
+        segmentParams.x += snakeNarrowing;
+        segmentParams.y += snakeNarrowing;
+        segmentParams.width -= 2* snakeNarrowing;
+        break;
+      case 'right':
+        segmentParams.x -= snakeNarrowing;
+        segmentParams.y += snakeNarrowing;
+        segmentParams.height -= snakeNarrowing * 2;
+        break;
+      case 'down':
+        segmentParams.x += snakeNarrowing;
+        segmentParams.y -= snakeNarrowing;
+        segmentParams.width -= snakeNarrowing * 2;
+        break;
+      case 'left':
+        segmentParams.x += snakeNarrowing;
+        segmentParams.y += snakeNarrowing;
+        segmentParams.height -= snakeNarrowing * 2;
+        break;
+    }
+
+    return { ...segmentParams };
+  }
+
+  // Determine the part of the snake segment to draw
+  trimSnakeSegment(segmentParams: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  }, direction: string, shiftFactor: number) {
+    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let segmentPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+    switch(direction) {
+      case 'up':
+        segmentParams.y += segmentPart;
+        segmentParams.height *= shiftFactor;
+        break;
+      case 'right':
+        segmentParams.width *= shiftFactor;
+        break;
+      case 'down':
+        segmentParams.height *= shiftFactor;
+        break;
+      case 'left':
+        segmentParams.x += segmentPart;
+        segmentParams.width *= shiftFactor;
+        break;
+    }
+
+    return { ...segmentParams };
+  }
+
+  drawSnakeNewSegment(segmentParams: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  }, boardElCoord: SnakeCoordinateModel, direction: string, color: string) {
+    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let snakeNarrowing = this._board.getSnakeNarrowing();
+
+    // In the narrowSnakeSegment function, the position of the snake is visually moved backwards.
+    // The resulting gap in front of the snake is filled by the next element. 
+    // When the snake passes through the wall, the gap is not filled because there is no next element.
+    // The snake in the first element after passing through the wall also moves backwards,
+    // so it draws a fragment outside the array. 
+    // The code below moves this piece of the snake outside the board to the place where the gap occurs.
+
+    let isFirstColumn = boardElCoord.x === 0;
+    let isFirstRow = boardElCoord.y === 0;
+    let isLastColumn = boardElCoord.x === (this._board.widthInElements - 1);
+    let isLastRow = boardElCoord.y === (this._board.heightInElements - 1);
+    let withLessThanNarrowing = segmentParams.width <= snakeNarrowing;
+    let heigthLessThanNarrowing = segmentParams.height <= snakeNarrowing;
+
+    // Invisible part is the part of the snake drawn outside the board
+    let isOnlyDrawInvisiblePartBehindTopWall = 
+    (direction === 'down' && isFirstRow && heigthLessThanNarrowing);
+    let isOnlyDrawInvisiblePartBehindRightWall = 
+    (direction === 'left' && isLastColumn && withLessThanNarrowing);
+    let isOnlyDrawInvisiblePartBehindBottomWall = 
+      (direction === 'up' && isLastRow && heigthLessThanNarrowing);
+    let isOnlyDrawInvisiblePartBehindLeftWall = 
+      (direction === 'right' && isFirstColumn && withLessThanNarrowing);
+   
+    // Changes the drawing position to a gap in front of the wall when drawing an invisible part outside the board.
+    if(isOnlyDrawInvisiblePartBehindTopWall) {
+      segmentParams.y = this._board.heightInElements * boardElementLenInPixels - snakeNarrowing;
+    }
+    else if(isOnlyDrawInvisiblePartBehindRightWall) {
+      segmentParams.x = snakeNarrowing - segmentParams.width
+    }
+    else if(isOnlyDrawInvisiblePartBehindBottomWall) {
+      segmentParams.y = snakeNarrowing -  segmentParams.height;
+    }
+    else if(isOnlyDrawInvisiblePartBehindLeftWall) {
+      segmentParams.x = this._board.widthInElements * boardElementLenInPixels - snakeNarrowing;
+    }
+
+    this._gameCanvasDrawer.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
+
+    // The entire gap will be filled as the snake passes through the wall
+    // if the visible part of the first element after the wall is also drawn.
+    // If the snake moves fast enough so that the size of the drawn element is always greater than the narrowing 
+    // (size of the gap in front of the wall), the gap will be filled.
+    let isAlsoDrawInvisiblePartBehindTopWall = 
+    (direction === 'down' && isFirstRow && !heigthLessThanNarrowing);
+    let isAlsoDrawInvisiblePartBehindRightWall = 
+    (direction === 'left' && isLastColumn && !withLessThanNarrowing);
+    let isAlsoDrawInvisiblePartBehindBottomWall = 
+      (direction === 'up' && isLastRow && !heigthLessThanNarrowing);
+    let isAlsoDrawInvisiblePartBehindLeftWall = 
+      (direction === 'right' && isFirstColumn && !withLessThanNarrowing);
+
+    if(isAlsoDrawInvisiblePartBehindLeftWall) {
+      segmentParams.x = this._board.widthInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.width = snakeNarrowing;
+    } else if(isAlsoDrawInvisiblePartBehindTopWall) { 
+      segmentParams.y = this._board.heightInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.height = snakeNarrowing;
+    } else if(isAlsoDrawInvisiblePartBehindRightWall) { 
+      segmentParams.x = 0;
+      segmentParams.width = snakeNarrowing;
+    } else if(isAlsoDrawInvisiblePartBehindBottomWall) {
+      segmentParams.y = 0;
+      segmentParams.height = snakeNarrowing;
+    }
+
+    this._gameCanvasDrawer.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
+  }
+  
   clearSnakeOldSegment(
     drawCoord: SnakeCoordinateModel, 
-    direction: SnakeCoordinateModel, 
-    shiftFactor: number,
-    snakeNarrowing: number) { 
+    direction: string, 
+    shiftFactor: number) { 
     let boardElementLenInPixels = this._board.elementSizeInPixels;
-  
+    let snakeNarrowing = this._board.getSnakeNarrowing();
+
     //element with drawCoord
     let elementX = drawCoord.x * boardElementLenInPixels;
     let elementY = drawCoord.y * boardElementLenInPixels;
@@ -341,22 +431,22 @@ export class SnakeGameStateModel {
 
     let elementPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
 
-    if(direction.x === 0 && direction.y === -1) {
+    if(direction === 'up') {
       elementY -= snakeNarrowing;
       elementY += elementPart;
     
       elementHeight *= shiftFactor;
       //elementHeight += snakeNarrowing * 2;
-    } else if(direction.x === 1 && direction.y === 0) { 
+    } else if(direction === 'right') { 
       elementX -= snakeNarrowing;
       elementWidth *= shiftFactor;
       elementWidth += snakeNarrowing * 2;
-    } else if(direction.x === 0 && direction.y === 1) { 
+    } else if(direction === 'down') { 
       elementY -= snakeNarrowing;
     
       elementHeight *= shiftFactor;
       elementHeight += snakeNarrowing * 2;
-    } else if(direction.x === -1 && direction.y === 0) { 
+    } else if(direction === 'left') { 
       elementX -= snakeNarrowing;
       elementX += elementPart;
       elementWidth *= shiftFactor;
@@ -365,14 +455,14 @@ export class SnakeGameStateModel {
 
       this._gameCanvasDrawer.clearRect(elementX, elementY, elementWidth, elementHeight);
     
-      if(drawCoord.x == (this._board.widthInElements-1) && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction.x === 1  ) {
+      if(drawCoord.x == (this._board.widthInElements-1) && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction === 'right'  ) {
         this._gameCanvasDrawer.clearRect( -snakeNarrowing*2, elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
-      } else if(drawCoord.x == 0 && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction.x === -1  ) {
+      } else if(drawCoord.x == 0 && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction === 'left'  ) {
         this._gameCanvasDrawer.clearRect( boardElementLenInPixels*(this._board.widthInElements) - (snakeNarrowing - (boardElementLenInPixels - elementWidth)), elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
-      } else if(drawCoord.y == (this._board.heightInElements-1) && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction.y === 1  ) {
+      } else if(drawCoord.y == (this._board.heightInElements-1) && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction === 'down'  ) {
         console.log("test")
         this._gameCanvasDrawer.clearRect( elementX, -snakeNarrowing*2, elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
-      } else if(drawCoord.y == 0 && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction.y === -1  ) {
+      } else if(drawCoord.y == 0 && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction === 'up'  ) {
         this._gameCanvasDrawer.clearRect( elementX, boardElementLenInPixels*(this._board.heightInElements) - (snakeNarrowing - (boardElementLenInPixels - elementHeight)), elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
       }
   }
@@ -646,8 +736,8 @@ export class SnakeGameStateModel {
     this._timeElapsedInSeconds = timeElapsedInSeconds;
   }
 
-  set currentDirection(currentDirection: SnakeCoordinateModel) {
-    this._currentDirection = {x: currentDirection.x, y: currentDirection.y};
+  set currentDirection(currentDirection: string) {
+    this._currentDirection = currentDirection;
   }
 
   getBoardWidthInPixels () {
