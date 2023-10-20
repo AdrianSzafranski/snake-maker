@@ -3,18 +3,23 @@
     margin: 0; 
     display: grid;
     grid-template-rows: auto 1fr auto;
-    background-color: #2A2A2A;
+    background-color: #050B23;
     color: white;
 }
 header {
-    background-color: #333333;
-    z-index: 10;
+    background-color: #141A34;
+    z-index: 11;
 }
 li {
     list-style: none;
 }
-a {
+header a {
+    text-decoration: none;
     color: white;
+}
+.nav-menu a {
+    font-size: 1.2rem;
+    color: black;
     text-decoration: none;
 }
 nav {
@@ -28,15 +33,13 @@ nav {
     overflow: hidden;
     position: absolute;
     position: absolute;
-    left: 70%;
+    left: 85%;
     top: 50px;
     gap: 0;
     flex-direction: column;
-    background-color: #1d1d1d;
+    background-color: #d1d3d8;
     width: 0;
     text-align: center;
-
-   
 }
 .nav-branding {
     font-size: 2rem;
@@ -83,7 +86,7 @@ nav {
 }
 .nav-menu.active {
     overflow: visible;
-    width: 30%;
+    width: 15%;
 }
 main {
     margin: 0 auto; 
