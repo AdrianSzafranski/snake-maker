@@ -417,54 +417,68 @@ export class SnakeGameStateModel {
   }
   
   clearSnakeOldSegment(
-    drawCoord: SnakeCoordinateModel, 
+    boardElCoord: SnakeCoordinateModel, 
     direction: string, 
     shiftFactor: number) { 
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let boardElementSizeInPixels = this._board.elementSizeInPixels;
     let snakeNarrowing = this._board.getSnakeNarrowing();
 
     //element with drawCoord
-    let elementX = drawCoord.x * boardElementLenInPixels;
-    let elementY = drawCoord.y * boardElementLenInPixels;
-    let elementWidth = boardElementLenInPixels;
-    let elementHeight = boardElementLenInPixels;
-
-    let elementPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
-
-    if(direction === 'up') {
-      elementY -= snakeNarrowing;
-      elementY += elementPart;
-    
-      elementHeight *= shiftFactor;
-      //elementHeight += snakeNarrowing * 2;
-    } else if(direction === 'right') { 
-      elementX -= snakeNarrowing;
-      elementWidth *= shiftFactor;
-      elementWidth += snakeNarrowing * 2;
-    } else if(direction === 'down') { 
-      elementY -= snakeNarrowing;
-    
-      elementHeight *= shiftFactor;
-      elementHeight += snakeNarrowing * 2;
-    } else if(direction === 'left') { 
-      elementX -= snakeNarrowing;
-      elementX += elementPart;
-      elementWidth *= shiftFactor;
-    
+    let segmentParams = {
+      x: boardElCoord.x * boardElementSizeInPixels,
+      y: boardElCoord.y * boardElementSizeInPixels,
+      width: boardElementSizeInPixels,
+      height: boardElementSizeInPixels
     }
 
-      this._gameCanvasDrawer.clearRect(elementX, elementY, elementWidth, elementHeight);
+    let segmentPart = boardElementSizeInPixels - shiftFactor * boardElementSizeInPixels;
+
+    // positioning and calculation of parts of the cleared segment
+    if(direction === 'up') {
+      segmentParams.y -= snakeNarrowing;
+      segmentParams.y += segmentPart;
+      segmentParams.height *= shiftFactor;
+    } else if(direction === 'right') { 
+      segmentParams.x -= snakeNarrowing;
+      segmentParams.width *= shiftFactor;
+      segmentParams.width += snakeNarrowing * 2;
+    } else if(direction === 'down') { 
+      segmentParams.y -= snakeNarrowing;
+      segmentParams.height *= shiftFactor;
+      segmentParams.height += snakeNarrowing * 2;
+    } else if(direction === 'left') { 
+      segmentParams.x -= snakeNarrowing;
+      segmentParams.x += segmentPart;
+      segmentParams.width *= shiftFactor;
+    }
+
+    this._gameCanvasDrawer.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
     
-      if(drawCoord.x == (this._board.widthInElements-1) && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction === 'right'  ) {
-        this._gameCanvasDrawer.clearRect( -snakeNarrowing*2, elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
-      } else if(drawCoord.x == 0 && boardElementLenInPixels - elementWidth <= snakeNarrowing && direction === 'left'  ) {
-        this._gameCanvasDrawer.clearRect( boardElementLenInPixels*(this._board.widthInElements) - (snakeNarrowing - (boardElementLenInPixels - elementWidth)), elementY, snakeNarrowing- (boardElementLenInPixels - elementWidth), elementHeight);
-      } else if(drawCoord.y == (this._board.heightInElements-1) && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction === 'down'  ) {
-        console.log("test")
-        this._gameCanvasDrawer.clearRect( elementX, -snakeNarrowing*2, elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
-      } else if(drawCoord.y == 0 && boardElementLenInPixels - elementHeight <= snakeNarrowing && direction === 'up'  ) {
-        this._gameCanvasDrawer.clearRect( elementX, boardElementLenInPixels*(this._board.heightInElements) - (snakeNarrowing - (boardElementLenInPixels - elementHeight)), elementWidth, snakeNarrowing- (boardElementLenInPixels - elementHeight));
-      }
+    let isFirstColumn = boardElCoord.x === 0;
+    let isFirstRow = boardElCoord.y === 0;
+    let isLastColumn = boardElCoord.x === (this._board.widthInElements - 1);
+    let isLastRow = boardElCoord.y === (this._board.heightInElements - 1);
+    let uncleanWidth =  boardElementSizeInPixels - segmentParams.width;
+    let isUncleanWithLessThanNarrowing = uncleanWidth <= snakeNarrowing;
+    let uncleanHeight =  boardElementSizeInPixels - segmentParams.height;
+    let isUncleanHeightLessThanNarrowing = uncleanHeight <= snakeNarrowing;
+
+    // Additional cleaning when the snake passes through the wall
+    if(direction === 'right' && isLastColumn && isUncleanWithLessThanNarrowing) {
+      segmentParams.x = - snakeNarrowing * 2;
+      segmentParams.width = snakeNarrowing - uncleanWidth;
+    } else if( direction === 'left'  && isFirstColumn && isUncleanWithLessThanNarrowing) {
+      segmentParams.x = boardElementSizeInPixels * this._board.widthInElements - (snakeNarrowing - uncleanWidth);
+      segmentParams.width = snakeNarrowing - uncleanWidth;
+    } else if(direction === 'down' && isLastRow && isUncleanHeightLessThanNarrowing) {
+      segmentParams.y = -snakeNarrowing*2;
+      segmentParams.height = snakeNarrowing - uncleanHeight;
+    } else if(direction === 'up' && isFirstRow && isUncleanHeightLessThanNarrowing) {
+      segmentParams.y = boardElementSizeInPixels * this._board.heightInElements - (snakeNarrowing - uncleanHeight);
+      segmentParams.height = snakeNarrowing - uncleanHeight;
+    }
+
+    this._gameCanvasDrawer.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
   }
 
   isFood(newSnakeSegment: SnakeCoordinateModel, lastSnakeSegment: SnakeCoordinateModel) {
