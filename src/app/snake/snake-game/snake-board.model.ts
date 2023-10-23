@@ -1,18 +1,17 @@
 import { SnakeCoordinateModel } from "./snake-coordinate.model";
-import { SnakeComponent } from "./snake.component";
 
 export class SnakeBoardModel {
 
     private _elementSizeInPixels;
     private _elements;
-    private _firstBgColor = "#212c6d";
-    private _secondBgColor = "#111738";
     
     constructor(
         private _widthInPixels: number,
         private _heightInPixels: number,
         private _widthInElements: number,
         private _heightInElements: number,
+        private _firstBgColor: string,
+        private _secondBgColor: string,
         private _snakeNarrowingFactor: number) {
             this._elementSizeInPixels = this._widthInPixels / this._widthInElements;
             this._elements = Array.from({ length: this._heightInElements }, () => Array(this._widthInElements).fill(''));

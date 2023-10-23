@@ -1,0 +1,11 @@
+.mapsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 80%;
+    margin: auto;
+    margin-top: 20px;
+}
+.map {
+    width: 100%;
+}

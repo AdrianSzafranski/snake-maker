@@ -1,0 +1,3 @@
+<div class="mapsContainer">
+    <app-snake-map *ngFor="let currentMap of maps" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-snake-map>
+</div>
