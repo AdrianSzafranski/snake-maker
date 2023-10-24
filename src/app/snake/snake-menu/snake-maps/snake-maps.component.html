@@ -1,6 +1,11 @@
 <div class="container">
     <p class="title">Choose map</p>
     <div class="mapsContainer">
-        <app-snake-map *ngFor="let currentMap of maps" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-snake-map>
+        <app-snake-map *ngFor="let currentMap of displayedMaps" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-snake-map>
+    </div>
+    <div class="mapNav">
+        <div class="left-arrow" (click)="onGetPreviousMaps()"></div>
+        <span>{{ displayedMapsStartIndex / 4 + 1 }}/{{ this.pagesNumber }}</span>
+        <div class="right-arrow" (click)="onGetNextMaps()"></div>
     </div>
 </div>

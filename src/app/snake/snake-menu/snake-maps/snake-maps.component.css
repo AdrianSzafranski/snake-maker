@@ -17,3 +17,38 @@
 .map {
     width: 100%;
 }
+.mapNav {
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.arrow-button {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.left-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 25px 15px 0;
+    border-color: transparent white transparent transparent;
+}
+
+.right-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 0 15px 25px;
+    border-color: transparent transparent transparent white;
+}

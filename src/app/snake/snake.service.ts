@@ -68,6 +68,36 @@ export class SnakeService {
       snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
       initTimeToPassOneElementInSeconds: 0.7
     },
+    {
+      id: 5,
+      boardWidthInElements: 25,
+      boardHeightInElements: 15,
+      boardFirstColor: "#7c561b",
+      boardSecondColor: "#7e341b",
+      obstacleColor: "#000000",
+      obstacles: `[
+        {"x": 0, "y": 0, "width": 0, "height": 15},
+        {"x": 24, "y": 0, "width": 0, "height": 15}
+      ]`,
+      snakeInitDirection: 'up',
+      snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
+      initTimeToPassOneElementInSeconds: 0.7
+    },
+    {
+      id: 6,
+      boardWidthInElements: 25,
+      boardHeightInElements: 15,
+      boardFirstColor: "#7c561b",
+      boardSecondColor: "#7e341b",
+      obstacleColor: "#000000",
+      obstacles: `[
+        {"x": 0, "y": 0, "width": 25, "height": 0},
+        {"x": 0, "y": 14, "width": 25, "height": 0}
+      ]`,
+      snakeInitDirection: 'up',
+      snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
+      initTimeToPassOneElementInSeconds: 0.7
+    },
   ];
 
   getMaps() {
