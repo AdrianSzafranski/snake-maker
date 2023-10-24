@@ -8,6 +8,7 @@ import { SnakeMenuComponent } from './snake/snake-menu/snake-menu.component';
 import { SnakeGameComponent } from './snake/snake-game/snake-game.component';
 import { SnakeMapsComponent } from './snake/snake-menu/snake-maps/snake-maps.component';
 import { SnakeRulesComponent } from './snake/snake-menu/snake-rules/snake-rules.component';
+import { SnakeMenuNavComponent } from './snake/snake-menu/snake-menu-nav/snake-menu-nav.component';
 
 const routes: Routes = [ 
 { path: 'tic-tac-toe', component: TicTacToeComponent, children: [
@@ -15,7 +16,9 @@ const routes: Routes = [
   { path: 'game', component: TicTacToeGameComponent }
 ]},
 { path: 'snake', component: SnakeComponent, children: [
-  { path: '', component: SnakeMenuComponent, children: [
+  { path: '', redirectTo: 'menu', pathMatch: 'full' },
+  { path: 'menu', component: SnakeMenuComponent, children: [
+    { path: '', component: SnakeMenuNavComponent},
     { path: 'maps', component: SnakeMapsComponent},
     { path: 'rules', component: SnakeRulesComponent}
   ]},

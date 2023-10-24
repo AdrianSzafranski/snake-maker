@@ -13,6 +13,7 @@ import { SnakeMenuComponent } from './snake/snake-menu/snake-menu.component';
 import { SnakeMapsComponent } from './snake/snake-menu/snake-maps/snake-maps.component';
 import { SnakeRulesComponent } from './snake/snake-menu/snake-rules/snake-rules.component';
 import { SnakeMapComponent } from './snake/snake-menu/snake-maps/snake-map/snake-map.component';
+import { SnakeMenuNavComponent } from './snake/snake-menu/snake-menu-nav/snake-menu-nav.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { SnakeMapComponent } from './snake/snake-menu/snake-maps/snake-map/snake
     SnakeMenuComponent,
     SnakeMapsComponent,
     SnakeRulesComponent,
-    SnakeMapComponent
+    SnakeMapComponent,
+    SnakeMenuNavComponent
   ],
   imports: [
     BrowserModule,

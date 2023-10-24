@@ -3,11 +3,11 @@
     margin: 0; 
     display: grid;
     grid-template-rows: auto 1fr auto;
-    background-color: #050B23;
+    background-color: rgb(24, 25, 26);
     color: white;
 }
 header {
-    background-color: #141A34;
+    background-color: rgb(36, 37, 38);
     z-index: 11;
 }
 li {
