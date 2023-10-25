@@ -1,7 +1,7 @@
 <div class="container">
     <p class="title">Choose map</p>
     <div class="mapsContainer">
-        <app-snake-map *ngFor="let currentMap of displayedMaps" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-snake-map>
+        <app-map *ngFor="let currentMap of displayedMaps" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-map>
     </div>
     <div class="mapNav">
         <div class="left-arrow" (click)="onGetPreviousMaps()"></div>

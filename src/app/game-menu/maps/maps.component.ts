@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { SnakeService } from '../../snake.service';
-import { snakeMapModel } from '../../snake-map.model';
+import { MapModel } from '../../map.model';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-snake-maps',
-  templateUrl: './snake-maps.component.html',
-  styleUrls: ['./snake-maps.component.css']
+  selector: 'app-maps',
+  templateUrl: './maps.component.html',
+  styleUrls: ['./maps.component.css']
 })
-export class SnakeMapsComponent implements OnInit {
+export class MapsComponent implements OnInit {
 
-  maps!: snakeMapModel[];
-  displayedMaps!: snakeMapModel[];
+  maps!: MapModel[];
+  displayedMaps!: MapModel[];
   displayedMapsStartIndex!: number;
   selectedMap?: number;
   pagesNumber!: number;
@@ -28,7 +28,7 @@ export class SnakeMapsComponent implements OnInit {
   onStartGame(mapId: number) {
     this.selectedMap = mapId;
 
-    this.router.navigate(['/snake/game', this.selectedMap]);
+    this.router.navigate(['/game', this.selectedMap]);
   }
 
   onGetPreviousMaps() {

@@ -1,15 +1,15 @@
-import { SnakeCoordinateModel } from "./snake-coordinate.model";
+import { CoordinateModel } from "./coordinate.model";
 
-export class SnakeSnakeModel {
+export class SnakeModel {
 
-    private _segments: SnakeCoordinateModel[] = [];
+    private _segments: CoordinateModel[] = [];
     private _directionHistory: string[] = [];
     private direction: string;
     private _liveSnakeColor = "rgb(131, 245, 108)";
     private _deadSnakeColor = "rgb(112, 112, 112)";
-    destination: SnakeCoordinateModel = {x: 0, y:0};
+    destination: CoordinateModel = {x: 0, y:0};
 
-    constructor(coords: SnakeCoordinateModel[], direction: string) {
+    constructor(coords: CoordinateModel[], direction: string) {
         for(let coord of coords) {
             this._segments.push({x: coord.x, y: coord.y});
         }
@@ -67,7 +67,7 @@ export class SnakeSnakeModel {
       
     }
 
-    eat(foodCoordinate: SnakeCoordinateModel, elongationNumber: number) {
+    eat(foodCoordinate: CoordinateModel, elongationNumber: number) {
         for(let i = 0; i < elongationNumber; i++) {
             this._segments.splice(0, 0, { x: foodCoordinate.x, y: foodCoordinate.y });
         }

@@ -1,31 +1,16 @@
 <div class="container">
   <header>
     <nav>
-      <a routerLink="/" class="nav-branding">Home</a>
-      <div #hamburgerMenu>
-        <ul class="nav-menu" [ngClass]="{'active': isHamburgerMenuOpen}">
-          <li class="nav-item">
-            <a routerLink="/tic-tac-toe" (click)="onCloseHamburgerMenu()">
-              <div class="nav-link-value">Tic Tac Toes</div>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/snake" (click)="onCloseHamburgerMenu()">
-              <div class="nav-link-value">Snake</div>
-            </a>
-          </li>
-        </ul>
-        <div 
-          class="hamburger"
-          [ngClass]="{'active': isHamburgerMenuOpen}" 
-          (click)="isHamburgerMenuOpen = !isHamburgerMenuOpen">
-            <div class="hamburgerLabel">Games</div>
-            <div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-              <div class="bar"></div>
-            </div>
+      <a routerLink="/" class="nav-home">Home</a>
+      <div #menu>
+        <div class="menu-toggle" (click)="toggleMenu()">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
         </div>
+        <ul [ngClass]="{'active': isMenuOpen}">
+          <li><a routerLink="/guide">Guide</a></li>
+        </ul>
       </div>
     </nav>
   </header>

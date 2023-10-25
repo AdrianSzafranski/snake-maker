@@ -1,4 +1,4 @@
-export interface snakeMapModel {
+export interface MapModel {
     id: number;
     boardWidthInElements: number;
     boardHeightInElements: number;

@@ -1,6 +1,6 @@
-import { SnakeCoordinateModel } from "./snake-coordinate.model";
+import { CoordinateModel } from "./coordinate.model";
 
-export class SnakeFoodModel {
+export class FoodModel {
 
     _speedModifier: number;
     _elongationNumber: number;
@@ -8,7 +8,7 @@ export class SnakeFoodModel {
     _sign: string;
     _color: string;
     
-    constructor(private _coordinate: SnakeCoordinateModel, private _type: string){ 
+    constructor(private _coordinate: CoordinateModel, private _type: string){ 
         switch(this.type) {
             case 'normal':
                 this._speedModifier = 1;
@@ -112,7 +112,7 @@ export class SnakeFoodModel {
         this._color = color;
     }
 
-    set coordinate(coordinate: SnakeCoordinateModel) {
+    set coordinate(coordinate: CoordinateModel) {
         this._coordinate = {x: coordinate.x, y: coordinate.y};
     }
 

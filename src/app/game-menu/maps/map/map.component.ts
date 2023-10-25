@@ -1,16 +1,16 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { SnakeCoordinateModel } from 'src/app/snake/snake-game/snake-coordinate.model';
-import { snakeMapModel } from 'src/app/snake/snake-map.model';
+import { MapModel } from 'src/app/map.model';
+
 
 @Component({
-  selector: 'app-snake-map',
-  templateUrl: './snake-map.component.html',
-  styleUrls: ['./snake-map.component.css']
+  selector: 'app-map',
+  templateUrl: './map.component.html',
+  styleUrls: ['./map.component.css']
 })
-export class SnakeMapComponent implements OnInit {
+export class MapComponent implements OnInit {
 
   @ViewChild('mapCanvas', {static: true}) mapCanvasRef!: ElementRef;
-  @Input() map!: snakeMapModel;
+  @Input() map!: MapModel;
 
   mapCanvas!: HTMLCanvasElement
   mapCanvasContext!: CanvasRenderingContext2D;

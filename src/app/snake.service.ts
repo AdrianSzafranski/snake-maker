@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { snakeMapModel } from './snake-map.model';
 
 @Injectable({
   providedIn: 'root'

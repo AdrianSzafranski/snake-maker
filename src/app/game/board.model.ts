@@ -1,6 +1,6 @@
-import { SnakeCoordinateModel } from "./snake-coordinate.model";
+import { CoordinateModel } from "./coordinate.model";
 
-export class SnakeBoardModel {
+export class BoardModel {
 
     private _elementSizeInPixels;
     private _elements;
@@ -19,7 +19,7 @@ export class SnakeBoardModel {
 
     setItemInRandElement(
         item: string,
-        occupiedCoords: SnakeCoordinateModel[] = [],
+        occupiedCoords: CoordinateModel[] = [],
         maxWidth: number = 1,
         maxHeight: number = 1) {
     
@@ -29,7 +29,7 @@ export class SnakeBoardModel {
             return [{ ...itemCoord }];
         }
 
-        let itemCoords: SnakeCoordinateModel[] = [{ ...itemCoord }];
+        let itemCoords: CoordinateModel[] = [{ ...itemCoord }];
 
         for(let i = 1; i < maxWidth; i++) {
 
@@ -52,7 +52,7 @@ export class SnakeBoardModel {
         return JSON.parse(JSON.stringify(itemCoords));
     }
 
-    getConnectedElementCoord(elementCoord: SnakeCoordinateModel, isHorizontal: boolean) {
+    getConnectedElementCoord(elementCoord: CoordinateModel, isHorizontal: boolean) {
 
         let newElementCoord = {x: elementCoord.x, y: elementCoord.y};
 
@@ -65,7 +65,7 @@ export class SnakeBoardModel {
         return { ...newElementCoord};
     }
 
-    isAvailableElement(elementCoords: SnakeCoordinateModel, occupiedCoords: SnakeCoordinateModel[] = []) {
+    isAvailableElement(elementCoords: CoordinateModel, occupiedCoords: CoordinateModel[] = []) {
       
         let occupiedRows: number[] = []
         let occupiedColumns: number[] = [];
@@ -87,7 +87,7 @@ export class SnakeBoardModel {
     
     }
 
-    findAvailableElement(occupiedCoords: SnakeCoordinateModel[] = []) {
+    findAvailableElement(occupiedCoords: CoordinateModel[] = []) {
         let occupiedRows: number[] = []
         let occupiedColumns: number[] = [];
 
@@ -109,7 +109,7 @@ export class SnakeBoardModel {
         return { ...randCoord };
     }
 
-    isSuitableElementForObstacle(testCoord: SnakeCoordinateModel, snakeCoord: SnakeCoordinateModel) {
+    isSuitableElementForObstacle(testCoord: CoordinateModel, snakeCoord: CoordinateModel) {
        
         let isSnakeRow = snakeCoord.x == testCoord.x;
         let isSnakeColumn = snakeCoord.y == testCoord.y;
@@ -128,7 +128,7 @@ export class SnakeBoardModel {
         return {x: x, y: y};
     }
 
-    editSnakeCoordinate(lastPartOfSnakeBody: SnakeCoordinateModel, penultimatePartOfSnakeBody: SnakeCoordinateModel | null, newSnakeCoord: SnakeCoordinateModel) {
+    editSnakeCoordinate(lastPartOfSnakeBody: CoordinateModel, penultimatePartOfSnakeBody: CoordinateModel | null, newSnakeCoord: CoordinateModel) {
    
         this._elements[newSnakeCoord.y][newSnakeCoord.x] = 'snake';
         
@@ -141,14 +141,14 @@ export class SnakeBoardModel {
         this._elements[lastPartOfSnakeBody.y][lastPartOfSnakeBody.x] = '';
     }
 
-    isEqualCoordinates(firstCoordinate: SnakeCoordinateModel, secondCoordinate: SnakeCoordinateModel) {
+    isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
         if(firstCoordinate.x === secondCoordinate.x && firstCoordinate.y === secondCoordinate.y) {
             return true;
         }
         return false;
     }
 
-    isGameOver(snakeDestination: SnakeCoordinateModel) {
+    isGameOver(snakeDestination: CoordinateModel) {
         let destinationElement = this._elements[snakeDestination.y][snakeDestination.x];
         if(destinationElement === 'snake' || destinationElement === 'obstacle') {
             return true;

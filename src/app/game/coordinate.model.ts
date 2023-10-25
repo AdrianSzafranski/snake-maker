@@ -1,4 +1,4 @@
-export class SnakeCoordinateModel {
+export class CoordinateModel {
     x: number; 
     y: number;
     constructor(x: number, y: number) {

@@ -1,0 +1,104 @@
+<div class="container">
+    <div class="rulesContainer">
+        <h1>Rules</h1>
+        <div class="rules">
+            <ol>
+                <li>
+                   The user controls the snake.
+                    <p class='comments'>
+                        Unless the snake is too fast, in which case the snake controls the user's
+                    </p>
+                </li>
+                <li>
+                    The snake moves automatically, the user can change its direction of movement.
+                    <p class="comments">
+                        "It's not what happens to us, but how we react to it that matters for our destiny" ~Epictetus
+                    </p>
+                </li>
+                <li>
+                    The snake dies when it hits an obstacle, itself or an opponent.
+                    <p class='comments'>If the user is a minor, the snake just falls asleep</p>
+                </li>
+                <li>
+                    Food changes the snake's properties and the game score.
+                    <p class='comments'>A snake eats to grow, but never to get fat. It's fun to be a snake</p>
+                </li>
+                <li>
+                    The way to win depends on the game mode.
+                    <p class="comments">I have run out of ideas for comments</p>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <div class="objectContainer">
+        <h1>Types of objects</h1>
+        <div class="generalObjectContainer">
+            <div class="map">
+                <canvas class="mapCanvas" #mapCanvas></canvas>
+                <p class="mapDescription">Sample map</p>
+            </div>
+            <div class="generalObjects">
+                <p class="title">General objects:</p>
+                <div class="objectDescription">
+                    <div class="snake"></div>
+                    Snake
+                </div>
+                <div class="objectDescription">
+                    <div class="obstacle"></div>
+                    Obstacle
+                </div>
+                <div class="objectDescription">
+                    <div class="food"></div>
+                    Food
+                </div>
+            </div>
+        </div>
+        <div class="foodContainer">
+            <div class="standardFood">
+                <p class="title">Standard food:</p>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #normalFoodCanvas></canvas>
+                    <p>Normal food: +1 length; +1 speed</p>
+                </div>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #lengthFoodCanvas></canvas>
+                    <p>Speed food: +2 length</p>
+                </div>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #speedFoodCanvas></canvas>
+                    <p>Speed food: +2 speed</p>
+                </div>
+            </div>
+            <div class="specialFood">
+                <p class="title">Special food:</p>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #fortuneFoodCanvas></canvas>
+                    <p>Fortune food: +5 score</p>
+                </div>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #curseFoodCanvas></canvas>
+                    <p>Curse food: -5 score</p>
+                </div>
+                <div class="foodDescription">
+                    <canvas class="foodCanvas" width="40" height="40" #unknownFoodCanvas></canvas>
+                    <p>Unknown food: from -10 to 10 score</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modeContainer">
+        <h1>Modes</h1>
+        <div class="modeDescription">
+            <p class="normalModeTitle">Classic</p>
+            <p class="modeDescription">Reach a minimum score threshold before you die.</p>
+            <p class="normalModeTitle">Time</p>
+            <p class="modeDescription">Reach a minimum score threshold before time runs out.</p>
+            <p class="arenaModeTitle">Arena</p>
+            <p class="modeDescription">Reach a higher score than your opponent.</p>
+            <p class="coopModeTitle">Classic Coop</p>
+            <p class="modeDescription">Reach a minimum score threshold with an ally before you die.</p>
+            <p class="coopModeTitle">Time Coop</p>
+            <p class="modeDescription">Reach a minimum score threshold with an ally before time runs out.</p>
+        </div>
+    </div>
+</div>

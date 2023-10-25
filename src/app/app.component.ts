@@ -6,18 +6,19 @@ import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  @ViewChild('hamburgerMenu') hamburgerMenu?: ElementRef;
-  isHamburgerMenuOpen = false;
+  @ViewChild('menu') menu?: ElementRef;
+  isMenuOpen = false;
 
   @HostListener('document:click', ['$event']) navOpen(event: Event) {
-    let isHamburgerMenuDefined = this.hamburgerMenu;
-    let isClickedOutsideHamburgerMenu = isHamburgerMenuDefined && !this.hamburgerMenu!.nativeElement.contains(event.target);
-    if (isClickedOutsideHamburgerMenu) {
-      this.isHamburgerMenuOpen = false;
+    let isMenuDefined = this.menu;
+    let isClickedOutsideMenu = isMenuDefined && !this.menu!.nativeElement.contains(event.target);
+    if (isClickedOutsideMenu) {
+      this.isMenuOpen = false;
     } 
   }
   
-  onCloseHamburgerMenu() {
-    this.isHamburgerMenuOpen = false;
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
+  
 }

@@ -1,19 +1,19 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { SnakeGameStateModel } from './snake-game-state.model';
+import { GameStateModel } from './game-state.model';
 import { ActivatedRoute } from '@angular/router';
 import { SnakeService } from '../snake.service';
 
 @Component({
-  selector: 'app-snake-game',
-  templateUrl: './snake-game.component.html',
-  styleUrls: ['./snake-game.component.css']
+  selector: 'app-game',
+  templateUrl: './game.component.html',
+  styleUrls: ['./game.component.css']
 })
-export class SnakeGameComponent implements OnInit, AfterViewInit {
+export class GameComponent implements OnInit, AfterViewInit {
   @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
   @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
   @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
 
-  gameState!: SnakeGameStateModel;
+  gameState!: GameStateModel;
   isFixedMap = false;
   
   constructor(private snakeService: SnakeService, private route: ActivatedRoute) {}
@@ -27,7 +27,7 @@ export class SnakeGameComponent implements OnInit, AfterViewInit {
       this.isFixedMap = true;
     }
 
-    this.gameState = new SnakeGameStateModel(
+    this.gameState = new GameStateModel(
       map,
       this.gameCanvasRef.nativeElement,
       this.bgCanvasRef.nativeElement,

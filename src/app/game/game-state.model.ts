@@ -1,11 +1,11 @@
-import { snakeMapModel } from "../snake-map.model";
-import { SnakeBoardModel } from "./snake-board.model";
-import { SnakeCanvasDrawer } from "./snake-canvas-drawer";
-import { SnakeCoordinateModel } from "./snake-coordinate.model";
-import { SnakeFoodModel } from "./snake-food.model";
-import { SnakeSnakeModel } from "./snake-snake.model";
+import { MapModel } from "../map.model";
+import { BoardModel } from "./board.model";
+import { CanvasDrawer } from "./canvas-drawer";
+import { CoordinateModel } from "./coordinate.model";
+import { FoodModel } from "./food.model";
+import { SnakeModel } from "./snake.model";
 
-export class SnakeGameStateModel {
+export class GameStateModel {
   private _currentScore = 0; 
   private _bestScore = 0; 
   private _isGameInterrupted = false;
@@ -15,26 +15,26 @@ export class SnakeGameStateModel {
   private _timeToPassOneElementInSeconds = 0.5;
   private _timeElapsedInSeconds = 0;
   private _currentDirection = 'down';
-  private _specialFood: SnakeFoodModel | null = null;
-  private _board!: SnakeBoardModel;
-  private _snake!: SnakeSnakeModel;
-  private _foods!: SnakeFoodModel[];
-  private _obstacles: SnakeCoordinateModel[] = [];
-  private _bgCanvasDrawer: SnakeCanvasDrawer;
-  private _gameCanvasDrawer: SnakeCanvasDrawer;
-  private _gridCanvasDrawer: SnakeCanvasDrawer;
-  private initSnakeCoords: SnakeCoordinateModel[] = [];
-  private initFoodCoords: SnakeCoordinateModel[] = [];
+  private _specialFood: FoodModel | null = null;
+  private _board!: BoardModel;
+  private _snake!: SnakeModel;
+  private _foods!: FoodModel[];
+  private _obstacles: CoordinateModel[] = [];
+  private _bgCanvasDrawer: CanvasDrawer;
+  private _gameCanvasDrawer: CanvasDrawer;
+  private _gridCanvasDrawer: CanvasDrawer;
+  private initSnakeCoords: CoordinateModel[] = [];
+  private initFoodCoords: CoordinateModel[] = [];
   private candrawBoards = true;
   
   constructor(
-    private map: snakeMapModel,
+    private map: MapModel,
     gameCanvas: HTMLCanvasElement, 
     bgCanvas: HTMLCanvasElement, 
     gidCanvas: HTMLCanvasElement) {
-      this._bgCanvasDrawer = new SnakeCanvasDrawer(bgCanvas);
-      this._gameCanvasDrawer = new SnakeCanvasDrawer(gameCanvas);
-      this._gridCanvasDrawer = new SnakeCanvasDrawer(gidCanvas);
+      this._bgCanvasDrawer = new CanvasDrawer(bgCanvas);
+      this._gameCanvasDrawer = new CanvasDrawer(gameCanvas);
+      this._gridCanvasDrawer = new CanvasDrawer(gidCanvas);
 
       if(this.map.obstacles) {
         this.initBoardElementsUsingFixedPositions();
@@ -46,14 +46,14 @@ export class SnakeGameStateModel {
   initBoardElementsUsingFixedPositions() {
     this._timeElapsedInSeconds = this.map.initTimeToPassOneElementInSeconds;
 
-    this._board = new SnakeBoardModel(
+    this._board = new BoardModel(
       400, 240, 
       this.map.boardWidthInElements, this.map.boardHeightInElements, 
       this.map.boardFirstColor, this.map.boardSecondColor,
       0.2);
     
-    let initSnakeCoords: SnakeCoordinateModel[] = JSON.parse(this.map.snakeInitCoords);
-    this._snake = new SnakeSnakeModel(initSnakeCoords, this.map.snakeInitDirection);
+    let initSnakeCoords: CoordinateModel[] = JSON.parse(this.map.snakeInitCoords);
+    this._snake = new SnakeModel(initSnakeCoords, this.map.snakeInitDirection);
   
     this._foods = [];
         
@@ -62,7 +62,7 @@ export class SnakeGameStateModel {
     for(let initFoodType of initFoodTypes) {
         let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
         this.initFoodCoords.push({ ...initFoodCoord });
-        let food = new SnakeFoodModel(initFoodCoord, initFoodType);
+        let food = new FoodModel(initFoodCoord, initFoodType);
         this._foods.push(food);
     }
 
@@ -84,14 +84,14 @@ export class SnakeGameStateModel {
   initBoardElementsUsingRandPositions() {
     this._timeElapsedInSeconds = this.map.initTimeToPassOneElementInSeconds;
 
-    this._board = new SnakeBoardModel(
+    this._board = new BoardModel(
       400, 240, 
       this.map.boardWidthInElements, this.map.boardHeightInElements, 
       this.map.boardFirstColor, this.map.boardSecondColor,
       0.2);
     
     this.initSnakeCoords = this._board.setItemInRandElement('', undefined, undefined, 2);
-    this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
+    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection);
   
     this._foods = [];
         
@@ -100,7 +100,7 @@ export class SnakeGameStateModel {
     for(let initFoodType of initFoodTypes) {
         let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
         this.initFoodCoords.push({ ...initFoodCoord });
-        let food = new SnakeFoodModel(initFoodCoord, initFoodType);
+        let food = new FoodModel(initFoodCoord, initFoodType);
         this._foods.push(food);
     }
 
@@ -113,13 +113,13 @@ export class SnakeGameStateModel {
   }
 
   setInitBoardElements() {
-    this._board = new SnakeBoardModel(
+    this._board = new BoardModel(
       400, 240, 
       this.map.boardWidthInElements, this.map.boardHeightInElements, 
       this.map.boardFirstColor, this.map.boardSecondColor,
       0.2);
 
-    this._snake = new SnakeSnakeModel(this.initSnakeCoords, this._currentDirection);
+    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection);
     for(let initSnakeCoord of this.initSnakeCoords) {
       this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
     } 
@@ -127,7 +127,7 @@ export class SnakeGameStateModel {
     this._foods = [];
     let initFoodTypes = ['normal', 'speed', 'length'];
     for(let i = 0; i < initFoodTypes.length; i++) {
-          let food = new SnakeFoodModel(this.initFoodCoords[i], initFoodTypes[i]);
+          let food = new FoodModel(this.initFoodCoords[i], initFoodTypes[i]);
           this._foods.push(food);
           this._board.setElement(this.initFoodCoords[i].x, this.initFoodCoords[i].y, 'food');
     }
@@ -258,7 +258,7 @@ export class SnakeGameStateModel {
       boardElementLenInPixels - 2 * snakeNarrowing );
   }
 
-  isEqualCoords(firstCoord: SnakeCoordinateModel, secondCoord: SnakeCoordinateModel) {
+  isEqualCoords(firstCoord: CoordinateModel, secondCoord: CoordinateModel) {
     return (firstCoord.x === secondCoord.x && firstCoord.y === secondCoord.y)
      ? true 
      : false;
@@ -315,7 +315,7 @@ export class SnakeGameStateModel {
   }
     
   determineSnakeNewSegment(
-    boardElCoord: SnakeCoordinateModel, 
+    boardElCoord: CoordinateModel, 
     direction: string, 
     shiftFactor: number, 
     color: string) {
@@ -403,7 +403,7 @@ export class SnakeGameStateModel {
     y: number,
     width: number,
     height: number
-  }, boardElCoord: SnakeCoordinateModel, direction: string, color: string) {
+  }, boardElCoord: CoordinateModel, direction: string, color: string) {
     let boardElementLenInPixels = this._board.elementSizeInPixels;
     let snakeNarrowing = this._board.getSnakeNarrowing();
 
@@ -478,7 +478,7 @@ export class SnakeGameStateModel {
   }
   
   clearSnakeOldSegment(
-    boardElCoord: SnakeCoordinateModel, 
+    boardElCoord: CoordinateModel, 
     direction: string, 
     shiftFactor: number) { 
     let boardElementSizeInPixels = this._board.elementSizeInPixels;
@@ -542,7 +542,7 @@ export class SnakeGameStateModel {
     this._gameCanvasDrawer.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
   }
 
-  isFood(newSnakeSegment: SnakeCoordinateModel, lastSnakeSegment: SnakeCoordinateModel) {
+  isFood(newSnakeSegment: CoordinateModel, lastSnakeSegment: CoordinateModel) {
     let boardElement = this._board.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
     if(boardElement !== 'food') return;
@@ -564,7 +564,7 @@ export class SnakeGameStateModel {
     this.manageSpecialFood();
   }
     
-  isSpecialFood(newSnakeSegment: SnakeCoordinateModel) {
+  isSpecialFood(newSnakeSegment: CoordinateModel) {
     let boardElement = this._board.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
     if(boardElement !== 'specialFood' || this._specialFood === null) return;
@@ -599,7 +599,7 @@ export class SnakeGameStateModel {
     }
       
     let specialFoodCoord = this._board.setItemInRandElement('specialFood')[0];
-    this._specialFood = new SnakeFoodModel(specialFoodCoord, specialFoodType);
+    this._specialFood = new FoodModel(specialFoodCoord, specialFoodType);
     
     this.drawFoods();
   }
@@ -657,7 +657,7 @@ export class SnakeGameStateModel {
     }
   }
     
-  drawFood(foodCoord: SnakeCoordinateModel, color: string, sign: string) {
+  drawFood(foodCoord: CoordinateModel, color: string, sign: string) {
     let boardElementSizeInPixels = this._board.elementSizeInPixels;
     
     let centerX = foodCoord.x * boardElementSizeInPixels + boardElementSizeInPixels / 2;
@@ -747,7 +747,7 @@ export class SnakeGameStateModel {
     this._gridCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
   }
 
-  isEqualCoordinates(firstCoordinate: SnakeCoordinateModel, secondCoordinate: SnakeCoordinateModel) {
+  isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
     if(firstCoordinate.x === secondCoordinate.x && firstCoordinate.y === secondCoordinate.y) {
       return true;
     }

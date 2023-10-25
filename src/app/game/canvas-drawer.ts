@@ -1,4 +1,4 @@
-export class SnakeCanvasDrawer {
+export class CanvasDrawer {
 
     private _canvasContext: CanvasRenderingContext2D;
 

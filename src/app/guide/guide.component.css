@@ -1,0 +1,110 @@
+.container {
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    min-height: 85%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(36, 37, 38);
+    border-radius: 15px;
+    position: relative;
+    font-size: 1.2rem;
+    padding: 2% 40px;
+}
+.rulesContainer {
+    width: 100%;
+    margin-bottom: 20px;
+}
+h1 {
+    margin-bottom: 15px;
+}
+ol {
+    list-style-position: inside;
+}
+li {
+    margin-bottom: 10px;
+}
+.comments {
+    font-style: italic;
+    color: rgb(191, 191, 191);
+}
+.objectContainer {
+    width: 100%;
+    margin-bottom: 20px;
+}
+.generalObjectContainer {
+    display: flex; 
+    margin-bottom: 20px;  
+}
+.mapCanvas {
+    border: 3px solid black;
+}
+.mapDescription {
+    text-align: center;
+    color: rgb(191, 191, 191);
+    font-style: italic;
+}
+.generalObjects{
+    margin-left: 20px;
+}
+.title {
+    margin-bottom: 10px;
+}
+.objectDescription {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.snake {
+    background-color: rgb(131, 245, 108);
+    width: 35px;
+    height: 35px;
+    margin-right: 5px;
+}
+.obstacle {
+    background-color: rgb(0, 0, 0);
+    width: 35px;
+    height: 35px;
+    margin-right: 5px;
+}
+.food {
+    background-color: rgb(144, 144, 144);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+.foodContainer {
+    display: flex;
+}
+.standardFood {
+    margin-right: 30px;
+}
+.foodDescription {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.foodCanvas {
+    margin-right: 10px;
+}
+.modeContainer {
+    width: 100%;
+}
+.normalModeTitle {
+    font-weight: bold;
+    color: rgb(148, 208, 217);
+}
+.arenaModeTitle {
+    font-weight: bold;
+    color: rgb(217, 149, 148);
+}
+.coopModeTitle {
+    font-weight: bold;
+    color: rgb(207, 217, 148);
+}
+.modeDescription {
+    margin-bottom: 10px;
+}
