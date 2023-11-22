@@ -6,9 +6,11 @@ import { GuideComponent } from './guide/guide.component';
 import { AuthComponent } from './auth/auth.component';
 
 const routes: Routes = [ 
-  { path: '', component: GameMenuComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: AuthComponent},
   { path: 'auth', component: AuthComponent},
   { path: 'guide', component: GuideComponent },
+  { path: 'game', component: GameMenuComponent },
   { path: 'game/:mapId', component: GameComponent },
 ];
 

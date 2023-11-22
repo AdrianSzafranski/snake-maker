@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { AuthService } from './auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -7,20 +9,40 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent {
-  isLoginMode = true;
+  isSignInMode = true;
   isLoading = false;
   error: string | null = null;
 
+  constructor(
+    private authService: AuthService,
+    private router: Router
+    ) {}
+
   onSwitchMode() {
-    this.isLoginMode = !this.isLoginMode;
+    this.isSignInMode = !this.isSignInMode;
+    this.error = null;
   }
 
   onSubmit(form: NgForm) {
     if(!form.valid) {
       return;
     }
-    
-    console.log(form.value);
+    const email = form.value.email;
+    const password = form.value.password;
+
+    this.isLoading = true;
+    this.authService.auth(email, password, this.isSignInMode)
+    .subscribe({
+      next: resData => {
+        this.isLoading = false;
+        this.router.navigate(['/']);
+      },
+      error: errorMessage => {
+        this.error = errorMessage.message;
+        this.isLoading = false;
+      }
+    });
+
     form.reset();
   }
 }

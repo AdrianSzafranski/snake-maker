@@ -1,5 +1,5 @@
 <div class="container">
-    <h2>{{ isLoginMode ? 'Sign in' : 'Sign up' }}</h2>
+    <h2>{{ isSignInMode ? 'Sign in' : 'Sign up' }}</h2>
     <div class="form-error" *ngIf="error">
         <p>{{ error }}</p>
     </div>
@@ -37,7 +37,7 @@
                 minlength="6"
                 #password="ngModel">
             <p class="input-error" *ngIf="!password.valid && password.touched">
-                Please enter a valid email!
+                Please enter a valid password!
             </p>
         </div>
         <div class="form-buttons">
@@ -45,14 +45,14 @@
                 class="submit-button"
                 type="submit"
                 [disabled]="!authForm.valid">
-                {{ isLoginMode ? 'Login' : 'Register ' }}
+                {{ isSignInMode ? 'Login' : 'Register ' }}
             </button>
-            <span class="switch-text">{{ isLoginMode ? 'You do not have an account?' : 'Do you have an account?' }}</span>
+            <span class="switch-text">{{ isSignInMode ? 'You do not have an account?' : 'Do you have an account?' }}</span>
             <button 
                 class="switch-button"
                 type="button"
                 (click)="onSwitchMode()">
-                {{ isLoginMode ? 'Sign up!' : 'Sign in!' }}
+                {{ isSignInMode ? 'Sign up!' : 'Sign in!' }}
             </button>
         </div>
     </form>
