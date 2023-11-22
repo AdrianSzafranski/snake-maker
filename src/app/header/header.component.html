@@ -1,0 +1,21 @@
+<header>
+    <nav>
+      <a routerLink="/" class="nav-home">Home</a>
+      <div #menu>
+        <div class="menu-toggle" (click)="toggleMenu()">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <ul [ngClass]="{'active': isMenuOpen}">
+            <li routerLinkActive="activeLink" *ngIf="!isAuthenticated">
+                <a routerLink="/auth">Sign in/up</a>
+            </li>
+            <li routerLinkActive="activeLink"><a routerLink="/guide">Guide</a></li>
+            <li *ngIf="isAuthenticated">
+                <a style="cursor: pointer;" (click)="onLogout()">Logout</a>
+            </li>
+        </ul>
+      </div>
+    </nav>
+</header>

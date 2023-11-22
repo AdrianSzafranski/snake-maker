@@ -13,6 +13,7 @@ import { MapComponent } from './game-menu/maps/map/map.component';
 import { AuthComponent } from './auth/auth.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { HomeComponent } from './home/home.component';
+import { HeaderComponent } from './header/header.component';
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import { HomeComponent } from './home/home.component';
     AuthComponent,
     LoadingSpinnerComponent,
     HomeComponent,
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,

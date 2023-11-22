@@ -1,20 +1,4 @@
+<app-header></app-header>
 <div class="container">
-  <header>
-    <nav>
-      <a routerLink="/" class="nav-home">Home</a>
-      <div #menu>
-        <div class="menu-toggle" (click)="toggleMenu()">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-        </div>
-        <ul [ngClass]="{'active': isMenuOpen}">
-          <li><a routerLink="/guide">Guide</a></li>
-        </ul>
-      </div>
-    </nav>
-  </header>
-  <main>
     <router-outlet></router-outlet>
-  </main>
 </div>
