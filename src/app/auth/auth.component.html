@@ -1,0 +1,59 @@
+<div class="container">
+    <h2>{{ isLoginMode ? 'Sign in' : 'Sign up' }}</h2>
+    <div class="form-error" *ngIf="error">
+        <p>{{ error }}</p>
+    </div>
+    <div *ngIf="isLoading" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+    <form 
+        #authForm="ngForm"
+        (ngSubmit)="onSubmit(authForm)"
+        *ngIf="!isLoading">
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input
+                type="email"
+                id="email"
+                class="form-control"
+                ngModel
+                name="email"
+                required
+                email
+                #email="ngModel">
+            <p class="input-error" *ngIf="!email.valid && email.touched">
+                Please enter a valid email!
+            </p>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                class="form-control"
+                ngModel
+                name="password"
+                required
+                minlength="6"
+                #password="ngModel">
+            <p class="input-error" *ngIf="!password.valid && password.touched">
+                Please enter a valid email!
+            </p>
+        </div>
+        <div class="form-buttons">
+            <button 
+                class="submit-button"
+                type="submit"
+                [disabled]="!authForm.valid">
+                {{ isLoginMode ? 'Login' : 'Register ' }}
+            </button>
+            <span class="switch-text">{{ isLoginMode ? 'You do not have an account?' : 'Do you have an account?' }}</span>
+            <button 
+                class="switch-button"
+                type="button"
+                (click)="onSwitchMode()">
+                {{ isLoginMode ? 'Sign up!' : 'Sign in!' }}
+            </button>
+        </div>
+    </form>
+</div>

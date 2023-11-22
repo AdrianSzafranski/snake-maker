@@ -9,6 +9,8 @@ import { GameMenuComponent } from './game-menu/game-menu.component';
 import { GuideComponent } from './guide/guide.component';
 import { MapsComponent } from './game-menu/maps/maps.component';
 import { MapComponent } from './game-menu/maps/map/map.component';
+import { AuthComponent } from './auth/auth.component';
+import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +20,8 @@ import { MapComponent } from './game-menu/maps/map/map.component';
     MapsComponent,
     GuideComponent,
     MapComponent,
+    AuthComponent,
+    LoadingSpinnerComponent,
   ],
   imports: [
     BrowserModule,
