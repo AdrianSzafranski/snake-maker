@@ -11,8 +11,14 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent},
   { path: 'auth', component: AuthComponent},
   { path: 'guide', component: GuideComponent },
-  { path: 'game', component: GameMenuComponent },
-  { path: 'game/:mapId', component: GameComponent },
+  { 
+    path: 'game', 
+    component: GameMenuComponent, 
+    children: [
+      { path: 'game/:mapId', component: GameComponent },
+    ] 
+},
+
 ];
 
 @NgModule({

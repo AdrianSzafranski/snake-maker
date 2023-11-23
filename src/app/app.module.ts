@@ -14,6 +14,7 @@ import { AuthComponent } from './auth/auth.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
+import { GlobalChatComponent } from './home/global-chat/global-chat.component';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { HeaderComponent } from './header/header.component';
     LoadingSpinnerComponent,
     HomeComponent,
     HeaderComponent,
+    GlobalChatComponent,
   ],
   imports: [
     BrowserModule,
