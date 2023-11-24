@@ -1,10 +1,11 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, mergeMap, of, tap, throwError } from 'rxjs';
 
 import { User } from './user.model';
 import firebaseConfig from '../config';
+import { UserAuth } from './user-auth.model';
 
 export interface AuthResponseData {
   kind: string;
@@ -20,6 +21,7 @@ export interface AuthResponseData {
   providedIn: 'root'
 })
 export class AuthService {
+  userAuth = new BehaviorSubject<UserAuth | null>(null);
   user = new BehaviorSubject<User | null>(null);
   private tokenExpirationTimer: any;
 
@@ -27,10 +29,11 @@ export class AuthService {
     private http: HttpClient,
     private router: Router) {}
 
-  auth(email: string, password: string, isSignInMode: boolean) {
-    const httpUrl = 
-      (isSignInMode ? firebaseConfig.signInUrl : firebaseConfig.signUpUrl) + 
-      firebaseConfig.apiKey;
+
+
+
+  signIn(email: string, password: string) {
+    const httpUrl = firebaseConfig.signInUrl + firebaseConfig.apiKey;
    
     return this.http.post<AuthResponseData>(
       httpUrl,
@@ -47,8 +50,57 @@ export class AuthService {
           resData.localId, 
           resData.idToken, 
           +resData.expiresIn);
-      })
+      }),
+      mergeMap((resData) => {
+        const userId = resData.localId;
+          return this.http.get<User>(
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userId}.json`).pipe(
+          catchError(this.handleError),
+          tap(response2 => {
+        
+            this.user.next(response2);
+          })
+          );
+         
+      }),
     );
+  }
+
+  signUp(email: string, password: string, user: User) {
+    const httpUrl = firebaseConfig.signUpUrl + firebaseConfig.apiKey;
+   
+    return this.http.post<AuthResponseData>(
+      httpUrl,
+      {
+        email: email,
+        password: password,
+        returnSecureToken: true
+      }
+    ).pipe(
+      catchError(this.handleError), 
+      tap(resData => {
+        this.handleAuthentication(
+          resData.email, 
+          resData.localId, 
+          resData.idToken, 
+          +resData.expiresIn);
+      }),
+      mergeMap((resData) => {
+        const userId = resData.localId;
+          return this.http.put(
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userId}.json`,
+          user
+        ).pipe(
+          catchError(this.handleError),
+          tap(response2 => {
+            this.user.next(user);
+          })
+          );
+         
+      }),
+      
+      
+    )
   }
   
   autoLogin() {
@@ -59,35 +111,44 @@ export class AuthService {
       return;
     }
 
-    const userData: {
+    const userAuth: {
       email: string;
       id: string;
       _token: string;
       _tokenExpirationDate: string;
     } = JSON.parse(userDataString);
 
-    if(!userData) {
+    if(!userAuth) {
       return;
     }
 
-    const loadedUser = new User(
-      userData.email,
-      userData.id,
-      userData._token,
-      new Date(userData._tokenExpirationDate)
+    const loadedUser = new UserAuth(
+      userAuth.email,
+      userAuth.id,
+      userAuth._token,
+      new Date(userAuth._tokenExpirationDate)
     );
 
     if (loadedUser.token) {
-      this.user.next(loadedUser);
+      this.userAuth.next(loadedUser);
       const expirationDuration = 
-       new Date(userData._tokenExpirationDate).getTime() -
+       new Date(userAuth._tokenExpirationDate).getTime() -
        new Date().getTime();
       this.autoLogout(expirationDuration);
+
+      this.http.get<User>(
+        `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userAuth.id}.json`).pipe(
+        catchError(this.handleError),
+        tap(response2 => {
+      
+          this.user.next(response2);
+        })
+        ).subscribe();
     }
   }
 
   logout() {
-    this.user.next(null);
+    this.userAuth.next(null);
     this.router.navigate(['/auth']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {
@@ -108,11 +169,11 @@ export class AuthService {
     token: string, 
     expiresIn: number) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-    const user = new User(email, userId, token, expirationDate);
-    this.user.next(user);
+    const userAuth = new UserAuth(email, userId, token, expirationDate);
+    this.userAuth.next(userAuth);
     this.autoLogout(expiresIn * 1000);
 
-    localStorage.setItem('userData', JSON.stringify(user));
+    localStorage.setItem('userData', JSON.stringify(userAuth));
   }
 
   private handleError(errorRes: HttpErrorResponse) {
@@ -120,7 +181,7 @@ export class AuthService {
     if(!errorRes.error || !errorRes.error.error) {
       return throwError(() => new Error(errorMessage));
     }
-
+    console.log(errorRes);
     switch (errorRes.error.error.message) {
       case 'EMAIL_EXISTS':
         errorMessage = 'This email exists already';
@@ -137,4 +198,6 @@ export class AuthService {
     }
     return throwError(() => new Error(errorMessage));
   }
+
+
 }

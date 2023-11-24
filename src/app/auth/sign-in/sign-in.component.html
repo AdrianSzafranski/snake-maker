@@ -1,5 +1,5 @@
 <div class="container">
-    <h2>{{ isSignInMode ? 'Sign in' : 'Sign up' }}</h2>
+    <h2>Sign in</h2>
     <div class="form-error" *ngIf="error">
         <p>{{ error }}</p>
     </div>
@@ -7,8 +7,8 @@
         <app-loading-spinner></app-loading-spinner>
     </div>
     <form 
-        #authForm="ngForm"
-        (ngSubmit)="onSubmit(authForm)"
+        #signInForm="ngForm"
+        (ngSubmit)="onSignIn(signInForm)"
         *ngIf="!isLoading">
         <div class="form-group">
             <label for="email">E-mail</label>
@@ -44,16 +44,11 @@
             <button 
                 class="submit-button"
                 type="submit"
-                [disabled]="!authForm.valid">
-                {{ isSignInMode ? 'Login' : 'Register ' }}
+                [disabled]="!signInForm.valid">
+                Login
             </button>
-            <span class="switch-text">{{ isSignInMode ? 'You do not have an account?' : 'Do you have an account?' }}</span>
-            <button 
-                class="switch-button"
-                type="button"
-                (click)="onSwitchMode()">
-                {{ isSignInMode ? 'Sign up!' : 'Sign in!' }}
-            </button>
+            <span class="switch-text">You do not have an account?</span>
+            <a class="switch-button" routerLink="/signup">Sign up!</a>
         </div>
     </form>
 </div>

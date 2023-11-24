@@ -1,7 +1,9 @@
 .container {
     margin-top: 8%;
-    margin-left: auto;
+    margin-bottom: 2%;
     margin-right: auto;
+    margin-left: auto;
+
     width: 30%;
     min-height: 50%;
     display: flex;
@@ -15,7 +17,7 @@
 }
 h2 {
     margin-bottom: 15px;
-    color: rgb(210, 162, 73);
+    color: #d2a249;
 }
 label {
     display: block;
@@ -50,6 +52,7 @@ form {
 .form-buttons {
     width: 100%;
     text-align: center;
+    margin-bottom: 10px;
 }
 .submit-button {
     width: 100%;
@@ -77,7 +80,6 @@ form {
     padding: 8px;
     margin-left: 10px;
     cursor: pointer;
-
 }
 .input-error {
     color: #ea7272;
@@ -85,4 +87,22 @@ form {
 }
 input.ng-invalid.ng-touched {
     border: 3px solid #ea7272;
+}
+a {
+    text-decoration: none;
+}
+@media only screen and (max-width: 1200px) {
+    .container {
+        width: 40%;
+    }
+}
+@media only screen and (max-width: 900px) {
+    .container {
+        width: 50%;
+    }
+}
+@media only screen and (max-width: 700px) {
+    .container {
+        width: 75%;
+    }
 }

@@ -3,14 +3,18 @@ import { RouterModule, Routes } from '@angular/router';
 import { GameMenuComponent } from './game-menu/game-menu.component';
 import { GameComponent } from './game/game.component';
 import { GuideComponent } from './guide/guide.component';
-import { AuthComponent } from './auth/auth.component';
 import { HomeComponent } from './home/home.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { SignInComponent } from './auth/sign-in/sign-in.component';
+import { SignUpComponent } from './auth/sign-up/sign-up.component';
 
 const routes: Routes = [ 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent},
-  { path: 'auth', component: AuthComponent},
+  { path: 'signin', component: SignInComponent },
+  { path: 'signup', component: SignUpComponent },
   { path: 'guide', component: GuideComponent },
+  { path: 'profile', component: UserProfileComponent },
   { 
     path: 'game', 
     component: GameMenuComponent, 

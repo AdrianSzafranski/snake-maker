@@ -9,10 +9,16 @@
         </div>
         <ul [ngClass]="{'active': isMenuOpen}">
             <li routerLinkActive="activeLink" *ngIf="!isAuthenticated">
-                <a routerLink="/auth">Sign in/up</a>
+                <a routerLink="/signin">Sign in</a>
             </li>
+            <li routerLinkActive="activeLink" *ngIf="!isAuthenticated">
+              <a routerLink="/signup">Sign up</a>
+          </li>
             <li routerLinkActive="activeLink" *ngIf="isAuthenticated">
               <a routerLink="/game">Game</a>
+            </li>
+            <li routerLinkActive="activeLink" *ngIf="isAuthenticated">
+              <a routerLink="/profile">Profile</a>
             </li>
             <li routerLinkActive="activeLink"><a routerLink="/guide">Guide</a></li>
             <li *ngIf="isAuthenticated">
