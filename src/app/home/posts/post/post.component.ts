@@ -17,6 +17,7 @@ export class PostComponent implements OnInit {
   postId!: string;
   userId: string | null = null;
   isLoading = false;
+  currentComment = "";
 
   constructor(
     private postsService: PostService,
@@ -59,10 +60,11 @@ export class PostComponent implements OnInit {
 
  }
 
- onAddNewComment(newCommentContent: string) {
-    this.postsService.addPostComment(this.postId, newCommentContent)
+ onAddNewComment() {
+    this.postsService.addPostComment(this.postId, this.currentComment)
       .subscribe(postComments => {
         this.postComments = postComments;
+        this.currentComment = "";
       }
     );
  }

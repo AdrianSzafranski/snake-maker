@@ -20,8 +20,8 @@
                 </div>
             </div>
             <div class="comment-form" *ngIf="userId">
-                <textarea row="3" placeholder="Write a comment..." #newComment></textarea>
-                <button type="button" (click)="onAddNewComment(newComment.value)">Send</button>
+                <textarea row="3" placeholder="Write a comment..." [(ngModel)]="currentComment"></textarea>
+                <button type="button" (click)="onAddNewComment()">Send</button>
             </div>
         </div>
     </div>
