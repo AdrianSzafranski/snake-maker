@@ -20,7 +20,7 @@
             <li routerLinkActive="activeLink" *ngIf="isAuthenticated">
               <a routerLink="/profile">Profile</a>
             </li>
-            <li routerLinkActive="activeLink"><a routerLink="/guide">Guide</a></li>
+            <li routerLinkActive="activeLink" *ngIf="isAuthenticated"><a routerLink="/guide">Guide</a></li>
             <li *ngIf="isAuthenticated">
                 <a style="cursor: pointer;" (click)="onLogout()">Logout</a>
             </li>

@@ -9,6 +9,7 @@ import { SignInComponent } from './auth/sign-in/sign-in.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { PostComponent } from './home/posts/post/post.component';
 import { PostsComponent } from './home/posts/posts.component';
+import { AuthGuard } from './auth/auth-guard';
 
 const routes: Routes = [ 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -22,11 +23,16 @@ const routes: Routes = [
   },
   { path: 'signin', component: SignInComponent },
   { path: 'signup', component: SignUpComponent },
-  { path: 'guide', component: GuideComponent },
+  { 
+    path: 'guide', 
+    component: GuideComponent,
+    canActivate: [AuthGuard],
+  },
   { path: 'profile', component: UserProfileComponent },
   { 
     path: 'game', 
     component: GameMenuComponent, 
+    canActivate: [AuthGuard],
     children: [
       { path: ':mapId', component: GameComponent },
     ] 
