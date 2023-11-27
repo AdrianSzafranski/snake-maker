@@ -14,6 +14,8 @@ export class PostsComponent {
   postsData: PostData[] = [];
   userId: string | null = null;
   adminId = firebaseConfig.adminId;
+  isLoading = false;
+
   constructor(
     private postService: PostService,
     private authService: AuthService) {}
@@ -26,8 +28,10 @@ export class PostsComponent {
     } 
     );
 
+    this.isLoading = true;
     this.postService.fetchPostsData().subscribe(postsData => {
       this.postsData = postsData;
+      this.isLoading = false;
     });
   }
 

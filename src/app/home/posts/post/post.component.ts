@@ -16,6 +16,7 @@ export class PostComponent implements OnInit {
   postComments!: PostComment[];
   postId!: string;
   userId: string | null = null;
+  isLoading = false;
 
   constructor(
     private postsService: PostService,
@@ -30,6 +31,7 @@ export class PostComponent implements OnInit {
       }
     });
 
+    this.isLoading = true;
     this.route.params.pipe(
       map((params) => {
         const postId = params['postId'];
@@ -51,7 +53,7 @@ export class PostComponent implements OnInit {
         this.postComments = postComments
       }),
     ).subscribe((postComments) => {
-      
+      this.isLoading = false;
     }
     );
 

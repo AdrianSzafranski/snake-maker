@@ -1,7 +1,12 @@
 <div class="container">
     <app-post-form *ngIf="userId === adminId" (postsData)="receiveActualPostsData($event)"></app-post-form>
-    <app-post-preview
-        *ngFor="let currentPostData of postsData"
-        [postData]="currentPostData">
-    </app-post-preview>
+    <div *ngIf="isLoading" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+    <div *ngIf="!isLoading">
+        <app-post-preview
+            *ngFor="let currentPostData of postsData"
+            [postData]="currentPostData">
+        </app-post-preview>
+    </div>
 </div>
