@@ -7,10 +7,19 @@ import { HomeComponent } from './home/home.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { SignInComponent } from './auth/sign-in/sign-in.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
+import { PostComponent } from './home/posts/post/post.component';
+import { PostsComponent } from './home/posts/posts.component';
 
 const routes: Routes = [ 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent},
+  { 
+    path: 'home', 
+    component: HomeComponent, 
+    children: [
+      { path: '', component: PostsComponent },
+      { path: 'post/:postId', component: PostComponent },
+    ] 
+  },
   { path: 'signin', component: SignInComponent },
   { path: 'signup', component: SignUpComponent },
   { path: 'guide', component: GuideComponent },
@@ -19,7 +28,7 @@ const routes: Routes = [
     path: 'game', 
     component: GameMenuComponent, 
     children: [
-      { path: 'game/:mapId', component: GameComponent },
+      { path: ':mapId', component: GameComponent },
     ] 
 },
 

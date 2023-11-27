@@ -1,0 +1,14 @@
+<div class="comment">
+    <div class="user-avatar">
+        <canvas class="user-avatar-canvas" width="50" height="50" #avatarCanvas></canvas>
+    </div>
+    <div class="container">
+        <div class="comment-data">
+            <span class="username" title="{{ postComment.authorId }}">{{ postComment.authorUsername }}</span>&nbsp;
+            <span class="comment-date">{{ getCommentDate() }}</span>
+        </div>
+        <div class="comment-content">
+            {{ postComment.content }}
+        </div>
+    </div>
+</div>

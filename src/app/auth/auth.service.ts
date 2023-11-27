@@ -5,7 +5,7 @@ import { BehaviorSubject, catchError, mergeMap, of, tap, throwError } from 'rxjs
 
 import { User } from './user.model';
 import firebaseConfig from '../config';
-import { UserAuth } from './user-auth.model';
+import { UserDetails } from '../user-profile/userDetails.model';
 
 export interface AuthResponseData {
   kind: string;
@@ -21,7 +21,6 @@ export interface AuthResponseData {
   providedIn: 'root'
 })
 export class AuthService {
-  userAuth = new BehaviorSubject<UserAuth | null>(null);
   user = new BehaviorSubject<User | null>(null);
   private tokenExpirationTimer: any;
 
@@ -44,21 +43,18 @@ export class AuthService {
       }
     ).pipe(
       catchError(this.handleError), 
-      tap(resData => {
-        this.handleAuthentication(
-          resData.email, 
-          resData.localId, 
-          resData.idToken, 
-          +resData.expiresIn);
-      }),
-      mergeMap((resData) => {
-        const userId = resData.localId;
+      mergeMap((userAuthData) => {
+        const userId = userAuthData.localId;
           return this.http.get<User>(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userId}.json`).pipe(
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`).pipe(
           catchError(this.handleError),
-          tap(response2 => {
-        
-            this.user.next(response2);
+          tap(userBasicData => {
+            this.handleAuthentication(  userAuthData.email, 
+              userAuthData.localId, 
+              userBasicData.username,
+              userBasicData.avatar,
+              userAuthData.idToken, 
+              +userAuthData.expiresIn);
           })
           );
          
@@ -66,9 +62,11 @@ export class AuthService {
     );
   }
 
-  signUp(email: string, password: string, user: User) {
+  signUp(email: string, password: string, username: string, avatar: string, userDetails: UserDetails) {
     const httpUrl = firebaseConfig.signUpUrl + firebaseConfig.apiKey;
    
+    let userId: string;
+
     return this.http.post<AuthResponseData>(
       httpUrl,
       {
@@ -79,22 +77,31 @@ export class AuthService {
     ).pipe(
       catchError(this.handleError), 
       tap(resData => {
+        userId = resData.localId;
         this.handleAuthentication(
           resData.email, 
           resData.localId, 
+          username,
+          avatar,
           resData.idToken, 
           +resData.expiresIn);
       }),
       mergeMap((resData) => {
-        const userId = resData.localId;
           return this.http.put(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userId}.json`,
-          user
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/usersDetails/${userId}.json`,
+          userDetails
         ).pipe(
           catchError(this.handleError),
-          tap(response2 => {
-            this.user.next(user);
-          })
+          );
+        
+         
+      }),
+      mergeMap((resData) => {
+          return this.http.put(
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`,
+          {username: username, avatar: avatar}
+        ).pipe(
+          catchError(this.handleError),
           );
          
       }),
@@ -111,44 +118,40 @@ export class AuthService {
       return;
     }
 
-    const userAuth: {
+    const user: {
       email: string;
       id: string;
+      username: string;
+      avatar: string;
       _token: string;
       _tokenExpirationDate: string;
     } = JSON.parse(userDataString);
 
-    if(!userAuth) {
+    if(!user) {
       return;
     }
 
-    const loadedUser = new UserAuth(
-      userAuth.email,
-      userAuth.id,
-      userAuth._token,
-      new Date(userAuth._tokenExpirationDate)
+    const loadedUser = new User(
+      user.email,
+      user.id,
+      user.username,
+      user.avatar,
+      user._token,
+      new Date(user._tokenExpirationDate)
     );
 
     if (loadedUser.token) {
-      this.userAuth.next(loadedUser);
+      this.user.next(loadedUser);
       const expirationDuration = 
-       new Date(userAuth._tokenExpirationDate).getTime() -
+       new Date(user._tokenExpirationDate).getTime() -
        new Date().getTime();
       this.autoLogout(expirationDuration);
 
-      this.http.get<User>(
-        `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/user/${userAuth.id}.json`).pipe(
-        catchError(this.handleError),
-        tap(response2 => {
-      
-          this.user.next(response2);
-        })
-        ).subscribe();
     }
   }
 
   logout() {
-    this.userAuth.next(null);
+    this.user.next(null);
     this.router.navigate(['/auth']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {
@@ -166,14 +169,16 @@ export class AuthService {
   private handleAuthentication(
     email: string, 
     userId: string, 
+    username: string,
+    avatar: string,
     token: string, 
     expiresIn: number) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-    const userAuth = new UserAuth(email, userId, token, expirationDate);
-    this.userAuth.next(userAuth);
+    const user = new User(email, userId, username, avatar, token, expirationDate);
+    this.user.next(user);
     this.autoLogout(expiresIn * 1000);
 
-    localStorage.setItem('userData', JSON.stringify(userAuth));
+    localStorage.setItem('userData', JSON.stringify(user));
   }
 
   private handleError(errorRes: HttpErrorResponse) {

@@ -1,0 +1,23 @@
+<div class="post">
+    <div class="title">
+        <h1>{{ postData.title }}</h1>
+    </div>
+    <div class="image">
+        <img src="{{ postData.imageUrl }}" alt="message image" />
+    </div>
+    <div class="content">
+        <p>{{ postData.content }}</p>
+    </div>
+    <hr>
+    <div class="comments">
+        <div class="comments-window">
+            <div class="post-comment" *ngFor="let currentPostComment of postComments">
+                <app-post-comment [postComment]="currentPostComment"></app-post-comment>
+            </div>
+        </div>
+        <div class="comment-form">
+            <textarea row="3" placeholder="Write a comment..." #newComment></textarea>
+            <button type="button" (click)="onAddNewComment(newComment.value)">Send</button>
+        </div>
+    </div>
+</div>

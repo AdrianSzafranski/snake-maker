@@ -13,10 +13,14 @@ import { MapComponent } from './game-menu/maps/map/map.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
-import { GlobalChatComponent } from './home/global-chat/global-chat.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { SignInComponent } from './auth/sign-in/sign-in.component';
 import { SignUpComponent } from './auth/sign-up/sign-up.component';
+import { PostsComponent } from './home/posts/posts.component';
+import { PostFormComponent } from './home/posts/post-form/post-form.component';
+import { PostPreviewComponent } from './home/posts/post-preview/post-preview.component';
+import { PostComponent } from './home/posts/post/post.component';
+import { PostCommentComponent } from './home/posts/post/post-comment/post-comment.component';
 
 
 @NgModule({
@@ -30,10 +34,14 @@ import { SignUpComponent } from './auth/sign-up/sign-up.component';
     LoadingSpinnerComponent,
     HomeComponent,
     HeaderComponent,
-    GlobalChatComponent,
     UserProfileComponent,
     SignInComponent,
     SignUpComponent,
+    PostsComponent,
+    PostFormComponent,
+    PostPreviewComponent,
+    PostComponent,
+    PostCommentComponent
   ],
   imports: [
     BrowserModule,

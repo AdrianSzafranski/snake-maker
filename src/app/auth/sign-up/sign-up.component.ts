@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { AbstractControl, FormArray, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { User } from '../user.model';
-import { UserAuth } from '../user-auth.model';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UserDetails } from 'src/app/user-profile/userDetails.model';
 
 @Component({
   selector: 'app-sign-up',
@@ -125,9 +123,7 @@ export class SignUpComponent {
     });
     const favGames = userValues.favGames;
 
-    const user = new User(
-      username, 
-      JSON.stringify(this.avatarArray),
+    const userDetails = new UserDetails(
       birthdate,
       gender,
       roles,
@@ -136,7 +132,12 @@ export class SignUpComponent {
 
     this.isLoading = true;
 
-    this.authService.signUp(email, password, user)
+    this.authService.signUp(
+      email, 
+      password, 
+      username, 
+      JSON.stringify(this.avatarArray),
+      userDetails)
       .subscribe({
         next: resData => {
           this.isLoading = false;

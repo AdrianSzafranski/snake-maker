@@ -1,0 +1,79 @@
+<div class="container"  [ngStyle]="{'background-color': isShowForm ? '#242526' : 'transparent'}">
+    <div class="form-container" *ngIf="isShowForm">
+        <h2>Add post</h2>
+        <div class="form-error" *ngIf="error">
+            <p>{{ error }}</p>
+        </div>
+        <div *ngIf="isLoading" style="text-align: center;">
+            <app-loading-spinner></app-loading-spinner>
+        </div>
+        <form 
+            #addPostForm="ngForm"
+            (ngSubmit)="onAddPost(addPostForm)"
+            *ngIf="!isLoading">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    class="form-control"
+                    ngModel
+                    name="title"
+                    required
+                    #title="ngModel">
+                <p class="input-error" *ngIf="!title.valid && title.touched">
+                    Please enter a valid title!
+                </p>
+            </div>
+            <div class="form-group">
+                <label for="imageUrl">Image url</label>
+                <input
+                    type="text"
+                    id="imageUrl"
+                    class="form-control"
+                    ngModel
+                    name="imageUrl"
+                    required
+                    #imageUrl="ngModel">
+                <p class="input-error" *ngIf="!imageUrl.valid && imageUrl.touched">
+                    Please enter a valid imageUrl!
+                </p>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea
+                    type="text"
+                    id="content"
+                    class="form-control"
+                    ngModel
+                    row="8"
+                    name="content"
+                    required
+                    #content="ngModel"></textarea>
+                <p class="input-error" *ngIf="!content.valid && content.touched">
+                    Please enter a valid content!
+                </p>
+            </div>
+            <div class="form-button">
+                <button 
+                    class="submit-button"
+                    type="submit"
+                    [disabled]="!addPostForm.valid">
+                    Add
+                </button>
+            </div>
+        </form>
+    </div>
+    <div 
+        class="show-form-button-container" 
+        [ngStyle]="{'text-align': isShowForm ? 'right' : 'center'}">
+        <button 
+            class="show-form-button"
+            [ngStyle]="{'width': isShowForm ? '200px' : '90%'}"
+            type="button"
+            (click)="onShowForm()">
+            {{ isShowForm ? 'Hide' : 'Show' }} form
+        </button>
+    </div>
+ 
+</div>

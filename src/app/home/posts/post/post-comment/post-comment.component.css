@@ -1,0 +1,19 @@
+.comment {
+    display: flex;
+}
+.user-avatar {
+    margin-right: 10px;
+   
+}
+.user-avatar-canvas {
+    border: 2px solid black;
+}
+.comment-data{
+    display: flex;
+}
+.username {
+    color: rgb(210, 162, 73);
+}
+.comment-content {
+    text-align: justify;
+}
