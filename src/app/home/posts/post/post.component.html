@@ -15,7 +15,7 @@
                 <app-post-comment [postComment]="currentPostComment"></app-post-comment>
             </div>
         </div>
-        <div class="comment-form">
+        <div class="comment-form" *ngIf="userId">
             <textarea row="3" placeholder="Write a comment..." #newComment></textarea>
             <button type="button" (click)="onAddNewComment(newComment.value)">Send</button>
         </div>

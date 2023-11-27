@@ -1,5 +1,5 @@
 <div class="container">
-    <app-post-form (postsData)="receiveActualPostsData($event)"></app-post-form>
+    <app-post-form *ngIf="userId === adminId" (postsData)="receiveActualPostsData($event)"></app-post-form>
     <app-post-preview
         *ngFor="let currentPostData of postsData"
         [postData]="currentPostData">
