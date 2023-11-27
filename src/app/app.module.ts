@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,6 +21,7 @@ import { PostFormComponent } from './home/posts/post-form/post-form.component';
 import { PostPreviewComponent } from './home/posts/post-preview/post-preview.component';
 import { PostComponent } from './home/posts/post/post.component';
 import { PostCommentComponent } from './home/posts/post/post-comment/post-comment.component';
+import { AuthInterceptorService } from './auth/auth-interceptor.service';
 
 
 @NgModule({
@@ -50,7 +51,13 @@ import { PostCommentComponent } from './home/posts/post/post-comment/post-commen
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS, 
+      useClass: AuthInterceptorService, 
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

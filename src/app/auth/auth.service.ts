@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, mergeMap, of, tap, throwError } from 'rxjs';
@@ -46,7 +46,9 @@ export class AuthService {
       mergeMap((userAuthData) => {
         const userId = userAuthData.localId;
           return this.http.get<User>(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`).pipe(
+          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`, {
+            params: new HttpParams().set('auth', userAuthData.idToken)
+          }).pipe(
           catchError(this.handleError),
           tap(userBasicData => {
             this.handleAuthentication(  userAuthData.email, 
