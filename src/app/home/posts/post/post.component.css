@@ -65,3 +65,18 @@ button {
     color: #ccc;
     text-align: center;
 }
+@media only screen and (max-width: 1200px) {
+    .post {
+        width: 50%;
+    }
+}
+@media only screen and (max-width: 900px) {
+    .post {
+        width: 60%;
+    }
+}
+@media only screen and (max-width: 700px) {
+    .post {
+        width: 80%;
+    }
+}
