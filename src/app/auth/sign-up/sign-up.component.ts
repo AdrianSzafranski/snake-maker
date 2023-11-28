@@ -3,6 +3,7 @@ import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserDetails } from 'src/app/user-profile/userDetails.model';
+import { GameMapService } from 'src/app/snake-game/game-menu/game-maps/game-map.service';
 
 @Component({
   selector: 'app-sign-up',

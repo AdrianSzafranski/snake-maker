@@ -5,11 +5,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GameComponent } from './game/game.component';
-import { GameMenuComponent } from './game-menu/game-menu.component';
 import { GuideComponent } from './guide/guide.component';
-import { MapsComponent } from './game-menu/maps/maps.component';
-import { MapComponent } from './game-menu/maps/map/map.component';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
@@ -22,6 +18,11 @@ import { PostPreviewComponent } from './home/posts/post-preview/post-preview.com
 import { PostComponent } from './home/posts/post/post.component';
 import { PostCommentComponent } from './home/posts/post/post-comment/post-comment.component';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
+import { SnakeGameComponent } from './snake-game/snake-game.component';
+import { GameComponent } from './snake-game/game/game.component';
+import { GameMenuComponent } from './snake-game/game-menu/game-menu.component';
+import { GameMapsComponent } from './snake-game/game-menu/game-maps/game-maps.component';
+import { GameMapComponent } from './snake-game/game-menu/game-maps/game-map/game-map.component';
 
 
 @NgModule({
@@ -29,9 +30,9 @@ import { AuthInterceptorService } from './auth/auth-interceptor.service';
     AppComponent,
     GameComponent,
     GameMenuComponent,
-    MapsComponent,
+    GameMapsComponent,
+    GameMapComponent,
     GuideComponent,
-    MapComponent,
     LoadingSpinnerComponent,
     HomeComponent,
     HeaderComponent,
@@ -42,7 +43,8 @@ import { AuthInterceptorService } from './auth/auth-interceptor.service';
     PostFormComponent,
     PostPreviewComponent,
     PostComponent,
-    PostCommentComponent
+    PostCommentComponent,
+    SnakeGameComponent
   ],
   imports: [
     BrowserModule,

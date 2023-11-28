@@ -1,0 +1,16 @@
+<div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+<div class="container" *ngIf="!isLoading">
+    <div class="title">
+        <h1>Select map</h1>
+    </div>
+    <div class="mapsContainer">
+        <app-game-map *ngFor="let currentMap of getDisplayedMaps()" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-game-map>
+    </div>
+    <div class="mapNav">
+        <div class="left-arrow" (click)="onGetPreviousMaps()"></div>
+        <span>{{ displayedMapsStartIndex / 6 + 1 }}/{{ this.pagesNumber }}</span>
+        <div class="right-arrow" (click)="onGetNextMaps()"></div>
+    </div>
+</div>

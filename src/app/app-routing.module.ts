@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GameMenuComponent } from './game-menu/game-menu.component';
-import { GameComponent } from './game/game.component';
 import { GuideComponent } from './guide/guide.component';
 import { HomeComponent } from './home/home.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
@@ -10,6 +8,9 @@ import { SignUpComponent } from './auth/sign-up/sign-up.component';
 import { PostComponent } from './home/posts/post/post.component';
 import { PostsComponent } from './home/posts/posts.component';
 import { AuthGuard } from './auth/auth-guard';
+import { GameComponent } from './snake-game/game/game.component';
+import { SnakeGameComponent } from './snake-game/snake-game.component';
+import { GameMenuComponent } from './snake-game/game-menu/game-menu.component';
 
 const routes: Routes = [ 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -30,11 +31,12 @@ const routes: Routes = [
   },
   { path: 'profile', component: UserProfileComponent },
   { 
-    path: 'game', 
-    component: GameMenuComponent, 
+    path: 'snake-game', 
+    component: SnakeGameComponent, 
     canActivate: [AuthGuard],
     children: [
-      { path: ':mapId', component: GameComponent },
+      { path: '', component: GameMenuComponent },
+      { path: 'game/:mapId', component: GameComponent },
     ] 
 },
 

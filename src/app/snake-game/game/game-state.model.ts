@@ -1,4 +1,6 @@
-import { MapModel } from "../map.model";
+
+
+import { GameMap } from "../game-menu/game-maps/game-map.model";
 import { BoardModel } from "./board.model";
 import { CanvasDrawer } from "./canvas-drawer";
 import { CoordinateModel } from "./coordinate.model";
@@ -28,7 +30,7 @@ export class GameStateModel {
   private candrawBoards = true;
   
   constructor(
-    private map: MapModel,
+    private map: GameMap,
     gameCanvas: HTMLCanvasElement, 
     bgCanvas: HTMLCanvasElement, 
     gidCanvas: HTMLCanvasElement) {
@@ -52,6 +54,7 @@ export class GameStateModel {
       this.map.boardFirstColor, this.map.boardSecondColor,
       0.2);
     
+    this.currentDirection = this.map.snakeInitDirection;
     let initSnakeCoords: CoordinateModel[] = JSON.parse(this.map.snakeInitCoords);
     this._snake = new SnakeModel(initSnakeCoords, this.map.snakeInitDirection);
   

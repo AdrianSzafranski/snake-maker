@@ -1,0 +1,21 @@
+.mapContainer {
+    margin: auto;
+    background-color: rgb(36, 37, 38);
+    border: 1px solid black;
+    padding: 10px 20px;
+    border-radius: 15px;
+    color: #c7b89c;
+}
+.mapName {
+    margin-bottom: 10px;
+}
+.map {
+    border: 3px solid black;
+}
+.mapInfo {
+    text-align: center;
+}
+.statsInfo {
+    display: flex;
+    justify-content: space-between;
+}

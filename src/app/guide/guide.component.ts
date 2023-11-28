@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { CanvasDrawer } from '../game/canvas-drawer';
-import { CoordinateModel } from '../game/coordinate.model';
+import { CanvasDrawer } from '../snake-game/game/canvas-drawer';
+import { CoordinateModel } from '../snake-game/game/coordinate.model';
 
 @Component({
   selector: 'app-guide',

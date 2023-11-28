@@ -50,7 +50,7 @@ export class SnakeService {
         {"x": 12, "y": 8, "width": 0, "height": 2}
       ]`,
       snakeInitDirection: 'left',
-      snakeInitCoords:  `[{"x": 5, "y": 5}, {"x": 4, "y": 5}]`,
+      snakeInitCoords:  `[{"x": 5, "y": 4}, {"x": 4, "y": 4}]`,
       initTimeToPassOneElementInSeconds: 1.0
     },
     {

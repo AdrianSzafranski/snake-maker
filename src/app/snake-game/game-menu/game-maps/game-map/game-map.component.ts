@@ -1,16 +1,16 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { MapModel } from 'src/app/map.model';
+import { GameMap } from '../game-map.model';
 
 
 @Component({
-  selector: 'app-map',
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  selector: 'app-game-map',
+  templateUrl: './game-map.component.html',
+  styleUrls: ['./game-map.component.css']
 })
-export class MapComponent implements OnInit {
+export class GameMapComponent implements OnInit {
 
   @ViewChild('mapCanvas', {static: true}) mapCanvasRef!: ElementRef;
-  @Input() map!: MapModel;
+  @Input() map!: GameMap;
 
   mapCanvas!: HTMLCanvasElement
   mapCanvasContext!: CanvasRenderingContext2D;

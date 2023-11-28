@@ -1,5 +1,6 @@
-export interface MapModel {
-    id: number;
+export interface GameMap {
+    id?: number;
+    name: string;
     boardWidthInElements: number;
     boardHeightInElements: number;
     boardFirstColor: string;

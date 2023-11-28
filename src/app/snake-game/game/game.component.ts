@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { GameStateModel } from './game-state.model';
 import { ActivatedRoute } from '@angular/router';
-import { SnakeService } from '../snake.service';
+import { GameMapService } from '../game-menu/game-maps/game-map.service';
 
 @Component({
   selector: 'app-game',
@@ -16,24 +16,27 @@ export class GameComponent implements OnInit, AfterViewInit {
   gameState!: GameStateModel;
   isFixedMap = false;
   
-  constructor(private snakeService: SnakeService, private route: ActivatedRoute) {}
+  constructor(private gameMapService: GameMapService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
 
-    const mapId = +this.route.snapshot.params['mapId'];
-    const map = this.snakeService.getMap(mapId);
+    const mapId = this.route.snapshot.params['mapId'];
+    this.gameMapService.fetchMap(mapId).subscribe(gameMap => {
+      if(gameMap.obstacles) {
+        this.isFixedMap = true;
+      }
+  
+      this.gameState = new GameStateModel(
+        gameMap,
+        this.gameCanvasRef.nativeElement,
+        this.bgCanvasRef.nativeElement,
+        this.gridCanvasRef.nativeElement
+      );
 
-    if(map.obstacle) {
-      this.isFixedMap = true;
-    }
+      this.changeScreenSize();
+    });
 
-    this.gameState = new GameStateModel(
-      map,
-      this.gameCanvasRef.nativeElement,
-      this.bgCanvasRef.nativeElement,
-      this.gridCanvasRef.nativeElement
-    );
-    this.changeScreenSize();
+    
   }
 
   ngAfterViewInit(): void {
