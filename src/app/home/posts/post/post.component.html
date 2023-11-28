@@ -14,14 +14,23 @@
         </div>
         <hr>
         <div class="comments">
+            <div class="comments-title">
+                <h2>Comments</h2>
+            </div>
             <div class="comments-window">
                 <div class="post-comment" *ngFor="let currentPostComment of postComments">
                     <app-post-comment [postComment]="currentPostComment"></app-post-comment>
+                </div>
+                <div class="post-no-comments" *ngIf="postComments.length === 0">
+                    <p>No comments!</p>
                 </div>
             </div>
             <div class="comment-form" *ngIf="userId">
                 <textarea row="3" placeholder="Write a comment..." [(ngModel)]="currentComment"></textarea>
                 <button type="button" (click)="onAddNewComment()">Send</button>
+            </div>
+            <div class="comment-no-sign-in" *ngIf="!userId">
+                <p>Sign in to add a comment!</p>
             </div>
         </div>
     </div>

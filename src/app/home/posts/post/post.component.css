@@ -33,6 +33,10 @@ img {
 .comments {
     padding: 20px;
 }
+.comments-title {
+    margin-bottom: 10px;
+    color: #d2a249;
+}
 .comment-form {
     display: flex;
     justify-content: space-between;
@@ -55,4 +59,9 @@ button {
 }
 .post-comment {
     margin-bottom: 5px;
+}
+.comment-no-sign-in {
+    margin-top: 20px;
+    color: #ccc;
+    text-align: center;
 }
