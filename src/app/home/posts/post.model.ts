@@ -3,7 +3,7 @@ export interface PostData {
     title: string;
     content: string;
     imageUrl: string;
-    data: Date;
+    date: Date;
 }
 
 export interface PostComment {

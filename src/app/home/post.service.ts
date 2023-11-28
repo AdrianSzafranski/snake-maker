@@ -19,15 +19,18 @@ export class PostService {
 
 
   fetchPostsData() {
-    const httpUrl = firebaseConfig.dbUrl + "posts/data.json";
+    const httpUrl = firebaseConfig.dbUrl + 'posts/data.json';
     return this.http.get<any>(httpUrl).pipe(
       map(postsDataObject => {
         return Object.keys(postsDataObject).map(key => ({ id: key, ...postsDataObject[key] }));
       }),
+      map(postsData => {
+        return postsData.reverse();
+      }),
      
     );
   }
-
+ 
   fetchPostData(postId: string) {
     const httpUrl = firebaseConfig.dbUrl + `posts/data/${postId}.json`;
     return this.http.get<any>(httpUrl).pipe(

@@ -33,7 +33,7 @@ export class PostFormComponent {
       title: title,
       imageUrl: imageUrl,
       content: content,
-      data: new Date()
+      date: new Date()
     };
 
     this.isLoading = true;
