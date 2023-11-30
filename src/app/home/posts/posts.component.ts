@@ -21,9 +21,9 @@ export class PostsComponent {
     private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.authService.user.pipe(take(1)).subscribe((user) => {
-      if(user) {
-        this.userId = user.id;
+    this.authService.userAuth.pipe(take(1)).subscribe((userAuth) => {
+      if(userAuth) {
+        this.userId = userAuth.id;
       }
     } 
     );

@@ -10,7 +10,7 @@ import { PostsComponent } from './home/posts/posts.component';
 import { AuthGuard } from './auth/auth-guard';
 import { GameComponent } from './snake-game/game/game.component';
 import { SnakeGameComponent } from './snake-game/snake-game.component';
-import { GameMenuComponent } from './snake-game/game-menu/game-menu.component';
+import { GameMapsComponent } from './snake-game/game-menu/game-maps/game-maps.component';
 
 const routes: Routes = [ 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -33,9 +33,9 @@ const routes: Routes = [
   { 
     path: 'snake-game', 
     component: SnakeGameComponent, 
-    canActivate: [AuthGuard],
+    //canActivate: [AuthGuard],
     children: [
-      { path: '', component: GameMenuComponent },
+      { path: '', component: GameMapsComponent },
       { path: 'game/:mapId', component: GameComponent },
     ] 
 },

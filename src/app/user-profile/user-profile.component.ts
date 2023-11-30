@@ -1,7 +1,10 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../auth/user.model';
-import { take } from 'rxjs';
+import { take, tap } from 'rxjs';
+import { UserProfileService } from './user-profile.service';
+import { UserDetails } from './user-details.model';
+import { UserData } from './user-data.model';
 
 @Component({
   selector: 'app-user-profile',
@@ -9,23 +12,35 @@ import { take } from 'rxjs';
   styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit {
-  avatarLength = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  avatarArray: string[][] = Array.from({ length: 10 }, () => Array(10).fill('#FFFFFF'));
-  user: User | null = null;
-  
-  constructor(private authService: AuthService) {}
+
+  isEditMode = false;
+  userData: UserData = {
+    username: 'Adrian',
+    email: 'adrian@gmail.com',
+    id: '3',
+    avatar: '[["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040"],["#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#000","#000","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#000","#000","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#ff4040","#ff4040","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"]]',
+    birthdate: '1996-01-01',
+    favGames: ["Snake"],
+    roles: ["friend"],
+    gender: 'male'
+
+  };
+
+  constructor (private userProfileService: UserProfileService) {}
 
   ngOnInit(): void {
-    this.authService.user.pipe(take(1)).subscribe(user => {
-      this.user = user;
-      if(user) {
-        this.avatarArray = JSON.parse(user.avatar);
-      }
+    this.userProfileService.fetchUserData().subscribe(userData => {
+      this.userData = userData;
     }
     );
   }
 
-  onChangeColor() {
-    
+  onSwitchMode() {
+    this.isEditMode = !this.isEditMode;
+  }
+
+  setNewUserData(userData: UserData) {
+    this.userData = userData;
+    this.isEditMode = false;
   }
 }

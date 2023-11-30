@@ -26,7 +26,7 @@ export class PostComponent implements OnInit {
     ) {}
 
  ngOnInit(): void {
-    this.authService.user.pipe(take(1)).subscribe((user) => {
+    this.authService.userAuth.pipe(take(1)).subscribe((user) => {
       if(user) {
         this.userId = user.id;
       }

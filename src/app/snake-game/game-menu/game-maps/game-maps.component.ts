@@ -16,7 +16,8 @@ export class GameMapsComponent implements OnInit {
   selectedMap?: number;
   pagesNumber!: number;
   isLoading = false;
-
+  isOfficialMaps = true;
+  
   constructor(private gameMapsService: GameMapService, private router: Router){
   }
 
@@ -51,5 +52,14 @@ export class GameMapsComponent implements OnInit {
   getDisplayedMaps() {
     return this.gameMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
   }
+
+  onShowOfficialMaps() {
+    this.isOfficialMaps = true;
+  }
+
+  onShowUsersMaps() {
+    this.isOfficialMaps = false;
+  }
+
 
 }

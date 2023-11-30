@@ -24,6 +24,7 @@ ul {
     font-size: 1.3rem;
     list-style: none;
     display: flex;
+    z-index: 11;
 }
 li {
     min-height: 50px;

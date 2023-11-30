@@ -20,16 +20,17 @@ import { PostCommentComponent } from './home/posts/post/post-comment/post-commen
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { SnakeGameComponent } from './snake-game/snake-game.component';
 import { GameComponent } from './snake-game/game/game.component';
-import { GameMenuComponent } from './snake-game/game-menu/game-menu.component';
 import { GameMapsComponent } from './snake-game/game-menu/game-maps/game-maps.component';
 import { GameMapComponent } from './snake-game/game-menu/game-maps/game-map/game-map.component';
+import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
+import { UserDataEditComponent } from './user-profile/user-data-edit/user-data-edit.component';
+import { UserDataComponent } from './user-profile/user-data/user-data.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     GameComponent,
-    GameMenuComponent,
     GameMapsComponent,
     GameMapComponent,
     GuideComponent,
@@ -44,7 +45,10 @@ import { GameMapComponent } from './snake-game/game-menu/game-maps/game-map/game
     PostPreviewComponent,
     PostComponent,
     PostCommentComponent,
-    SnakeGameComponent
+    SnakeGameComponent,
+    UserDataEditComponent,
+    UserDataComponent,
+    UserAvatarComponent
   ],
   imports: [
     BrowserModule,

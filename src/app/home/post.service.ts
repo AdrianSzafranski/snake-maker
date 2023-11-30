@@ -88,16 +88,16 @@ export class PostService {
   addPostComment(postId: string, newCommentContent: string) {
     const httpUrl = firebaseConfig.dbUrl + `posts/comments/${postId}.json`;
 
-    return this.authService.user.pipe(
+    return this.authService.userAuth.pipe(
         take(1), 
-        exhaustMap(user => {
+        exhaustMap(userAuth => {
            
-            if(!user) {
+            if(!userAuth) {
                 return throwError(() => new Error("Error"));
             }
 
             const newComment = {
-                authorId: user.id,
+                authorId: userAuth.id,
                 content: newCommentContent,
                 date: new Date()
             }

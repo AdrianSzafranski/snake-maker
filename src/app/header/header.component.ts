@@ -17,8 +17,8 @@ export class HeaderComponent {
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.userSub = this.authService.user.subscribe(user => {
-      this.isAuthenticated = !!user;
+    this.userSub = this.authService.userAuth.subscribe(userAuth => {
+      this.isAuthenticated = !!userAuth;
     });
   }
 

@@ -1,16 +1,13 @@
 <div class="container">
-    <div class="user-data">
-        <div class="avatar">
-            <div *ngFor="let avatarRow  of avatarLength; let i = index" class="partAvatar1">
-                <div 
-                    [ngStyle]="{'background-color': avatarArray[i][j]}"
-                    *ngFor="let avatarColumn  of avatarLength; let j = index" 
-                    class="partAvatar2">
-                </div>
+    <div class="side-panel">
+            <app-user-data *ngIf="!isEditMode" [userData]="userData"></app-user-data>
+            <app-user-data-edit *ngIf="isEditMode" [userData]="userData" (newUserData)="setNewUserData($event)"></app-user-data-edit>
+            <div class="switch-mode-button">
+                <button type="button" (click)="onSwitchMode()">{{ isEditMode ? 'Cancel' : 'Edit data' }}</button>
             </div>
-        </div>f
+            
     </div>
-    <div class="user-maps">f
+    <div class="user-maps">
     
     </div>
 </div>

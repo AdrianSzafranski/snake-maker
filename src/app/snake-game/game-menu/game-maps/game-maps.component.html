@@ -2,8 +2,15 @@
     <app-loading-spinner></app-loading-spinner>
 </div>
 <div class="container" *ngIf="!isLoading">
-    <div class="title">
-        <h1>Select map</h1>
+    <div class="nav">
+        <button 
+        class="nav-element" 
+        [ngClass]="{'selected-official-nav-element': isOfficialMaps}"
+        (click)="onShowOfficialMaps()">Official maps</button>
+        <button 
+        class="nav-element" 
+        [ngClass]="{'selected-users-nav-element': !isOfficialMaps}"
+        (click)="onShowUsersMaps()">Users maps</button>
     </div>
     <div class="mapsContainer">
         <app-game-map *ngFor="let currentMap of getDisplayedMaps()" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-game-map>

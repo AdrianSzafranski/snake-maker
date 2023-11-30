@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { UserDetails } from 'src/app/user-profile/userDetails.model';
-import { GameMapService } from 'src/app/snake-game/game-menu/game-maps/game-map.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -116,20 +114,20 @@ export class SignUpComponent {
     const username = userValues.username;
     const birthdate = userValues.birthdate;
     const gender = userValues.gender;
-    let roles = "";
+    let roles: string[] = [];
     this.roles.forEach(role => {
       if(userValues.roles[''+role]) {
-        roles += role + ";";
+        roles.push(role);
       }
     });
     const favGames = userValues.favGames;
 
-    const userDetails = new UserDetails(
-      birthdate,
-      gender,
-      roles,
-      favGames
-    );
+    const userDetails = {
+      birthdate: birthdate,
+      gender: gender,
+      roles: roles,
+      favGames: favGames
+    };
 
     this.isLoading = true;
 

@@ -1,0 +1,22 @@
+.user-data {
+    background-color: rgb(36, 37, 38);
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px 20px;
+}
+.user-avatar-container {
+    display: flex;
+    justify-content: center;
+}
+.user-avatar {
+    width: 100px;
+}
+.label {
+    margin-top: 20px;
+    color: #d2a249;
+}
+.user-maps {
+    width: 68%;
+    background-color: rgb(36, 37, 38);
+    border-radius: 10px;
+}

@@ -11,7 +11,7 @@
     position: relative;
     font-size: 1.2rem;
 }
-.user-data {
+.side-panel {
     width: 30%;
     background-color: rgb(36, 37, 38);
     border-radius: 10px;
@@ -21,15 +21,14 @@
     background-color: rgb(36, 37, 38);
     border-radius: 10px;
 }
-.avatar {
+.switch-mode-button {
+    margin: 20px 0;
     text-align: center;
 }
-.partAvatar1 {
-    display: flex;
-}
-.partAvatar2 {
-    display: flex;
-    width: 10px;
-    height: 10px;
-
+.switch-mode-button button {
+    background-color: #d2a249;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
 }

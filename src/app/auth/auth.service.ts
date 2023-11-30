@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, mergeMap, of, tap, throwError } from 'rxjs';
 
-import { User } from './user.model';
 import firebaseConfig from '../config';
-import { UserDetails } from '../user-profile/userDetails.model';
+import { UserDetails } from '../user-profile/user-details.model';
+import { UserAuth } from './userAuth.model';
+import { User } from './user.model';
 
 export interface AuthResponseData {
   kind: string;
@@ -21,15 +22,12 @@ export interface AuthResponseData {
   providedIn: 'root'
 })
 export class AuthService {
-  user = new BehaviorSubject<User | null>(null);
+  userAuth = new BehaviorSubject<UserAuth | null>(null);
   private tokenExpirationTimer: any;
 
   constructor(
     private http: HttpClient,
     private router: Router) {}
-
-
-
 
   signIn(email: string, password: string) {
     const httpUrl = firebaseConfig.signInUrl + firebaseConfig.apiKey;
@@ -120,32 +118,29 @@ export class AuthService {
       return;
     }
 
-    const user: {
+    const userAuth: {
       email: string;
       id: string;
-      username: string;
-      avatar: string;
       _token: string;
       _tokenExpirationDate: string;
     } = JSON.parse(userDataString);
 
-    if(!user) {
+    if(!userAuth) {
       return;
     }
 
-    const loadedUser = new User(
-      user.email,
-      user.id,
-      user.username,
-      user.avatar,
-      user._token,
-      new Date(user._tokenExpirationDate)
+    const loadedUser = new UserAuth(
+      userAuth.email,
+      userAuth.id,
+      userAuth._token,
+      new Date(userAuth._tokenExpirationDate)
     );
 
+
     if (loadedUser.token) {
-      this.user.next(loadedUser);
+      this.userAuth.next(loadedUser);
       const expirationDuration = 
-       new Date(user._tokenExpirationDate).getTime() -
+       new Date(userAuth._tokenExpirationDate).getTime() -
        new Date().getTime();
       this.autoLogout(expirationDuration);
 
@@ -153,7 +148,7 @@ export class AuthService {
   }
 
   logout() {
-    this.user.next(null);
+    this.userAuth.next(null);
     this.router.navigate(['/signin']);
     localStorage.removeItem('userData');
     if (this.tokenExpirationTimer) {
@@ -176,11 +171,11 @@ export class AuthService {
     token: string, 
     expiresIn: number) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
-    const user = new User(email, userId, username, avatar, token, expirationDate);
-    this.user.next(user);
+    const userAuth = new UserAuth(email, userId, token, expirationDate);
+    this.userAuth.next(userAuth);
     this.autoLogout(expiresIn * 1000);
 
-    localStorage.setItem('userData', JSON.stringify(user));
+    localStorage.setItem('userData', JSON.stringify(userAuth));
   }
 
   private handleError(errorRes: HttpErrorResponse) {

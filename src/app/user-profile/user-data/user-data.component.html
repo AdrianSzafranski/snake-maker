@@ -1,0 +1,31 @@
+<div class="user-data">
+    <div class="user-avatar-container">
+        <div class="user-avatar">
+            <app-user-avatar [userAvatar]="userData.avatar"></app-user-avatar>
+        </div>
+    </div>
+    <div class="user-element user-email">
+        <p class="label">E-mail</p>
+        <p>{{ userData.email }}</p>
+    </div>
+    <div class="user-element user-username">
+        <p class="label">Username</p>
+        <p>{{ userData.username }}</p>
+    </div>
+    <div class="user-element user-birthday">
+        <p class="label">Gender</p>
+        <p>{{ userData.gender }}</p>
+    </div>
+    <div class="user-element user-birthday">
+        <p class="label">Birthday</p>
+        <p>{{ userData.birthdate }}</p>
+    </div>
+    <div class="user-element user-roles">
+        <p class="label">Roles</p>
+        <p *ngFor="let role of userData.roles">{{ role }}</p>
+    </div>
+    <div class="user-element user-fav-games">
+        <p class="label">Favourite games</p>
+        <p *ngFor="let favGame of userData.favGames">{{ favGame }}</p>
+    </div>
+</div>

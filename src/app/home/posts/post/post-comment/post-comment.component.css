@@ -3,10 +3,6 @@
 }
 .user-avatar {
     margin-right: 10px;
-   
-}
-.user-avatar-canvas {
-    border: 2px solid black;
 }
 .comment-data{
     display: flex;
