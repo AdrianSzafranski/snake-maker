@@ -290,7 +290,7 @@ export class GameMapAddComponent implements OnInit {
             checkDestinationColumn = 0;
           }
           break;
-        case 'bottom':
+        case 'down':
           checkDestinationRow++;
           if (checkDestinationRow >= this.mapHeightInElements) {
             checkDestinationRow = 0;
@@ -341,7 +341,7 @@ export class GameMapAddComponent implements OnInit {
           tailColIndex = this.mapWidthInElements - 1;
         }
         break;
-      case 'bottom':
+      case 'down':
         tailRowIndex--;
         if (tailRowIndex < 0) {
           tailRowIndex = this.mapHeightInElements - 1;
