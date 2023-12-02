@@ -459,7 +459,10 @@ onSubmit() {
     });
   });
 
-  obstaclesString = obstaclesString.slice(0, -1);
+  if(obstaclesString[obstaclesString.length - 1] === ',') {
+    obstaclesString = obstaclesString.slice(0, -1);
+  }
+
   obstaclesString += "]";
 
   let snakeCoordsString = `[{"x": ${this.snakeCoord!.colIndexWithTail}, "y": ${this.snakeCoord!.rowIndexWithTail}}, {"x": ${this.snakeCoord!.colIndexWithHead}, "y": ${this.snakeCoord!.rowIndexWithHead}}]`;
