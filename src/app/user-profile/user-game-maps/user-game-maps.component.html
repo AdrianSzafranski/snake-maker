@@ -4,10 +4,10 @@
     [gameMap]="currentUserGameMap" 
     [userScore]="getUserScore(currentUserGameMap.id)"
     [ngStyle]="{
-        'border': i === selectedUserGameMapArrayId ? '2px solid #eaea4e' : '2px solid black',
+        'border': (i + displayedGameMapsStartIndex) === selectedUserGameMapArrayId ? '2px solid #eaea4e' : '2px solid black',
         'border-radius': '15px'
     }" 
-    (click)="onSelectMap(i)"></app-game-map>
+    (click)="onSelectMap((i + displayedGameMapsStartIndex))"></app-game-map>
     <h2 *ngIf="userGameMaps.length === 0">You don't have maps</h2>
 </div>
 <div class="bottom-panel">
