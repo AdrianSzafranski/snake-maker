@@ -1,5 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
+import { UserScore } from '../../user-score.model';
 
 
 @Component({
@@ -11,6 +12,7 @@ export class GameMapComponent implements OnInit {
 
   @ViewChild('mapCanvas', {static: true}) mapCanvasRef!: ElementRef;
   @Input() map!: GameMap;
+  @Input() userScore: UserScore | null = null;
 
   mapCanvas!: HTMLCanvasElement
   mapCanvasContext!: CanvasRenderingContext2D;

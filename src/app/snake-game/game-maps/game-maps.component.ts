@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameMap } from './game-map.model';
 import { GameMapService } from './game-map.service';
+import { UserScore } from '../user-score.model';
 
 
 @Component({
@@ -19,6 +20,7 @@ export class GameMapsComponent implements OnInit {
   unOfficialMapsPagesNumber!: number;
   isLoading = false;
   isOfficialMaps = true;
+  userScores: UserScore[] = [];
   
   constructor(private gameMapsService: GameMapService, private router: Router){
   }
@@ -35,6 +37,14 @@ export class GameMapsComponent implements OnInit {
       this.unofficialMaps = unofficialMaps;
       this.unOfficialMapsPagesNumber =  Math.ceil(this.unofficialMaps.length / 6);
     });
+
+    this.gameMapsService.fetchUserScores().subscribe(userScores => {
+      this.userScores = userScores;
+    });
+  }
+
+  getUserScore(currentMapId: string | undefined) {
+    return this.userScores.find(userScore => userScore.idMap === currentMapId) ?? null;
   }
 
   onStartGame(mapId?: string) {

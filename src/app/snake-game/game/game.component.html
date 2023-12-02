@@ -1,5 +1,5 @@
 <div id='container'>
-    <div id='topPanel' [ngStyle]="{'width': gameState.getBoardWidthInPixels()+9+'px'}">
+    <div *ngIf="!isLoading" id='topPanel' [ngStyle]="{'width': gameState.getBoardWidthInPixels()+9+'px'}">
         <p class='bestScore'>Best Score: {{ gameState.bestScore }} </p>
         <p class='currentScore'>Current Score: {{ gameState.currentScore }} </p>
         <div class="optionsContainer">

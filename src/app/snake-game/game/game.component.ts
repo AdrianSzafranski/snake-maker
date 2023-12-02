@@ -15,33 +15,40 @@ export class GameComponent implements OnInit, AfterViewInit {
 
   gameState!: GameStateModel;
   isFixedMap = false;
-  
+  isLoading = true;
   constructor(private gameMapService: GameMapService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-
     const mapType = this.route.snapshot.params['mapType'];
     const mapId = this.route.snapshot.params['mapId'];
-    this.gameMapService.fetchMap(mapType, mapId).subscribe(gameMap => {
+    this.gameMapService.fetchMap(mapType, mapId).subscribe(mapData => {
+      let gameMap = mapData.gameMap;
+      let userScore = mapData.userScore;
       if(gameMap.obstacles) {
         this.isFixedMap = true;
       }
   
       this.gameState = new GameStateModel(
         gameMap,
+        userScore,
         this.gameCanvasRef.nativeElement,
         this.bgCanvasRef.nativeElement,
-        this.gridCanvasRef.nativeElement
+        this.gridCanvasRef.nativeElement,
+        this.gameMapService
       );
 
       this.changeScreenSize();
+      
+      this.isLoading = false;
+
+      this.gameState.startGame();
     });
 
     
   }
 
   ngAfterViewInit(): void {
-    this.gameState.startGame();
+   
   }
 
   onRestart(isChangeMap: boolean) {

@@ -2,6 +2,7 @@
     <app-game-map 
     *ngFor="let currentUserMap of getDisplayedUserMaps(); let i = index" 
     [map]="currentUserMap" 
+    [userScore]="getUserScore(currentUserMap.id)"
     [ngStyle]="{
         'border': i === selectedUserMapArrayId ? '2px solid #eaea4e' : '2px solid black',
         'border-radius': '15px'

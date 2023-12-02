@@ -5,8 +5,8 @@
     <canvas class="map" width="350" #mapCanvas></canvas>
     <div class="mapInfo">
         <div class="statsInfo">
-            <p>Best score: #</p>
-            <p>Game counter: #</p>
+            <p>Highest score: {{ userScore ? userScore.highestScore : 0 }}</p>
+            <p>Game counter: {{ userScore ? userScore.gamesNumber : 0 }}</p>
         </div>
     </div>
 </div>

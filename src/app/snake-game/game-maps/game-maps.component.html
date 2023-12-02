@@ -13,7 +13,12 @@
         (click)="onShowUsersMaps()">Users maps</button>
     </div>
     <div class="mapsContainer">
-        <app-game-map *ngFor="let currentMap of getDisplayedMaps()" [map]="currentMap" class="map" (click)="onStartGame(currentMap.id)"></app-game-map>
+        <app-game-map 
+        *ngFor="let currentMap of getDisplayedMaps()" 
+        [map]="currentMap"
+        [userScore]="getUserScore(currentMap.id)"
+        class="map" 
+        (click)="onStartGame(currentMap.id)"></app-game-map>
     </div>
     <div class="mapNav">
         <div class="left-arrow" (click)="onGetPreviousMaps()"></div>

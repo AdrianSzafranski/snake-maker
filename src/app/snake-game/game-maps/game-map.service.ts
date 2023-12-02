@@ -5,6 +5,7 @@ import { BehaviorSubject, catchError, exhaustMap, map, mergeMap, of, take, tap, 
 import firebaseConfig from '../../config';
 import { GameMap } from './game-map.model';
 import { AuthService } from 'src/app/auth/auth.service';
+import { UserScore } from '../user-score.model';
 
 
 @Injectable({
@@ -34,6 +35,7 @@ export class GameMapService {
 
   fetchMap(mapType: string, mapId: string) {
     let httpUrl = firebaseConfig.dbUrl + `${mapType}/${mapId}.json`;
+    let userId: string | null = null;
 
     return this.authService.userAuth.pipe(
       take(1), 
@@ -42,7 +44,7 @@ export class GameMapService {
           if(!userAuth) {
               return throwError(() => new Error("Error"));
           }
-
+          userId = userAuth.id;
           if(mapType === 'usersMaps') {
             httpUrl = firebaseConfig.dbUrl + `usersMaps/${userAuth.id}/${mapId}.json`;
           }
@@ -55,8 +57,30 @@ export class GameMapService {
             })
           );
           
-      }));
+      }),
+      exhaustMap(gameMap => {
+        if(!userId || !gameMap.id) {
+            return throwError(() => new Error("Error"));
+        }
+        let httpUrl = firebaseConfig.dbUrl + `usersScores/${userId}/${gameMap.id}.json`;
+        return this.http.get<any>(httpUrl).pipe(
+          map(userScore => {
+            if(!userScore) {
+              userScore = {
+                highestScore: 0,
+                gamesNumber: 0,
+              }
+            }
+            return {
+              gameMap: gameMap,
+              userScore: { idMap: mapId, ...userScore }
+          }})
+        );
+        
+    }));
   }
+
+ 
 
   addMap() {
     const gameMaps = [
@@ -245,6 +269,46 @@ export class GameMapService {
     const httpUrl = firebaseConfig.dbUrl + "gameMaps.json";
     return this.http.post(httpUrl, gameMaps[8]);
  
+  }
+
+  fetchUserScores() {
+   
+    return this.authService.userAuth.pipe(
+      take(1), 
+      exhaustMap(userAuth => {
+         
+          if(!userAuth) {
+              return throwError(() => new Error("Error"));
+          }
+
+          let httpUrl = firebaseConfig.dbUrl + `usersScores/${userAuth.id}.json`;
+          return this.http.get<any>(httpUrl).pipe(
+            map(userScoresObject => {
+              if(userScoresObject === null) {
+                return [];
+              }
+              return Object.keys(userScoresObject).map(key => (<UserScore>{ idMap: key, ...userScoresObject[key] }));
+            })
+          );
+          
+      }));
+  }
+
+
+
+  editUserScore(mapId: string, userScore: UserScore) {
+    return this.authService.userAuth.pipe(
+      take(1), 
+      exhaustMap(userAuth => {
+         
+          if(!userAuth) {
+              return throwError(() => new Error("Error"));
+          }
+
+          let httpUrl = firebaseConfig.dbUrl + `usersScores/${userAuth.id}/${mapId}.json`;
+          return this.http.put<any>(httpUrl, userScore);
+          
+      })).subscribe();
   }
 
 }

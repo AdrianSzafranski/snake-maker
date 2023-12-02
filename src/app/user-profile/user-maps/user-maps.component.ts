@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 
 import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
 import { UserProfileService } from '../user-profile.service';
+import { GameMapService } from 'src/app/snake-game/game-maps/game-map.service';
+import { UserScore } from 'src/app/snake-game/user-score.model';
 
 @Component({
   selector: 'app-user-maps',
@@ -15,10 +17,12 @@ export class UserMapsComponent implements OnInit {
   displayedMapsStartIndex = 0;
   selectedUserMapArrayId: number | null = null;
   pagesNumber: number = 1;
+  userScores: UserScore[] = [];
 
   constructor(
     private userProfileService: UserProfileService,
-    private router: Router
+    private router: Router,
+    private gameMapService: GameMapService
     ) {}
 
   ngOnInit(): void {
@@ -27,6 +31,14 @@ export class UserMapsComponent implements OnInit {
       this.userMaps = userMaps;
       this.pagesNumber =  Math.ceil(this.userMaps.length / 6);
     })
+
+    this.gameMapService.fetchUserScores().subscribe(userScores => {
+      this.userScores = userScores;
+    });
+  }
+
+  getUserScore(currentMapId: string | undefined) {
+    return this.userScores.find(userScore => userScore.idMap === currentMapId) ?? null;
   }
 
   onGetPreviousUserMaps() {

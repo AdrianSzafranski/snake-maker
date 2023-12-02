@@ -4,6 +4,8 @@ import { CanvasDrawer } from "./canvas-drawer";
 import { CoordinateModel } from "./coordinate.model";
 import { FoodModel } from "./food.model";
 import { SnakeModel } from "./snake.model";
+import { UserScore } from "../user-score.model";
+import { GameMapService } from "../game-maps/game-map.service";
 
 export class GameStateModel {
   private _currentScore = 0; 
@@ -26,16 +28,19 @@ export class GameStateModel {
   private initSnakeCoords: CoordinateModel[] = [];
   private initFoodCoords: CoordinateModel[] = [];
   private candrawBoards = true;
-  
+
   constructor(
     private map: GameMap,
+    private userScore: UserScore,
     gameCanvas: HTMLCanvasElement, 
     bgCanvas: HTMLCanvasElement, 
-    gidCanvas: HTMLCanvasElement) {
+    gidCanvas: HTMLCanvasElement,
+    private gameMapService: GameMapService) {
       this._bgCanvasDrawer = new CanvasDrawer(bgCanvas);
       this._gameCanvasDrawer = new CanvasDrawer(gameCanvas);
       this._gridCanvasDrawer = new CanvasDrawer(gidCanvas);
 
+      this._bestScore = this.userScore.highestScore;
       if(this.map.obstacles) {
         this.initBoardElementsUsingFixedPositions();
       } else {
@@ -152,6 +157,15 @@ export class GameStateModel {
   determineBestScore() {
     if(this._currentScore <= this._bestScore) return;
     this._bestScore = this._currentScore;
+
+    const newUserScore = {
+      highestScore: this._bestScore,
+      gamesNumber: this.userScore.gamesNumber + 1
+    } 
+
+    if(this.map.id) {
+      this.gameMapService.editUserScore(this.map.id, newUserScore);
+    }
   }
 
   startGame() {
