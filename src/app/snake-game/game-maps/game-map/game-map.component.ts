@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { GameMap } from '../game-map.model';
+import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
 
 
 @Component({

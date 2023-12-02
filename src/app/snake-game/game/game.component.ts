@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { GameStateModel } from './game-state.model';
 import { ActivatedRoute } from '@angular/router';
-import { GameMapService } from '../game-menu/game-maps/game-map.service';
+import { GameMapService } from '../game-maps/game-map.service';
 
 @Component({
   selector: 'app-game',
@@ -20,8 +20,9 @@ export class GameComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
 
+    const mapType = this.route.snapshot.params['mapType'];
     const mapId = this.route.snapshot.params['mapId'];
-    this.gameMapService.fetchMap(mapId).subscribe(gameMap => {
+    this.gameMapService.fetchMap(mapType, mapId).subscribe(gameMap => {
       if(gameMap.obstacles) {
         this.isFixedMap = true;
       }

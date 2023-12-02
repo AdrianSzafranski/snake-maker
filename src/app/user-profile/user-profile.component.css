@@ -5,10 +5,9 @@
     width: 80%;
     min-height: 85%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     border-radius: 15px;
-    position: relative;
     font-size: 1.2rem;
 }
 .side-panel {
@@ -19,7 +18,36 @@
 .user-maps {
     width: 68%;
     background-color: rgb(36, 37, 38);
-    border-radius: 10px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+.nav {
+    text-align: center;
+    border-radius: 15px 15px 0 0;
+    background-color: rgb(16, 17, 17);
+    color: #ccc;
+}
+.nav-element {
+    height: 50px;
+    border: none;
+    width: 50%;
+    color: #ccc;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.selected-user-maps-nav-element {
+    background-color: #d2a249;
+    color: black;
+    font-weight: bold; 
+    border-radius: 15px 0 0 0;
+    
+}
+.selected-add-map-nav-element {
+    background-color: #d2a249;
+    color: black;
+    font-weight: bold; 
+    border-radius: 0 15px 0 0;
 }
 .switch-mode-button {
     margin: 20px 0;

@@ -20,11 +20,13 @@ import { PostCommentComponent } from './home/posts/post/post-comment/post-commen
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { SnakeGameComponent } from './snake-game/snake-game.component';
 import { GameComponent } from './snake-game/game/game.component';
-import { GameMapsComponent } from './snake-game/game-menu/game-maps/game-maps.component';
-import { GameMapComponent } from './snake-game/game-menu/game-maps/game-map/game-map.component';
+import { GameMapsComponent } from './snake-game/game-maps/game-maps.component';
+import { GameMapComponent } from './snake-game/game-maps/game-map/game-map.component';
 import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
 import { UserDataEditComponent } from './user-profile/user-data-edit/user-data-edit.component';
 import { UserDataComponent } from './user-profile/user-data/user-data.component';
+import { GameMapAddComponent } from './user-profile/game-map-add/game-map-add.component';
+import { UserMapsComponent } from './user-profile/user-maps/user-maps.component';
 
 
 @NgModule({
@@ -48,7 +50,9 @@ import { UserDataComponent } from './user-profile/user-data/user-data.component'
     SnakeGameComponent,
     UserDataEditComponent,
     UserDataComponent,
-    UserAvatarComponent
+    UserAvatarComponent,
+    GameMapAddComponent,
+    UserMapsComponent
   ],
   imports: [
     BrowserModule,

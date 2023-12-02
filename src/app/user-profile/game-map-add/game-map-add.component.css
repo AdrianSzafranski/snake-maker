@@ -1,0 +1,157 @@
+.container {
+    padding: 20px;
+}
+.center-map-preview {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.map-preview {
+    text-align: center;
+    align-items: center;
+    border: 4px black solid;
+    margin-bottom: 5px;
+}
+.map-preview-first-tip {
+    text-align: center;
+    color: #c7b89c;
+    margin-bottom: 10px;
+}
+.map-preview-second-tip {
+    text-align: justify;
+    color: #c7b89c;
+    margin-bottom: 10px;
+}
+.mapColumn {
+    display: flex;
+}
+.mapElement {
+    display: flex;
+}
+.submit-button {
+    width: 100%;
+    background-color: #d2a249;
+    color: black;
+    font-weight: bold;
+    padding: 10px 7px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.errorMessage {
+    color: black;
+    text-align: center;
+    margin: 30px 0 10px 0;
+    padding: 10px 0;
+    background-color: #cfa1a1;
+    border: 3px solid rgb(75, 24, 24);
+}
+.current-stage-info {
+    color: #d2a249;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.map-creation-stage {
+ margin-top: 20px;
+ text-align: center;
+}
+.map-preview-title {
+    text-align: center;
+    color: #ccc;
+    margin: 20px 0 5px 0;
+}
+.map-size-buttons-container {
+    margin: 5px 0 10px 0;
+}
+input[type="text"] {
+    width: 300px;
+    padding: 3px;
+    margin: 5px 0 10px 0;
+    display: inline-block;
+    border: 2px solid black;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #cccccc;
+}
+button {
+    background-color: #d2a249;
+    margin-right: 10px;
+    color: black;
+    padding: 10px;
+    width: 100px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.map-name-label {
+    display: block;
+}
+.center-map-creation-stage-nav {
+    text-align: center;
+}
+input[type="color"] {
+    margin: 5px 10px 0 10px;
+    width: 70px;
+    height: 40px;
+    border: none;
+}
+.map-background-colors-templates {
+    display: flex;
+   justify-content: center;
+   margin-top: 5px;
+}
+.map-background-colors {
+    margin: 5px 0 10px 0;
+}
+.template-background-colors {
+    display: flex;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 2px solid black;
+    width: 80px;
+}
+.template-first-background-color,
+.template-second-background-color {
+    width: 40px;
+    height: 40px;
+}
+input[type="number"],
+select {
+    width: 75px;
+    margin: 5px 0 10px 0;
+}
+.center-snake-parameters {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+}
+.snake-parameters {
+    display: flex;
+    align-items: center;
+}
+.snake-parameter {
+    margin: 0px 10px;
+}
+.map-creation-stage-nav {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    text-align: center;
+}
+.left-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 25px 15px 0;
+    border-color: transparent white transparent transparent;
+}
+.right-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 0 15px 25px;
+    border-color: transparent transparent transparent white;
+}

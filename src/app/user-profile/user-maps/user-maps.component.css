@@ -1,0 +1,63 @@
+.mapsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding: 20px 20px 20px 20px;
+    background-color: rgb(30, 29, 29);
+}
+.map {
+    width: 100%;
+}
+.bottom-panel {
+    display: flex;
+    justify-content: space-between;
+}
+.buttons {
+    display: flex;
+    align-items: center;
+}
+button {
+    background-color: #d2a249;
+    border: none;
+    margin: 0 10px;
+    color: black;
+    padding: 10px;
+    width: 100px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button[disabled] {
+    background-color: gray;
+    cursor: default;
+}
+.mapNav {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+}
+.arrow-button {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+}
+.left-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 25px 15px 0;
+    border-color: transparent white transparent transparent;
+}
+.right-arrow {
+    border-style: solid;
+    display: inline-block;
+    margin: 10px;
+    cursor: pointer;
+    border-width: 15px 0 15px 25px;
+    border-color: transparent transparent transparent white;
+}

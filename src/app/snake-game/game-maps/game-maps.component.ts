@@ -12,9 +12,11 @@ import { GameMapService } from './game-map.service';
 export class GameMapsComponent implements OnInit {
 
   gameMaps: GameMap[] = [];
+  unofficialMaps: GameMap[] = [];
   displayedMapsStartIndex = 0;
-  selectedMap?: number;
+  selectedMap?: string;
   pagesNumber!: number;
+  unOfficialMapsPagesNumber!: number;
   isLoading = false;
   isOfficialMaps = true;
   
@@ -28,15 +30,24 @@ export class GameMapsComponent implements OnInit {
       this.pagesNumber =  Math.ceil(this.gameMaps.length / 6);
       this.isLoading = false;
     });
+
+    this.gameMapsService.fetchUnofficialMaps().subscribe(unofficialMaps => {
+      this.unofficialMaps = unofficialMaps;
+      this.unOfficialMapsPagesNumber =  Math.ceil(this.unofficialMaps.length / 6);
+    });
   }
 
-  onStartGame(mapId?: number) {
+  onStartGame(mapId?: string) {
     if(!mapId) {
       return;
     }
     
     this.selectedMap = mapId;
-    this.router.navigate(['/snake-game', "game", this.selectedMap]);
+    let mapType = 'gameMaps';
+    if(!this.isOfficialMaps) {
+      mapType= 'unofficialMaps';
+    }
+    this.router.navigate(['/snake-game', "game", mapType, this.selectedMap]);
   }
 
   onGetPreviousMaps() {
@@ -45,20 +56,34 @@ export class GameMapsComponent implements OnInit {
   }
 
   onGetNextMaps() {
-    if(this.displayedMapsStartIndex + 6 >=  this.gameMaps.length) return;
+    let mapsNumber = 0;
+    if(this.isOfficialMaps) {
+      mapsNumber = this.gameMaps.length;
+    } else {
+      mapsNumber = this.unofficialMaps.length;
+    }
+
+    if(this.displayedMapsStartIndex + 6 >=  mapsNumber) return;
     this.displayedMapsStartIndex += 6;
   }
 
   getDisplayedMaps() {
-    return this.gameMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
+    if(this.isOfficialMaps) {
+      return this.gameMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
+    } else {
+      return this.unofficialMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
+    }
+  
   }
 
   onShowOfficialMaps() {
     this.isOfficialMaps = true;
+    this.displayedMapsStartIndex = 0;
   }
 
   onShowUsersMaps() {
     this.isOfficialMaps = false;
+    this.displayedMapsStartIndex = 0;
   }
 
 

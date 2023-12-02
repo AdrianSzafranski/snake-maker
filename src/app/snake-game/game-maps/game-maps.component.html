@@ -17,7 +17,7 @@
     </div>
     <div class="mapNav">
         <div class="left-arrow" (click)="onGetPreviousMaps()"></div>
-        <span>{{ displayedMapsStartIndex / 6 + 1 }}/{{ this.pagesNumber }}</span>
+        <span>{{ displayedMapsStartIndex / 6 + 1 }}/{{ isOfficialMaps ? pagesNumber : unOfficialMapsPagesNumber }}</span>
         <div class="right-arrow" (click)="onGetNextMaps()"></div>
     </div>
 </div>

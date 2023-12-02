@@ -1,6 +1,4 @@
-
-
-import { GameMap } from "../game-menu/game-maps/game-map.model";
+import { GameMap } from "../game-maps/game-map.model";
 import { BoardModel } from "./board.model";
 import { CanvasDrawer } from "./canvas-drawer";
 import { CoordinateModel } from "./coordinate.model";

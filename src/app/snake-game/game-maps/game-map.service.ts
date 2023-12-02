@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, mergeMap, of, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, exhaustMap, map, mergeMap, of, take, tap, throwError } from 'rxjs';
 
-import firebaseConfig from '../../../config';
+import firebaseConfig from '../../config';
 import { GameMap } from './game-map.model';
+import { AuthService } from 'src/app/auth/auth.service';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import { GameMap } from './game-map.model';
 })
 export class GameMapService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   fetchMaps() {
     const httpUrl = firebaseConfig.dbUrl + "gameMaps.json";
@@ -22,16 +23,39 @@ export class GameMapService {
     );
   }
 
-  fetchMap(mapId: string) {
-    const httpUrl = firebaseConfig.dbUrl + `gameMaps/${mapId}.json`;
+  fetchUnofficialMaps() {
+    const httpUrl = firebaseConfig.dbUrl + "unofficialMaps.json";
     return this.http.get<any>(httpUrl).pipe(
-      map(gameMapObject => {
-        return <GameMap>{
-          id: mapId,
-          ...gameMapObject
-        };
+      map(unofficialMapsObject => {
+        return Object.keys(unofficialMapsObject).map(key => ({ id: key, ...unofficialMapsObject[key] }));
       })
     );
+  }
+
+  fetchMap(mapType: string, mapId: string) {
+    let httpUrl = firebaseConfig.dbUrl + `${mapType}/${mapId}.json`;
+
+    return this.authService.userAuth.pipe(
+      take(1), 
+      exhaustMap(userAuth => {
+         
+          if(!userAuth) {
+              return throwError(() => new Error("Error"));
+          }
+
+          if(mapType === 'usersMaps') {
+            httpUrl = firebaseConfig.dbUrl + `usersMaps/${userAuth.id}/${mapId}.json`;
+          }
+          return this.http.get<any>(httpUrl).pipe(
+            map(gameMapObject => {
+              return <GameMap>{
+                id: mapId,
+                ...gameMapObject
+              };
+            })
+          );
+          
+      }));
   }
 
   addMap() {

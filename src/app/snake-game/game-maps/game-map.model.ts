@@ -1,5 +1,5 @@
 export interface GameMap {
-    id?: number;
+    id?: string;
     name: string;
     boardWidthInElements: number;
     boardHeightInElements: number;
@@ -9,5 +9,6 @@ export interface GameMap {
     obstacles: string;
     snakeInitDirection: string;
     snakeInitCoords: string;
+    snakeColor: string;
     initTimeToPassOneElementInSeconds: number;
 }

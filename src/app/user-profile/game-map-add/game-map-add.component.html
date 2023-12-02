@@ -1,0 +1,98 @@
+<div class="container">
+    <h2 class="current-stage-info">Stage {{ mapCreationStageStrings[currentMapCreationStage - 1] }}</h2>
+    <hr>
+    <div *ngIf="error" class="errorMessage">Error: {{ error }}</div>
+    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 1">
+        <div class="map-name-container">
+            <label class="map-name-label" for="map-name">Map name</label>
+            <input type="text" id="map-name" value="map-name" [(ngModel)]="mapName">
+        </div>
+        <div class="map-size-container">
+            <p>Map size</p>
+            <div class="map-size-buttons-container">
+                <button 
+                    type="button" 
+                    (click)="onSetMapSizeInElements('small')"
+                    [ngStyle]="{'border': (mapSizeInString === 'small') ? '3px #eaea4e solid' : 'none'}">Small</button>
+                <button 
+                    type="button" 
+                    (click)="onSetMapSizeInElements('medium')"
+                    [ngStyle]="{'border': (mapSizeInString === 'medium') ? '3px #eaea4e solid' : 'none'}">Medium</button>
+                <button 
+                    type="button" 
+                    (click)="onSetMapSizeInElements('large')"
+                    [ngStyle]="{'border': (mapSizeInString === 'large') ? '3px #eaea4e solid' : 'none'}">Large</button>
+            </div>     
+        </div>
+    </div>
+    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 2"> 
+        <p>Background colors</p>
+        <div class="map-background-colors">
+            <input type="color" [value]="mapBackgroundColors.firstColor"
+                (change)="onChangeBackgroundFirstColor($event)">
+            <input type="color" [value]="mapBackgroundColors.secondColor"
+                (change)="onChangeBackgroundSecondColor($event)">
+        </div>
+        <p>Background templates</p>
+        <div class="map-background-colors-templates">
+            <div class="template-background-colors"
+                *ngFor="let templateBackgroundColors of templatesBackgroundColors; let i = index"
+                (click)="onSetTemplateBackgroundColors(i)">
+                <div class='template-first-background-color'
+                    [ngStyle]="{'background-color': templateBackgroundColors.firstColor}"></div>
+                <div class='template-second-background-color'
+                    [ngStyle]="{'background-color': templateBackgroundColors.secondColor}"></div>
+            </div>
+        </div>
+    </div>
+    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 3">
+        <p>Obstacles color</p>
+        <input type="color" [value]="obstacleColor" (change)="onChangeObstaclesColor($event)">
+    </div>
+    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 4">
+        <p>Snake color</p>
+        <input type="color" [value]="snakeColor" (change)="onChangeSnakeColor($event)">
+        <div class="center-snake-parameters">
+            <div class="snake-parameters">
+                <div class="snake-parameter">
+                    <p>Snake direction</p>
+                    <select [(ngModel)]="snakeDirection" (ngModelChange)="onChangeSnakeDirection()">
+                        <option value="up">Up</option>
+                        <option value="right">Right</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="left">Left</option>
+                    </select>
+                </div>
+                <div class="snake-parameter">
+                    <p>Snake speed</p>
+                    <input type="number" [(ngModel)]="snakeSpeed" min="1" max="3" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="map-preview-title">
+        Map preview
+    </div>
+    <div class="center-map-preview">
+        <div class="map-preview">
+            <div *ngFor="let mapRow  of [].constructor(mapHeightInElements); let i = index" class="mapColumn">
+                <div 
+                    (click)="onManageMapElement(i, j)" 
+                    [ngStyle]="setMapElementStyle(i,j)"
+                    *ngFor="let mapColumn  of [].constructor(mapWidthInElements); let j = index" class="mapElement">
+                </div>
+            </div>
+        </div>
+        <h4 *ngIf="currentMapCreationStage === 3" class="map-preview-first-tip">[Tip] Add/remove obstacles by clicking on the map elements</h4> 
+        <h4 *ngIf="currentMapCreationStage === 4" class="map-preview-second-tip">[Tip] Add/remove snake clicking on the map squares. The snake position must have one free space in the back for the tail and
+            three free spaces in the front to avoid immediate failure.</h4>
+    </div>
+    <div class="center-map-creation-stage-nav">
+        <div class="map-creation-stage-nav">
+            <div class="left-arrow" (click)="onShowPreviousStage()"></div>
+            <span>{{ currentMapCreationStage }}/{{ mapCreationStageNumber }}</span>
+            <div class="right-arrow" (click)="onShowNextStage()"></div>
+        </div>
+    </div>
+    <button *ngIf="currentMapCreationStage === 4" class="submit-button" type="button" (click)="onSubmit()">{{ editMap ? 'Edit' : 'Create' }} map</button>
+</div>
