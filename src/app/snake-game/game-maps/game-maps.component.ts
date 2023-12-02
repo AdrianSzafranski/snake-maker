@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
 import { Router } from '@angular/router';
 import { GameMap } from './game-map.model';
 import { GameMapService } from './game-map.service';
@@ -22,7 +23,10 @@ export class GameMapsComponent implements OnInit {
   isOfficialGameMaps = true;
   userScores: UserScore[] = [];
 
-  constructor(private gameMapsService: GameMapService, private router: Router) {
+  constructor(
+    private gameMapsService: GameMapService, 
+    private router: Router,
+    private viewportScroller: ViewportScroller) {
   }
 
   ngOnInit(): void {
@@ -63,6 +67,7 @@ export class GameMapsComponent implements OnInit {
   onGetPreviousPage() {
     if (this.displayedGameMapsStartIndex - 6 < 0) return;
     this.displayedGameMapsStartIndex -= 6;
+    this.scrollToTop();
   }
 
   onGetNextPage() {
@@ -75,6 +80,7 @@ export class GameMapsComponent implements OnInit {
 
     if (this.displayedGameMapsStartIndex + 6 >= gameMapsNumber) return;
     this.displayedGameMapsStartIndex += 6;
+    this.scrollToTop();
   }
 
   getDisplayedGameMaps() {
@@ -93,5 +99,9 @@ export class GameMapsComponent implements OnInit {
   onShowUsersGameMaps() {
     this.isOfficialGameMaps = false;
     this.displayedGameMapsStartIndex = 0;
+  }
+
+  scrollToTop() {
+    this.viewportScroller.scrollToPosition([0, 0]);
   }
 }
