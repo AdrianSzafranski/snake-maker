@@ -18,7 +18,7 @@
             [ngClass]="{'selected-add-map-nav-element': !isShowUserMaps}"
             (click)="onShowAddMapsForm()">{{ editMap ? 'Edit' : 'Add' }} map</button>
         </div>
-        <app-user-maps (editMapId)="setEditMap($event)" *ngIf="isShowUserMaps"></app-user-maps>
+        <app-user-game-maps (editMapId)="setEditMap($event)" *ngIf="isShowUserMaps"></app-user-game-maps>
         <app-game-map-add [editMap]="editMap" (isShowUserMaps)="showUserMaps($event)" *ngIf="!isShowUserMaps"></app-game-map-add>
     </div>
 </div>

@@ -13,29 +13,29 @@ import { UserScore } from '../user-score.model';
 export class GameMapsComponent implements OnInit {
 
   gameMaps: GameMap[] = [];
-  unofficialMaps: GameMap[] = [];
-  displayedMapsStartIndex = 0;
-  selectedMap?: string;
+  unofficialGameMaps: GameMap[] = [];
+  displayedGameMapsStartIndex = 0;
+  selectedGameMap?: string;
   pagesNumber!: number;
-  unOfficialMapsPagesNumber!: number;
+  unOfficialGameMapsPagesNumber!: number;
   isLoading = false;
-  isOfficialMaps = true;
+  isOfficialGameMaps = true;
   userScores: UserScore[] = [];
-  
-  constructor(private gameMapsService: GameMapService, private router: Router){
+
+  constructor(private gameMapsService: GameMapService, private router: Router) {
   }
 
   ngOnInit(): void {
     this.isLoading = true;
     this.gameMapsService.fetchMaps().subscribe(gameMaps => {
       this.gameMaps = gameMaps;
-      this.pagesNumber =  Math.ceil(this.gameMaps.length / 6);
+      this.pagesNumber = Math.ceil(this.gameMaps.length / 6);
       this.isLoading = false;
     });
 
     this.gameMapsService.fetchUnofficialMaps().subscribe(unofficialMaps => {
-      this.unofficialMaps = unofficialMaps;
-      this.unOfficialMapsPagesNumber =  Math.ceil(this.unofficialMaps.length / 6);
+      this.unofficialGameMaps = unofficialMaps;
+      this.unOfficialGameMapsPagesNumber = Math.ceil(this.unofficialGameMaps.length / 6);
     });
 
     this.gameMapsService.fetchUserScores().subscribe(userScores => {
@@ -43,58 +43,55 @@ export class GameMapsComponent implements OnInit {
     });
   }
 
-  getUserScore(currentMapId: string | undefined) {
-    return this.userScores.find(userScore => userScore.idMap === currentMapId) ?? null;
+  getUserScore(currentGameMapId: string | undefined) {
+    return this.userScores.find(userScore => userScore.idMap === currentGameMapId) ?? null;
   }
 
-  onStartGame(mapId?: string) {
-    if(!mapId) {
+  onStartGame(gameMapId?: string) {
+    if (!gameMapId) {
       return;
     }
-    
-    this.selectedMap = mapId;
-    let mapType = 'gameMaps';
-    if(!this.isOfficialMaps) {
-      mapType= 'unofficialMaps';
+
+    this.selectedGameMap = gameMapId;
+    let gameMapType = 'gameMaps';
+    if (!this.isOfficialGameMaps) {
+      gameMapType = 'unofficialMaps';
     }
-    this.router.navigate(['/snake-game', "game", mapType, this.selectedMap]);
+    this.router.navigate(['/snake-game', "game", gameMapType, this.selectedGameMap]);
   }
 
-  onGetPreviousMaps() {
-    if(this.displayedMapsStartIndex - 6 < 0) return;
-    this.displayedMapsStartIndex -= 6;
+  onGetPreviousPage() {
+    if (this.displayedGameMapsStartIndex - 6 < 0) return;
+    this.displayedGameMapsStartIndex -= 6;
   }
 
-  onGetNextMaps() {
-    let mapsNumber = 0;
-    if(this.isOfficialMaps) {
-      mapsNumber = this.gameMaps.length;
+  onGetNextPage() {
+    let gameMapsNumber = 0;
+    if (this.isOfficialGameMaps) {
+      gameMapsNumber = this.gameMaps.length;
     } else {
-      mapsNumber = this.unofficialMaps.length;
+      gameMapsNumber = this.unofficialGameMaps.length;
     }
 
-    if(this.displayedMapsStartIndex + 6 >=  mapsNumber) return;
-    this.displayedMapsStartIndex += 6;
+    if (this.displayedGameMapsStartIndex + 6 >= gameMapsNumber) return;
+    this.displayedGameMapsStartIndex += 6;
   }
 
-  getDisplayedMaps() {
-    if(this.isOfficialMaps) {
-      return this.gameMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
+  getDisplayedGameMaps() {
+    if (this.isOfficialGameMaps) {
+      return this.gameMaps.slice(this.displayedGameMapsStartIndex, this.displayedGameMapsStartIndex + 6);
     } else {
-      return this.unofficialMaps.slice(this.displayedMapsStartIndex, this.displayedMapsStartIndex + 6);
+      return this.unofficialGameMaps.slice(this.displayedGameMapsStartIndex, this.displayedGameMapsStartIndex + 6);
     }
-  
   }
 
-  onShowOfficialMaps() {
-    this.isOfficialMaps = true;
-    this.displayedMapsStartIndex = 0;
+  onShowOfficialGameMaps() {
+    this.isOfficialGameMaps = true;
+    this.displayedGameMapsStartIndex = 0;
   }
 
-  onShowUsersMaps() {
-    this.isOfficialMaps = false;
-    this.displayedMapsStartIndex = 0;
+  onShowUsersGameMaps() {
+    this.isOfficialGameMaps = false;
+    this.displayedGameMapsStartIndex = 0;
   }
-
-
 }

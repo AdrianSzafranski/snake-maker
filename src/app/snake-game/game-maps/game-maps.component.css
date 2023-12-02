@@ -4,8 +4,9 @@
     margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
-   
+
 }
+
 .nav {
     display: flex;
     text-align: center;
@@ -13,6 +14,7 @@
     background-color: rgb(16, 17, 17);
     color: #ccc;
 }
+
 .nav-element {
     height: 50px;
     border: none;
@@ -25,31 +27,36 @@
 .selected-official-nav-element {
     background-color: #d2a249;
     color: black;
-    font-weight: bold; 
+    font-weight: bold;
     border-radius: 15px 0 0 15px;
 }
+
 .selected-users-nav-element {
     background-color: #d2a249;
     color: black;
-    font-weight: bold; 
+    font-weight: bold;
     border-radius: 0 15px 15px 0;
 }
-.mapsContainer {
+
+.game-maps-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     width: 100%;
     padding: 20px 7% 0 7%;
 }
-.map {
+
+.game-map {
     width: 100%;
 }
-.mapNav {
+
+.game-map-nav {
     margin-bottom: 10px;
     font-size: 1.2rem;
     display: inline-flex;
     align-items: center;
 }
+
 .arrow-button {
     width: 0;
     height: 0;
@@ -58,6 +65,7 @@
     margin: 10px;
     cursor: pointer;
 }
+
 .left-arrow {
     border-style: solid;
     display: inline-block;
@@ -66,6 +74,7 @@
     border-width: 15px 25px 15px 0;
     border-color: transparent white transparent transparent;
 }
+
 .right-arrow {
     border-style: solid;
     display: inline-block;

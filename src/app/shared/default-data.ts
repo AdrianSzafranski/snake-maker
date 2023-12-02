@@ -1,10 +1,12 @@
 export interface Defaultdata {
     defaultAvatar: string;
     defaultAvatarAlt: string;
+    defaultGameMapAlt: string;
 };
   
 export const defaultData: Defaultdata = {
     defaultAvatar: '[["#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#000","#000","#347e2c","#347e2c","#000","#000","#347e2c","#347e2c"],["#347e2c","#347e2c","#000","#000","#347e2c","#347e2c","#000","#000","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#347e2c","#000","#000","#347e2c","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#000","#000","#000","#000","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#000","#000","#000","#000","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#000","#347e2c","#347e2c","#000","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c"],["#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c","#347e2c"]]',
-    defaultAvatarAlt: 'user avatar'
+    defaultAvatarAlt: 'user avatar',
+    defaultGameMapAlt: 'game map'
 };
 

@@ -1,13 +1,10 @@
-.mapsContainer {
+.game-maps-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     width: 100%;
     padding: 20px 20px 20px 20px;
     background-color: rgb(30, 29, 29);
-}
-.map {
-    width: 100%;
 }
 .bottom-panel {
     display: flex;
@@ -31,7 +28,7 @@ button[disabled] {
     background-color: gray;
     cursor: default;
 }
-.mapNav {
+.game-map-nav {
     margin-bottom: 10px;
     font-size: 1.2rem;
     display: inline-flex;

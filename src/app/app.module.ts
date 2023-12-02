@@ -26,7 +26,7 @@ import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component'
 import { UserDataEditComponent } from './user-profile/user-data-edit/user-data-edit.component';
 import { UserDataComponent } from './user-profile/user-data/user-data.component';
 import { GameMapAddComponent } from './user-profile/game-map-add/game-map-add.component';
-import { UserMapsComponent } from './user-profile/user-maps/user-maps.component';
+import { UserGameMapsComponent } from './user-profile/user-game-maps/user-game-maps.component';
 
 
 @NgModule({
@@ -52,7 +52,7 @@ import { UserMapsComponent } from './user-profile/user-maps/user-maps.component'
     UserDataComponent,
     UserAvatarComponent,
     GameMapAddComponent,
-    UserMapsComponent
+    UserGameMapsComponent
   ],
   imports: [
     BrowserModule,

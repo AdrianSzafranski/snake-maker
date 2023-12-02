@@ -3,26 +3,20 @@
 </div>
 <div class="container" *ngIf="!isLoading">
     <div class="nav">
-        <button 
-        class="nav-element" 
-        [ngClass]="{'selected-official-nav-element': isOfficialMaps}"
-        (click)="onShowOfficialMaps()">Official maps</button>
-        <button 
-        class="nav-element" 
-        [ngClass]="{'selected-users-nav-element': !isOfficialMaps}"
-        (click)="onShowUsersMaps()">Users maps</button>
+        <button class="nav-element" [ngClass]="{'selected-official-nav-element': isOfficialGameMaps}"
+            (click)="onShowOfficialGameMaps()">Official maps</button>
+        <button class="nav-element" [ngClass]="{'selected-users-nav-element': !isOfficialGameMaps}"
+            (click)="onShowUsersGameMaps()">Users maps</button>
     </div>
-    <div class="mapsContainer">
-        <app-game-map 
-        *ngFor="let currentMap of getDisplayedMaps()" 
-        [map]="currentMap"
-        [userScore]="getUserScore(currentMap.id)"
-        class="map" 
-        (click)="onStartGame(currentMap.id)"></app-game-map>
+    <div class="game-maps-container">
+        <app-game-map *ngFor="let currentGameMap of getDisplayedGameMaps()" [gameMap]="currentGameMap"
+            [userScore]="getUserScore(currentGameMap.id)" class="game-map"
+            (click)="onStartGame(currentGameMap.id)"></app-game-map>
     </div>
-    <div class="mapNav">
-        <div class="left-arrow" (click)="onGetPreviousMaps()"></div>
-        <span>{{ displayedMapsStartIndex / 6 + 1 }}/{{ isOfficialMaps ? pagesNumber : unOfficialMapsPagesNumber }}</span>
-        <div class="right-arrow" (click)="onGetNextMaps()"></div>
+    <div class="game-map-nav">
+        <div class="left-arrow" (click)="onGetPreviousPage()"></div>
+        <span>{{ displayedGameMapsStartIndex / 6 + 1 }}/{{ isOfficialGameMaps ? pagesNumber :
+            unOfficialGameMapsPagesNumber }}</span>
+        <div class="right-arrow" (click)="onGetNextPage()"></div>
     </div>
 </div>

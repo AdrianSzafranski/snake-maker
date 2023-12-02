@@ -1,10 +1,10 @@
-<div class="mapContainer">
-    <div class="mapName">
-        <h2>{{ map.name }}</h2>
+<div class="game-map-container">
+    <div class="game-map-name">
+        <h2>{{ gameMap.name }}</h2>
     </div>
-    <canvas class="map" width="350" #mapCanvas></canvas>
-    <div class="mapInfo">
-        <div class="statsInfo">
+    <div #gameMapContainer></div>
+    <div class="game-map-info">
+        <div class="stats-info">
             <p>Highest score: {{ userScore ? userScore.highestScore : 0 }}</p>
             <p>Game counter: {{ userScore ? userScore.gamesNumber : 0 }}</p>
         </div>

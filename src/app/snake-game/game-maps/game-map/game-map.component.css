@@ -1,20 +1,22 @@
-.mapContainer {
+.game-map-container {
     margin: auto;
     background-color: rgb(36, 37, 38);
     padding: 10px 20px;
     border-radius: 15px;
     color: #c7b89c;
 }
-.mapName {
+.game-map-name {
     margin-bottom: 10px;
 }
-.map {
+img {
     border: 3px solid black;
+    width: 100%;
+    height: auto;
 }
-.mapInfo {
+.game-map-info {
     text-align: center;
 }
-.statsInfo {
+.stats-info {
     display: flex;
     justify-content: space-between;
 }

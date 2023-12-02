@@ -1,0 +1,26 @@
+<div class="game-maps-container">
+    <app-game-map 
+    *ngFor="let currentUserGameMap of getDisplayedUserGameMaps(); let i = index" 
+    [gameMap]="currentUserGameMap" 
+    [userScore]="getUserScore(currentUserGameMap.id)"
+    [ngStyle]="{
+        'border': i === selectedUserGameMapArrayId ? '2px solid #eaea4e' : '2px solid black',
+        'border-radius': '15px'
+    }" 
+    (click)="onSelectMap(i)"></app-game-map>
+    <h2 *ngIf="userGameMaps.length === 0">You don't have maps</h2>
+</div>
+<div class="bottom-panel">
+    <div class="buttons">
+        <button type="button" (click)="onStartGame()" [disabled]="selectedUserGameMapArrayId === null">Start game</button>
+        <button type="button" (click)="onEditMap()" [disabled]="selectedUserGameMapArrayId === null">Edit map</button>
+        <button type="button" (click)="onDeleteMap()" [disabled]="selectedUserGameMapArrayId === null">Delete map</button>
+        <button type="button" (click)="onPublishMap()" [disabled]="selectedUserGameMapArrayId === null">Publish map</button>
+        
+    </div>
+    <div class="game-map-nav">
+        <div class="left-arrow" (click)="onGetPreviousPage()"></div>
+        <span>{{ displayedGameMapsStartIndex / 6 + 1 }}/{{ this.pagesNumber }}</span>
+        <div class="right-arrow" (click)="onGetNextPage()"></div>
+    </div>
+</div>
