@@ -58,3 +58,17 @@ button[disabled] {
     border-width: 15px 0 15px 25px;
     border-color: transparent transparent transparent white;
 }
+
+@media only screen and (max-width: 920px) {
+    .buttons {
+        margin: 5px 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; 
+    }
+
+    .game-maps-container {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+

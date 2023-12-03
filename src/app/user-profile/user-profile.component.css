@@ -10,23 +10,27 @@
     border-radius: 15px;
     font-size: 1.2rem;
 }
+
 .side-panel {
     width: 30%;
     background-color: rgb(36, 37, 38);
     border-radius: 10px;
 }
+
 .user-maps {
     width: 68%;
     background-color: rgb(36, 37, 38);
     border-radius: 15px;
     margin-bottom: 20px;
 }
+
 .nav {
     text-align: center;
     border-radius: 15px 15px 0 0;
     background-color: rgb(16, 17, 17);
     color: #ccc;
 }
+
 .nav-element {
     height: 50px;
     border: none;
@@ -39,24 +43,81 @@
 .selected-user-maps-nav-element {
     background-color: #d2a249;
     color: black;
-    font-weight: bold; 
+    font-weight: bold;
     border-radius: 15px 0 0 0;
-    
+
 }
+
 .selected-add-map-nav-element {
     background-color: #d2a249;
     color: black;
-    font-weight: bold; 
+    font-weight: bold;
     border-radius: 0 15px 0 0;
 }
+
 .switch-mode-button {
     margin: 20px 0;
     text-align: center;
 }
+
 .switch-mode-button button {
     background-color: #d2a249;
     border: 1px solid black;
     border-radius: 10px;
     padding: 10px 20px;
     cursor: pointer;
+}
+
+@media only screen and (max-width: 1200px) {
+    .container {
+        width: 98%;
+    }
+}
+
+@media only screen and (max-width: 920px) {
+    .side-panel {
+        width: 35%;
+    }
+
+    .user-maps {
+        width: 63%;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .side-panel {
+        width: 45%;
+    }
+
+    .user-maps {
+        width: 53%;
+    }
+}
+
+@media only screen and (max-width: 720px) {
+    .container {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .side-panel {
+        width: 70%;
+        margin-bottom: 20px;
+    }
+
+    .user-maps {
+        width: 70%;
+    }
+}
+
+@media only screen and (max-width: 550px) {
+
+    .side-panel {
+        width: 95%;
+    }
+
+    .user-maps {
+        width: 95%;
+    }
 }
