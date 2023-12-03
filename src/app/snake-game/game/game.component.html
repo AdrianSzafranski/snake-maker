@@ -7,17 +7,20 @@
                 <div class="optionsTitle">
                     <div class="optionsTitleText">Options</div>
                     <div class="optionsTitleArrow">&#9662;</div>
-                </div>  
+                </div>
                 <ul class="dropDownOptions">
                     <li class="option" (click)="onRestart(false)">Restart game</li>
                     <li *ngIf="this.isFixedMap" class="option" (click)="onRestart(true)">Generate new map</li>
                 </ul>
             </li>
-        </div>    
+        </div>
     </div>
     <div class='canvas-container'>
         <canvas id="bgCanvas" class="canvas-layer" #bgCanvas></canvas>
         <canvas id="gameCanvas" class="canvas-layer" #gameCanvas></canvas>
         <canvas id="gridCanvas" class="canvas-layer" #gridCanvas></canvas>
     </div>
+</div>
+<div class="resolution-info">
+    <h1>Resolution too low!</h1>
 </div>
