@@ -14,10 +14,10 @@
             <li routerLinkActive="activeLink" *ngIf="!isAuthenticated">
               <a routerLink="/signup">Sign up</a>
           </li>
-            <li routerLinkActive="activeLink" >
+            <li routerLinkActive="activeLink" *ngIf="isAuthenticated">
               <a routerLink="/snake-game">Game</a>
             </li>
-            <li routerLinkActive="activeLink">
+            <li routerLinkActive="activeLink" *ngIf="isAuthenticated">
               <a routerLink="/profile">Profile</a>
             </li>
             <li routerLinkActive="activeLink" *ngIf="isAuthenticated"><a routerLink="/guide">Guide</a></li>

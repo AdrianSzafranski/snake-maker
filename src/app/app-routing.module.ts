@@ -30,11 +30,15 @@ const routes: Routes = [
     component: GuideComponent,
     canActivate: [AuthGuard],
   },
-  { path: 'profile', component: UserProfileComponent },
+  { 
+    path: 'profile', 
+    component: UserProfileComponent,
+    canActivate: [AuthGuard],
+  },
   { 
     path: 'snake-game', 
     component: SnakeGameComponent, 
-    //canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       { path: '', component: GameMapsComponent },
       { path: 'game/:mapType/:mapId', component: GameComponent },
