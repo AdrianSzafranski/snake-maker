@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="showAddGameMapContainer">
     <h2 class="current-stage-info">Stage {{ mapCreationStageStrings[currentMapCreationStage - 1] }}</h2>
     <hr>
     <div *ngIf="error" class="errorMessage">Error: {{ error }}</div>
@@ -10,22 +10,16 @@
         <div class="map-size-container">
             <p>Map size</p>
             <div class="map-size-buttons-container">
-                <button 
-                    type="button" 
-                    (click)="onSetMapSizeInElements('small')"
+                <button type="button" (click)="onSetMapSizeInElements('small')"
                     [ngStyle]="{'border': (mapSizeInString === 'small') ? '3px #eaea4e solid' : 'none'}">Small</button>
-                <button 
-                    type="button" 
-                    (click)="onSetMapSizeInElements('medium')"
+                <button type="button" (click)="onSetMapSizeInElements('medium')"
                     [ngStyle]="{'border': (mapSizeInString === 'medium') ? '3px #eaea4e solid' : 'none'}">Medium</button>
-                <button 
-                    type="button" 
-                    (click)="onSetMapSizeInElements('large')"
+                <button type="button" (click)="onSetMapSizeInElements('large')"
                     [ngStyle]="{'border': (mapSizeInString === 'large') ? '3px #eaea4e solid' : 'none'}">Large</button>
-            </div>     
+            </div>
         </div>
     </div>
-    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 2"> 
+    <div class="map-creation-stage" *ngIf="currentMapCreationStage === 2">
         <p>Background colors</p>
         <div class="map-background-colors">
             <input type="color" [value]="mapBackgroundColors.firstColor"
@@ -76,15 +70,15 @@
     <div class="center-map-preview">
         <div class="map-preview">
             <div *ngFor="let mapRow  of [].constructor(mapHeightInElements); let i = index" class="mapColumn">
-                <div 
-                    (click)="onManageMapElement(i, j)" 
-                    [ngStyle]="setMapElementStyle(i,j)"
+                <div (click)="onManageMapElement(i, j)" [ngStyle]="setMapElementStyle(i,j)"
                     *ngFor="let mapColumn  of [].constructor(mapWidthInElements); let j = index" class="mapElement">
                 </div>
             </div>
         </div>
-        <h4 *ngIf="currentMapCreationStage === 3" class="map-preview-first-tip">[Tip] Add/remove obstacles by clicking on the map elements</h4> 
-        <h4 *ngIf="currentMapCreationStage === 4" class="map-preview-second-tip">[Tip] Add/remove snake clicking on the map squares. The snake position must have one free space in the back for the tail and
+        <h4 *ngIf="currentMapCreationStage === 3" class="map-preview-first-tip">[Tip] Add/remove obstacles by clicking
+            on the map elements</h4>
+        <h4 *ngIf="currentMapCreationStage === 4" class="map-preview-second-tip">[Tip] Add/remove snake clicking on the
+            map squares. The snake position must have one free space in the back for the tail and
             three free spaces in the front to avoid immediate failure.</h4>
     </div>
     <div class="center-map-creation-stage-nav">
@@ -94,5 +88,9 @@
             <div class="right-arrow" (click)="onShowNextStage()"></div>
         </div>
     </div>
-    <button *ngIf="currentMapCreationStage === 4" class="submit-button" type="button" (click)="onSubmit()">{{ editMap ? 'Edit' : 'Create' }} map</button>
+    <button *ngIf="currentMapCreationStage === 4" class="submit-button" type="button" (click)="onSubmit()">{{ editMap ?
+        'Edit' : 'Create' }} map</button>
+</div>
+<div class="resolution-info" *ngIf="!showAddGameMapContainer">
+    <p>Resolution too low to create/edit map!</p>
 </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { UserProfileService } from '../user-profile.service';
 import { Coordinate } from 'src/app/shared/coordinate-model';
 import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
@@ -64,6 +64,7 @@ export class GameMapAddComponent implements OnInit {
   snakeSpeed = 1;
 
   error: string | null = null;
+  showAddGameMapContainer = true;
 
   constructor(private userProfileService: UserProfileService) { }
 
@@ -71,6 +72,7 @@ export class GameMapAddComponent implements OnInit {
     this.createMapArray();
     this.createObstacleArray();
     this.setInitMapData();
+    this.changeScreenSize();
   }
 
   createMapArray() {
@@ -85,7 +87,7 @@ export class GameMapAddComponent implements OnInit {
   }
 
   setInitMapData() {
-    if(!this.editMap) {
+    if (!this.editMap) {
       return;
     }
     this.mapName = this.editMap.name;
@@ -94,8 +96,8 @@ export class GameMapAddComponent implements OnInit {
     this.mapBackgroundColors.firstColor = this.editMap.boardFirstColor;
     this.mapBackgroundColors.secondColor = this.editMap.boardSecondColor;
     this.snakeColor = this.editMap.snakeColor,
-    this.obstacleColor = this.editMap.obstacleColor,
-    this.snakeDirection = this.editMap.snakeInitDirection
+      this.obstacleColor = this.editMap.obstacleColor,
+      this.snakeDirection = this.editMap.snakeInitDirection
     this.snakeSpeed = this.editMap.initTimeToPassOneElementInSeconds / 0.3;
 
     this.createMapArray();
@@ -103,14 +105,14 @@ export class GameMapAddComponent implements OnInit {
 
     const obstaclesString = this.editMap.obstacles;
 
-    let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(obstaclesString);
-    obstaclesJsonArray.forEach(obstacle => { 
-      for(let i = 0; i < obstacle.width; i++) {
+    let obstaclesJsonArray: { x: number, y: number, width: number, height: number }[] = JSON.parse(obstaclesString);
+    obstaclesJsonArray.forEach(obstacle => {
+      for (let i = 0; i < obstacle.width; i++) {
         const newX = obstacle.x + i;
         this.obstaclesArray[obstacle.y][newX] = true;
         this.mapArray[obstacle.y][newX] = this.obstacleColor;
       }
-      for(let i = 0; i < obstacle.height; i++) {
+      for (let i = 0; i < obstacle.height; i++) {
         const newY = obstacle.y + i;
         this.obstaclesArray[newY][obstacle.x] = true;
         this.mapArray[newY][obstacle.x] = this.obstacleColor;
@@ -119,7 +121,7 @@ export class GameMapAddComponent implements OnInit {
     });
 
     const snakeCoordString = this.editMap.snakeInitCoords;
-    let snakeCoords: {x: number, y: number}[] = JSON.parse(snakeCoordString);
+    let snakeCoords: { x: number, y: number }[] = JSON.parse(snakeCoordString);
     this.snakeCoord = {
       rowIndexWithHead: snakeCoords[1].y,
       colIndexWithHead: snakeCoords[1].x,
@@ -209,13 +211,13 @@ export class GameMapAddComponent implements OnInit {
 
     this.mapArray.forEach((row, rowIndex) => {
       row.forEach((element, colIndex) => {
-        if(this.obstaclesArray[rowIndex][colIndex]) {
+        if (this.obstaclesArray[rowIndex][colIndex]) {
           return;
         }
-        if(this.snakeCoord && this.snakeCoord.rowIndexWithHead === rowIndex && this.snakeCoord.colIndexWithHead === colIndex) {
+        if (this.snakeCoord && this.snakeCoord.rowIndexWithHead === rowIndex && this.snakeCoord.colIndexWithHead === colIndex) {
           return;
         }
-        if(this.snakeCoord && this.snakeCoord.rowIndexWithTail === rowIndex && this.snakeCoord.colIndexWithTail === colIndex) {
+        if (this.snakeCoord && this.snakeCoord.rowIndexWithTail === rowIndex && this.snakeCoord.colIndexWithTail === colIndex) {
           return;
         }
 
@@ -233,10 +235,10 @@ export class GameMapAddComponent implements OnInit {
         if (!(this.obstaclesArray[rowIndex][colIndex] === false)) {
           return;
         }
-        if(this.snakeCoord && this.snakeCoord.rowIndexWithHead === rowIndex && this.snakeCoord.colIndexWithHead === colIndex) {
+        if (this.snakeCoord && this.snakeCoord.rowIndexWithHead === rowIndex && this.snakeCoord.colIndexWithHead === colIndex) {
           return;
         }
-        if(this.snakeCoord && this.snakeCoord.rowIndexWithTail === rowIndex && this.snakeCoord.colIndexWithTail === colIndex) {
+        if (this.snakeCoord && this.snakeCoord.rowIndexWithTail === rowIndex && this.snakeCoord.colIndexWithTail === colIndex) {
           return;
         }
         this.mapArray[rowIndex][colIndex] = this.getMapElementBackgroundColor(rowIndex, colIndex);
@@ -272,7 +274,7 @@ export class GameMapAddComponent implements OnInit {
     if (this.currentMapCreationStage !== 4) {
       return;
     }
-    
+
     //check if the next 3 snake target elements are empty of obstacles
     let checkDestinationRow = rowIndex;
     let checkDestinationColumn = colIndex;
@@ -303,7 +305,7 @@ export class GameMapAddComponent implements OnInit {
           }
           break;
       }
-    
+
       if (this.mapArray[checkDestinationRow][checkDestinationColumn] === this.obstacleColor) {
         return;
       }
@@ -313,13 +315,13 @@ export class GameMapAddComponent implements OnInit {
     // If the snake exists and the user clicked on it, it means that the user wants to remove it
     if (isExistSnake) {
       const isClickedSnake = (this.snakeCoord!.rowIndexWithHead === rowIndex && this.snakeCoord!.colIndexWithHead === colIndex);
-      if(isClickedSnake) {
+      if (isClickedSnake) {
         this.removeSnakeFromMap();
         this.snakeCoord = null;
         return;
       }
     }
-   
+
     // check that the selected coordinate (for the snake's head) and the coordinate preceding 
     // it (for the snake's tail) do not contain any obstacles
     if (this.obstaclesArray[rowIndex][colIndex]) {
@@ -359,10 +361,10 @@ export class GameMapAddComponent implements OnInit {
       return;
     }
 
-    if(isExistSnake) {
+    if (isExistSnake) {
       this.removeSnakeFromMap();
     }
-   
+
     this.mapArray[rowIndex][colIndex] = this.snakeColor;
     this.mapArray[tailRowIndex][tailColIndex] = this.snakeColor;
     this.snakeCoord = {
@@ -374,7 +376,7 @@ export class GameMapAddComponent implements OnInit {
   }
 
   removeSnakeFromMap() {
-    if(this.snakeCoord === null) {
+    if (this.snakeCoord === null) {
       return;
     }
     this.mapArray[this.snakeCoord!.rowIndexWithHead][this.snakeCoord!.colIndexWithHead] =
@@ -406,9 +408,9 @@ export class GameMapAddComponent implements OnInit {
     this.obstacleColor = newColor;
     this.obstaclesArray.forEach((row, rowIndex) => {
       row.forEach((element, colIndex) => {
-          if(element) {
-            this.mapArray[rowIndex][colIndex] = newColor;
-          }
+        if (element) {
+          this.mapArray[rowIndex][colIndex] = newColor;
+        }
       });
     });
   }
@@ -435,65 +437,73 @@ export class GameMapAddComponent implements OnInit {
     this.snakeCoord = null;
   }
 
-onSubmit() {
-  this.error = null;
+  onSubmit() {
+    this.error = null;
 
-  if (this.snakeCoord === null) {
-    this.error = "Choose snake position!";
-  } else if (!this.snakeSpeed || this.snakeSpeed < 1 || this.snakeSpeed > 3) {
-    this.error = "Enter the snake speed from 1 to 3!";
-  }
+    if (this.snakeCoord === null) {
+      this.error = "Choose snake position!";
+    } else if (!this.snakeSpeed || this.snakeSpeed < 1 || this.snakeSpeed > 3) {
+      this.error = "Enter the snake speed from 1 to 3!";
+    }
 
-  if (this.error) {
-    setTimeout(() => { this.error = null }, 5000);
-    return;
-  }
-
-  let obstaclesString = '[';
-
-  this.obstaclesArray.forEach((row, rowIndex) => {
-    row.forEach((element, colIndex) => {
-        if(element) {
-          obstaclesString += `{"x": ${colIndex}, "y": ${rowIndex}, "width": 1, "height": 0},`;
-        }
-    });
-  });
-
-  if(obstaclesString[obstaclesString.length - 1] === ',') {
-    obstaclesString = obstaclesString.slice(0, -1);
-  }
-
-  obstaclesString += "]";
-
-  let snakeCoordsString = `[{"x": ${this.snakeCoord!.colIndexWithTail}, "y": ${this.snakeCoord!.rowIndexWithTail}}, {"x": ${this.snakeCoord!.colIndexWithHead}, "y": ${this.snakeCoord!.rowIndexWithHead}}]`;
-
-  const map = {
-    name: this.mapName,
-    boardWidthInElements: this.mapWidthInElements,
-    boardHeightInElements: this.mapHeightInElements,
-    boardFirstColor: this.mapBackgroundColors.firstColor,
-    boardSecondColor: this.mapBackgroundColors.secondColor,
-    obstacleColor: this.obstacleColor,
-    obstacles: obstaclesString,
-    snakeInitDirection: this.snakeDirection,
-    snakeInitCoords: snakeCoordsString,
-    snakeColor: this.snakeColor,
-    initTimeToPassOneElementInSeconds: this.snakeSpeed * 0.3
-  }
-
-  if(this.editMap) {
-    if(!this.editMap.id) {
+    if (this.error) {
+      setTimeout(() => { this.error = null }, 5000);
       return;
     }
-    this.userProfileService.editUserMap(map, this.editMap.id).subscribe(() => {
-      this.isShowUserMaps.next(true);
+
+    let obstaclesString = '[';
+
+    this.obstaclesArray.forEach((row, rowIndex) => {
+      row.forEach((element, colIndex) => {
+        if (element) {
+          obstaclesString += `{"x": ${colIndex}, "y": ${rowIndex}, "width": 1, "height": 0},`;
+        }
+      });
     });
-  } else {
-    this.userProfileService.addUserMap(map).subscribe(() => {
-      this.isShowUserMaps.next(true);
-    });
+
+    if (obstaclesString[obstaclesString.length - 1] === ',') {
+      obstaclesString = obstaclesString.slice(0, -1);
+    }
+
+    obstaclesString += "]";
+
+    let snakeCoordsString = `[{"x": ${this.snakeCoord!.colIndexWithTail}, "y": ${this.snakeCoord!.rowIndexWithTail}}, {"x": ${this.snakeCoord!.colIndexWithHead}, "y": ${this.snakeCoord!.rowIndexWithHead}}]`;
+
+    const map = {
+      name: this.mapName,
+      boardWidthInElements: this.mapWidthInElements,
+      boardHeightInElements: this.mapHeightInElements,
+      boardFirstColor: this.mapBackgroundColors.firstColor,
+      boardSecondColor: this.mapBackgroundColors.secondColor,
+      obstacleColor: this.obstacleColor,
+      obstacles: obstaclesString,
+      snakeInitDirection: this.snakeDirection,
+      snakeInitCoords: snakeCoordsString,
+      snakeColor: this.snakeColor,
+      initTimeToPassOneElementInSeconds: this.snakeSpeed * 0.3
+    }
+
+    if (this.editMap) {
+      if (!this.editMap.id) {
+        return;
+      }
+      this.userProfileService.editUserMap(map, this.editMap.id).subscribe(() => {
+        this.isShowUserMaps.next(true);
+      });
+    } else {
+      this.userProfileService.addUserMap(map).subscribe(() => {
+        this.isShowUserMaps.next(true);
+      });
+    }
   }
 
-  
-}
+  @HostListener('window:resize', ['$event'])
+  changeScreenSize(event?: Event): void {
+    if (window.innerWidth < 1000) {
+      this.showAddGameMapContainer = false;
+    } else {
+      this.showAddGameMapContainer = true;
+    }
+  }
+
 }
