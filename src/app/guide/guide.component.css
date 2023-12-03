@@ -111,26 +111,21 @@ img {
     margin-right: 10px;
 }
 
-.modeContainer {
+.controlContainer {
     width: 100%;
 }
 
-.normalModeTitle {
+.snakeControlTitle {
     font-weight: bold;
     color: rgb(148, 208, 217);
 }
 
-.arenaModeTitle {
+.pauseTitle {
     font-weight: bold;
     color: rgb(217, 149, 148);
 }
 
-.coopModeTitle {
-    font-weight: bold;
-    color: rgb(207, 217, 148);
-}
-
-.modeDescription {
+.controlDescription {
     margin-bottom: 10px;
 }
 
