@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { CanvasDrawer } from '../snake-game/game/canvas-drawer';
 import { CoordinateModel } from '../snake-game/game/coordinate.model';
+import { defaultData } from '../shared/default-data';
 
 @Component({
   selector: 'app-guide',
@@ -9,7 +10,7 @@ import { CoordinateModel } from '../snake-game/game/coordinate.model';
 })
 export class GuideComponent implements OnInit{
 
-  @ViewChild('mapCanvas', {static: true}) mapCanvasRef!: ElementRef;
+  @ViewChild('sampleGameMapContainer', {static: true}) sampleGameMapContainer!: ElementRef;
   @ViewChild('normalFoodCanvas', {static: true}) normalFoodCanvasRef!: ElementRef;
   @ViewChild('speedFoodCanvas', {static: true}) speedFoodCanvasRef!: ElementRef;
   @ViewChild('lengthFoodCanvas', {static: true}) lengthFoodCanvasRef!: ElementRef;
@@ -36,16 +37,15 @@ export class GuideComponent implements OnInit{
       {"coordinate": {"x": 5, "y": 5 }, "type": "speed", "sign": "S", "color": "rgb(245, 108, 108)"},
       {"coordinate": {"x": 8, "y": 1 }, "type": "unknown", "sign": "?", "color": "rgb(245, 108, 238)"}
   ]; 
+
+  constructor(private renderer: Renderer2) {}
   
   ngOnInit(): void {
-      const canvas = this.mapCanvasRef.nativeElement;
-      this.boardElementSizeInPixels = canvas.width / this.boardWidthInElements;
-      canvas.height = this.boardElementSizeInPixels * this.boardHeightInElements;
+     
+      this.initSampleGameMapCanvas();
+      this.drawSampleGameMap();
+      this.changeCanvasToImg();
 
-      this.mapCanvasDrawer = new CanvasDrawer(canvas);
-      this.drawSampleMap();
-
-    
       let normalFoodCanvasDrawer = new CanvasDrawer(this.normalFoodCanvasRef.nativeElement);
       this.drawSampleFood(40, "rgb(243, 245, 108)", "N", normalFoodCanvasDrawer);
       let speedFoodCanvasDrawer = new CanvasDrawer(this.speedFoodCanvasRef.nativeElement);
@@ -60,7 +60,18 @@ export class GuideComponent implements OnInit{
       this.drawSampleFood(40, "rgb(245, 108, 238)", "?", unknownFoodCanvasDrawer);
   }
 
-  drawSampleMap() {
+  initSampleGameMapCanvas() {
+    const sampleGameMapCanvas = this.renderer.createElement('canvas');
+
+    this.renderer.setAttribute(sampleGameMapCanvas, 'width', '1000');
+    this.boardElementSizeInPixels = sampleGameMapCanvas.width / this.boardWidthInElements;
+    const gameMapHeight = this.boardElementSizeInPixels * this.boardHeightInElements;
+    this.renderer.setAttribute(sampleGameMapCanvas, 'height', gameMapHeight.toString());
+
+    this.mapCanvasDrawer = new CanvasDrawer(sampleGameMapCanvas);
+  }
+
+  drawSampleGameMap() {
     this.drawBoard();
     this.drawObstacles();
     this.drawSnake();
@@ -152,6 +163,17 @@ export class GuideComponent implements OnInit{
       sign, fontSize, fontFamily,
       fontColor, centerX, centerY,
     );
+  }
+
+  changeCanvasToImg() {
+    const sampleGameMapURL = this.mapCanvasDrawer.canvas.toDataURL();
+
+    const img = this.renderer.createElement('img');
+    this.renderer.setAttribute(img, 'src', sampleGameMapURL);
+    this.renderer.setAttribute(img, 'alt', defaultData.defaultGameMapAlt);
+
+    const sampleGameMapNativeElement = this.sampleGameMapContainer.nativeElement;
+    this.renderer.appendChild(sampleGameMapNativeElement, img);
   }
 
 }

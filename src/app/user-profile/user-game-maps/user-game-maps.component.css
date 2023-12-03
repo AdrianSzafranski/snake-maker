@@ -71,3 +71,12 @@ button[disabled] {
     }
 }
 
+@media only screen and (max-width: 400px) {
+
+    .bottom-panel {
+        flex-direction: column;
+        align-items: center;
+    }
+
+}
+

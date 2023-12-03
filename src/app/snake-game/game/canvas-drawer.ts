@@ -72,4 +72,8 @@ export class CanvasDrawer {
         this._canvas.width = width;
         this._canvas.height = height;
     }
+
+    get canvas(){
+        return this._canvas;
+    }
 }

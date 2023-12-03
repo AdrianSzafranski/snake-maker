@@ -68,7 +68,7 @@
 
 @media only screen and (max-width: 1200px) {
     .container {
-        width: 98%;
+        width: 95%;
     }
 }
 
@@ -112,10 +112,10 @@
 @media only screen and (max-width: 550px) {
 
     .side-panel {
-        width: 95%;
+        width: 100%;
     }
 
     .user-maps {
-        width: 95%;
+        width: 100%;
     }
 }

@@ -12,62 +12,79 @@
     font-size: 1.2rem;
     padding: 2% 20px;
 }
+
 .rulesContainer {
     width: 100%;
     margin-bottom: 20px;
 }
+
 h1 {
     margin-bottom: 15px;
 }
+
 ol {
     list-style-position: inside;
 }
+
 li {
     margin-bottom: 10px;
 }
+
 .comments {
     font-style: italic;
     color: rgb(191, 191, 191);
 }
+
 .objectContainer {
     width: 100%;
     margin-bottom: 20px;
 }
+
 .generalObjectContainer {
-    display: flex; 
-    margin-bottom: 20px;  
+    display: flex;
+    margin-bottom: 20px;
 }
-.mapCanvas {
+
+img {
     border: 3px solid black;
+    width: 100%;
+    height: auto;
 }
+
 .mapDescription {
     text-align: center;
     color: rgb(191, 191, 191);
     font-style: italic;
 }
-.generalObjects{
+
+.generalObjects {
     margin-left: 20px;
 }
+
 .title {
     margin-bottom: 10px;
 }
+
 .objectDescription {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
+
 .snake {
     background-color: rgb(131, 245, 108);
     width: 35px;
     height: 35px;
     margin-right: 5px;
 }
+
 .obstacle {
     background-color: rgb(0, 0, 0);
     width: 35px;
     height: 35px;
     margin-right: 5px;
 }
+
 .food {
     background-color: rgb(144, 144, 144);
     width: 35px;
@@ -75,59 +92,73 @@ li {
     border-radius: 50%;
     margin-right: 5px;
 }
+
 .foodContainer {
     display: flex;
 }
+
 .standardFood {
     margin-right: 30px;
 }
+
 .foodDescription {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
+
 .foodCanvas {
     margin-right: 10px;
 }
+
 .modeContainer {
     width: 100%;
 }
+
 .normalModeTitle {
     font-weight: bold;
     color: rgb(148, 208, 217);
 }
+
 .arenaModeTitle {
     font-weight: bold;
     color: rgb(217, 149, 148);
 }
+
 .coopModeTitle {
     font-weight: bold;
     color: rgb(207, 217, 148);
 }
+
 .modeDescription {
     margin-bottom: 10px;
 }
+
 @media only screen and (max-width: 1200px) {
     .container {
         width: 50%;
     }
 }
-@media only screen and (max-width: 940px) {
-    .generalObjectContainer {
-        flex-direction: column;
-        align-items: center;
-    }
-    .generalObjects {
-        margin-top: 10px;
-    }
-}
+
 @media only screen and (max-width: 900px) {
     .container {
         width: 60%;
     }
 }
+
 @media only screen and (max-width: 700px) {
     .container {
-        width: 80%;
+        width: 95%;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    .generalObjectContainer {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .generalObjects {
+        margin-top: 10px;
     }
 }
