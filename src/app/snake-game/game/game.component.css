@@ -7,17 +7,17 @@
 
 #bgCanvas {
     z-index: 0;
+}
+.canvas-border {
     border: 5px solid black;
 }
 
 #gameCanvas {
     z-index: 2;
-    border: 5px solid black;
 }
 
 #gridCanvas {
     z-index: 1;
-    border: 5px solid black;
 }
 
 .canvas-container {
