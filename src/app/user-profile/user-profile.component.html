@@ -1,24 +1,26 @@
 <div class="container">
     <div class="side-panel">
-        <app-user-data *ngIf="!isEditMode" [userData]="userData"></app-user-data>
-        <app-user-data-edit *ngIf="isEditMode" [userData]="userData"
-            (newUserData)="setNewUserData($event)"></app-user-data-edit>
+        <div *ngIf="!isLoading">
+            <app-user-data *ngIf="!isEditMode" [userData]="userData"></app-user-data>
+            <app-user-data-edit *ngIf="isEditMode" [userData]="userData" (newUserData)="setNewUserData($event)">
+            </app-user-data-edit>
+        </div>
+        <div *ngIf="isLoading" style="text-align: center;">
+            <app-loading-spinner></app-loading-spinner>
+        </div>
         <div class="switch-mode-button">
             <button type="button" (click)="onSwitchMode()">{{ isEditMode ? 'Cancel' : 'Edit data' }}</button>
         </div>
     </div>
     <div class="user-maps">
         <div class="nav">
-            <button 
-            class="nav-element" 
-            [ngClass]="{'selected-user-maps-nav-element': isShowUserMaps}"
-            (click)="onShowUserMaps()">My maps</button>
-            <button 
-            class="nav-element" 
-            [ngClass]="{'selected-add-map-nav-element': !isShowUserMaps}"
-            (click)="onShowAddMapsForm()">{{ editMap ? 'Edit' : 'Add' }} map</button>
+            <button class="nav-element" [ngClass]="{'selected-user-maps-nav-element': isShowUserMaps}"
+                (click)="onShowUserMaps()">My maps</button>
+            <button class="nav-element" [ngClass]="{'selected-add-map-nav-element': !isShowUserMaps}"
+                (click)="onShowAddMapsForm()">{{ editMap ? 'Edit' : 'Add' }} map</button>
         </div>
         <app-user-game-maps (editMapId)="setEditMap($event)" *ngIf="isShowUserMaps"></app-user-game-maps>
-        <app-game-map-add [editMap]="editMap" (isShowUserMaps)="showUserMaps($event)" *ngIf="!isShowUserMaps"></app-game-map-add>
+        <app-game-map-add [editMap]="editMap" (isShowUserMaps)="showUserMaps($event)"
+            *ngIf="!isShowUserMaps"></app-game-map-add>
     </div>
 </div>

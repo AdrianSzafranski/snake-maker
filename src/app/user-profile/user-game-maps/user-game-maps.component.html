@@ -1,14 +1,18 @@
-<div class="game-maps-container">
+<div class="game-maps-container"  *ngIf="!(isUserGameMapsLoading || isUserScoresLoading)">
     <app-game-map 
-    *ngFor="let currentUserGameMap of getDisplayedUserGameMaps(); let i = index" 
-    [gameMap]="currentUserGameMap" 
-    [userScore]="getUserScore(currentUserGameMap.id)"
-    [ngStyle]="{
-        'border': (i + displayedGameMapsStartIndex) === selectedUserGameMapArrayId ? '2px solid #eaea4e' : '2px solid black',
-        'border-radius': '15px'
-    }" 
-    (click)="onSelectMap((i + displayedGameMapsStartIndex))"></app-game-map>
+        *ngFor="let currentUserGameMap of getDisplayedUserGameMaps(); let i = index" 
+        [gameMap]="currentUserGameMap" 
+        [userScore]="getUserScore(currentUserGameMap.id)"
+        [ngStyle]="{
+            'border': (i + displayedGameMapsStartIndex) === selectedUserGameMapArrayId ? '2px solid #eaea4e' : '2px solid black',
+            'border-radius': '15px'
+            }" 
+        (click)="onSelectMap((i + displayedGameMapsStartIndex))">
+    </app-game-map>
     <h2 *ngIf="userGameMaps.length === 0">You don't have maps</h2>
+</div>
+<div class="loading-spinner" *ngIf="isUserGameMapsLoading || isUserScoresLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
 </div>
 <div class="bottom-panel">
     <div class="buttons">

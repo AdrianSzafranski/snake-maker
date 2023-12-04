@@ -18,23 +18,14 @@ export class UserProfileComponent implements OnInit {
   isEditMode = false;
   editMap: GameMap | null = null;
   isShowUserMaps = true;
-  userData: UserData = {
-    username: 'Adrian',
-    email: 'adrian@gmail.com',
-    id: '3',
-    avatar: '[["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040"],["#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#000","#000","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#000","#000","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#000","#000","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#000","#ff4040","#ff4040","#000","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"],["#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040","#ff4040"]]',
-    birthdate: '1996-01-01',
-    favGames: ["Snake"],
-    roles: ["friend"],
-    gender: 'male'
-
-  };
-
+  userData!: UserData;
+  isLoading = true;
   constructor (private userProfileService: UserProfileService, private router: Router) {}
 
   ngOnInit(): void {
     this.userProfileService.fetchUserData().subscribe(userData => {
       this.userData = userData;
+      this.isLoading = false;
     }
     );
 

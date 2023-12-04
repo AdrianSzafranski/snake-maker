@@ -18,6 +18,8 @@ export class UserGameMapsComponent implements OnInit {
   selectedUserGameMapArrayId: number | null = null;
   pagesNumber: number = 1;
   userScores: UserScore[] = [];
+  isUserGameMapsLoading = true;
+  isUserScoresLoading = true;
 
   constructor(
     private userProfileService: UserProfileService,
@@ -30,10 +32,12 @@ export class UserGameMapsComponent implements OnInit {
     this.userProfileService.fetchUserMaps().subscribe(userMaps => {
       this.userGameMaps = userMaps;
       this.pagesNumber =  Math.ceil(this.userGameMaps.length / 6);
+      this.isUserGameMapsLoading = false;
     })
 
     this.gameMapService.fetchUserScores().subscribe(userScores => {
       this.userScores = userScores;
+      this.isUserScoresLoading = false;
     });
   }
 
