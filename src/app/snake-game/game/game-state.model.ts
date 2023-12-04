@@ -58,20 +58,9 @@ export class GameStateModel {
       0.2);
     
     this.currentDirection = this.map.snakeInitDirection;
-    let initSnakeCoords: CoordinateModel[] = JSON.parse(this.map.snakeInitCoords);
-    this._snake = new SnakeModel(initSnakeCoords, this.map.snakeInitDirection);
+    this.initSnakeCoords = JSON.parse(this.map.snakeInitCoords);
+    this._snake = new SnakeModel(this.initSnakeCoords, this.map.snakeInitDirection);
   
-    this._foods = [];
-        
-    let initFoodTypes = ['normal', 'speed', 'length'];
-    this.initFoodCoords = [];
-    for(let initFoodType of initFoodTypes) {
-        let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
-        this.initFoodCoords.push({ ...initFoodCoord });
-        let food = new FoodModel(initFoodCoord, initFoodType);
-        this._foods.push(food);
-    }
-
     let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.map.obstacles);
     obstaclesJsonArray.forEach(obstacle => { 
       for(let i = 0; i < obstacle.width; i++) {
@@ -85,6 +74,17 @@ export class GameStateModel {
         this._board.setElement(obstacle.x, newY, 'obstacle');
       }
     });
+
+    this._foods = [];
+        
+    let initFoodTypes = ['normal', 'speed', 'length'];
+    this.initFoodCoords = [];
+    for(let initFoodType of initFoodTypes) {
+        let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
+        this.initFoodCoords.push({ ...initFoodCoord });
+        let food = new FoodModel(initFoodCoord, initFoodType);
+        this._foods.push(food);
+    }
   }
 
   initBoardElementsUsingRandPositions() {
