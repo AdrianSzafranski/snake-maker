@@ -110,7 +110,7 @@ export class GameStateModel {
         this._foods.push(food);
     }
 
- 
+    this._obstacles = [];
     let newObstacle = this._board.setItemInRandElement('obstacle', 
       [ ...this.initSnakeCoords, ...this.initFoodCoords, ...this._obstacles ], 2, 5
     );
