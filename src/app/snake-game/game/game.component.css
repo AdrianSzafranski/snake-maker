@@ -20,6 +20,11 @@
     z-index: 1;
 }
 
+#textCanvas {
+    z-index: 3;
+}
+
+
 .canvas-container {
     position: relative;
     /* width: 500px; Szerokość płótna 

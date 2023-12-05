@@ -12,6 +12,7 @@ export class GameComponent implements OnInit, AfterViewInit {
   @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
   @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
   @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
+  @ViewChild('textCanvas', {static: true}) textCanvasRef!: ElementRef;
 
   gameState!: GameStateModel;
   isFixedMap = false;
@@ -34,6 +35,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         this.gameCanvasRef.nativeElement,
         this.bgCanvasRef.nativeElement,
         this.gridCanvasRef.nativeElement,
+        this.textCanvasRef.nativeElement,
         this.gameMapService
       );
 

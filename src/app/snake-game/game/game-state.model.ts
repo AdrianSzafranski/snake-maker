@@ -26,6 +26,7 @@ export class GameStateModel {
   private _bgCanvasDrawer: CanvasDrawer;
   private _gameCanvasDrawer: CanvasDrawer;
   private _gridCanvasDrawer: CanvasDrawer;
+  private _textCanvasDrawer: CanvasDrawer;
   private initSnakeCoords: CoordinateModel[] = [];
   private initFoodCoords: CoordinateModel[] = [];
   private candrawBoards = true;
@@ -36,10 +37,12 @@ export class GameStateModel {
     gameCanvas: HTMLCanvasElement, 
     bgCanvas: HTMLCanvasElement, 
     gidCanvas: HTMLCanvasElement,
+    textCanvas: HTMLCanvasElement,
     private gameMapService: GameMapService) {
       this._bgCanvasDrawer = new CanvasDrawer(bgCanvas);
       this._gameCanvasDrawer = new CanvasDrawer(gameCanvas);
       this._gridCanvasDrawer = new CanvasDrawer(gidCanvas);
+      this._textCanvasDrawer = new CanvasDrawer(textCanvas);
 
       this._bestScore = this.userScore.highestScore;
       if(this.map.obstacles) {
@@ -184,7 +187,7 @@ export class GameStateModel {
     if(this._isGameInterrupted) {
       this.drawTextInBoardCenter('Paused');
     } else {
-      this._gridCanvasDrawer.clearCanvas();
+      this._textCanvasDrawer.clearCanvas();
       this._lastFrameTime = performance.now();
       this.drawFoods();
       requestAnimationFrame((currentTime) => {
@@ -251,7 +254,7 @@ export class GameStateModel {
     const centerX = snakeDestination.x * boardElementSizeInPixels + boardElementSizeInPixels/2;
     const centerY = snakeDestination.y * boardElementSizeInPixels + boardElementSizeInPixels/2;
 
-    this._gridCanvasDrawer.drawSign(
+    this._textCanvasDrawer.drawSign(
       sign, fontSize, fontFamily, fontColor, centerX, centerY);
   }
   
@@ -628,6 +631,7 @@ export class GameStateModel {
     this._bgCanvasDrawer.clearCanvas();
     this._gameCanvasDrawer.clearCanvas();
     this._gridCanvasDrawer.clearCanvas();
+    this._textCanvasDrawer.clearCanvas();
     this.drawBoard();
     this.drawSnake(this._snake.liveSnakeColor);
     this.drawFoods();
@@ -710,7 +714,7 @@ export class GameStateModel {
   drawTextInBoardCenter(text: string) {
     let boardElementLenInPixels = this._board.elementSizeInPixels;
     
-    this._gridCanvasDrawer.drawTextInBoardCenter(
+    this._textCanvasDrawer.drawTextInBoardCenter(
       text, 
       boardElementLenInPixels*3,
       "Arial",
@@ -765,6 +769,7 @@ export class GameStateModel {
     this._bgCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
     this._gameCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
     this._gridCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
+    this._textCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
   }
 
   isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
