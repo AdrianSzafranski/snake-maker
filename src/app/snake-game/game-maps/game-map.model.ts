@@ -1,5 +1,7 @@
 export interface GameMap {
     id?: string;
+    authorId?: string;
+    authorUsername?: string;
     name: string;
     boardWidthInElements: number;
     boardHeightInElements: number;

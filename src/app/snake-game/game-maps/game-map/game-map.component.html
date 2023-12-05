@@ -8,6 +8,11 @@
             <p>Highest score: {{ userScore ? userScore.highestScore : 0 }}</p>
             <p>Game counter: {{ userScore ? userScore.gamesNumber : 0 }}</p>
         </div>
+        <p 
+            *ngIf="gameMap.authorUsername && gameMap.authorId" 
+            title="{{ gameMap.authorId }}">
+            Author: {{ gameMap.authorUsername }}
+        </p>
     </div>
 </div>
 

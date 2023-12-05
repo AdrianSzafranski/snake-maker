@@ -143,6 +143,7 @@ export class UserProfileService {
         if(!userAuth) {
           return throwError(() => new Error("Error"));
         }
+        map.authorId = userAuth.id;
         return this.http.delete(firebaseConfig.dbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json"
       )}),
       mergeMap((resData) => {

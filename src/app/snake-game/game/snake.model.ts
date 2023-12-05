@@ -9,7 +9,7 @@ export class SnakeModel {
     private _deadSnakeColor = "rgb(112, 112, 112)";
     destination: CoordinateModel = {x: 0, y:0};
 
-    constructor(coords: CoordinateModel[], direction: string) {
+    constructor(coords: CoordinateModel[], direction: string, color: string) {
         for(let coord of coords) {
             this._segments.push({x: coord.x, y: coord.y});
         }
@@ -17,6 +17,8 @@ export class SnakeModel {
         this.direction = direction;
         this._directionHistory.push(direction);
         this._directionHistory.push(direction);
+
+        this._liveSnakeColor = color;
     }
   
     move(direction: string) {

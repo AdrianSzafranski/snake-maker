@@ -58,20 +58,13 @@ export class PostService {
         return this.http.get<any>(httpUrlUsers);
       }),
       map(users => {
-        console.log(users);
         return postComments.map(key => {
-          console.log(key.authorId);
           key.authorUsername = users[''+key.authorId].username;
           key.authorAvatar = users[''+key.authorId].avatar;
           return key;
         }
-          
-        
-
         )}),
-      
-      
-      )
+    )
   }
 
   addPostData(postData: PostData) {

@@ -26,10 +26,29 @@ export class GameMapService {
 
   fetchUnofficialMaps() {
     const httpUrl = firebaseConfig.dbUrl + "unofficialMaps.json";
+    const httpUrlUsers = firebaseConfig.dbUrl + `users/.json`;
+
+    let unofficialMaps: GameMap[]; 
+
     return this.http.get<any>(httpUrl).pipe(
       map(unofficialMapsObject => {
+        if(!unofficialMapsObject) {
+          return [];
+        }
         return Object.keys(unofficialMapsObject).map(key => ({ id: key, ...unofficialMapsObject[key] }));
-      })
+      }),
+      tap((localunofficialMaps: GameMap[]) => {
+        unofficialMaps = localunofficialMaps;
+      }),
+      mergeMap((localUnofficialMaps) => {
+        return this.http.get<any>(httpUrlUsers);
+      }),
+      map(users => {
+        return unofficialMaps.map(key => {
+          key.authorUsername = users[''+key.authorId].username;
+          return key;
+        })
+      }),
     );
   }
 

@@ -63,7 +63,7 @@ export class GameStateModel {
     
     this.currentDirection = this.map.snakeInitDirection;
     this.initSnakeCoords = JSON.parse(this.map.snakeInitCoords);
-    this._snake = new SnakeModel(this.initSnakeCoords, this.map.snakeInitDirection);
+    this._snake = new SnakeModel(this.initSnakeCoords, this.map.snakeInitDirection, this.map.snakeColor);
   
     let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.map.obstacles);
     obstaclesJsonArray.forEach(obstacle => { 
@@ -101,7 +101,7 @@ export class GameStateModel {
       0.2);
     
     this.initSnakeCoords = this._board.setItemInRandElement('', undefined, undefined, 2);
-    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection);
+    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection, this.map.snakeColor);
   
     this._foods = [];
         
@@ -129,7 +129,7 @@ export class GameStateModel {
       this.map.boardFirstColor, this.map.boardSecondColor,
       0.2);
 
-    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection);
+    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection, this.map.snakeColor);
     for(let initSnakeCoord of this.initSnakeCoords) {
       this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
     } 
