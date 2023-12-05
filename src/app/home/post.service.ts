@@ -5,7 +5,7 @@ import { Subject, exhaustMap, map, mergeMap, of, take, tap, throwError } from 'r
 
 import { PostComment, PostData } from './posts/post.model';
 import { AuthService } from '../auth/auth.service';
-import firebaseConfig from '../config';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class PostService {
 
 
   fetchPostsData() {
-    const httpUrl = firebaseConfig.dbUrl + 'posts/data.json';
+    const httpUrl = environment.firebaseDbUrl + 'posts/data.json';
     return this.http.get<any>(httpUrl).pipe(
       map(postsDataObject => {
         return Object.keys(postsDataObject).map(key => ({ id: key, ...postsDataObject[key] }));
@@ -32,7 +32,7 @@ export class PostService {
   }
  
   fetchPostData(postId: string) {
-    const httpUrl = firebaseConfig.dbUrl + `posts/data/${postId}.json`;
+    const httpUrl = environment.firebaseDbUrl + `posts/data/${postId}.json`;
     return this.http.get<any>(httpUrl).pipe(
       map(postDataObject => {
         return { id: postId, ...postDataObject };
@@ -40,8 +40,8 @@ export class PostService {
   }
 
   fetchPostComments(postId: string) {
-    const httpUrl = firebaseConfig.dbUrl + `posts/comments/${postId}.json`;
-    const httpUrlUsers = firebaseConfig.dbUrl + `users/.json`;
+    const httpUrl = environment.firebaseDbUrl + `posts/comments/${postId}.json`;
+    const httpUrlUsers = environment.firebaseDbUrl + `users/.json`;
     let postComments: PostComment[]; 
 
     return this.http.get<any>(httpUrl).pipe(
@@ -69,7 +69,7 @@ export class PostService {
 
   addPostData(postData: PostData) {
 
-    const httpUrl = firebaseConfig.dbUrl + "posts/data.json";
+    const httpUrl = environment.firebaseDbUrl + "posts/data.json";
     return this.http.post(httpUrl, postData).pipe(
         mergeMap((resData) => {
             return this.fetchPostsData();
@@ -79,7 +79,7 @@ export class PostService {
   }
 
   addPostComment(postId: string, newCommentContent: string) {
-    const httpUrl = firebaseConfig.dbUrl + `posts/comments/${postId}.json`;
+    const httpUrl = environment.firebaseDbUrl + `posts/comments/${postId}.json`;
 
     return this.authService.userAuth.pipe(
         take(1), 

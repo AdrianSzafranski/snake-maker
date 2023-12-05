@@ -1,11 +1,11 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, exhaustMap, map, mergeMap, of, take, tap, throwError } from 'rxjs';
+import { exhaustMap, map, mergeMap, take, tap, throwError } from 'rxjs';
 
-import firebaseConfig from '../../config';
 import { GameMap } from './game-map.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserScore } from '../user-score.model';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -16,7 +16,7 @@ export class GameMapService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   fetchMaps() {
-    const httpUrl = firebaseConfig.dbUrl + "gameMaps.json";
+    const httpUrl = environment.firebaseDbUrl + "gameMaps.json";
     return this.http.get<any>(httpUrl).pipe(
       map(gameMapsObject => {
         return Object.keys(gameMapsObject).map(key => ({ id: key, ...gameMapsObject[key] }));
@@ -25,8 +25,8 @@ export class GameMapService {
   }
 
   fetchUnofficialMaps() {
-    const httpUrl = firebaseConfig.dbUrl + "unofficialMaps.json";
-    const httpUrlUsers = firebaseConfig.dbUrl + `users/.json`;
+    const httpUrl = environment.firebaseDbUrl + "unofficialMaps.json";
+    const httpUrlUsers = environment.firebaseDbUrl + `users/.json`;
 
     let unofficialMaps: GameMap[]; 
 
@@ -53,7 +53,7 @@ export class GameMapService {
   }
 
   fetchMap(mapType: string, mapId: string) {
-    let httpUrl = firebaseConfig.dbUrl + `${mapType}/${mapId}.json`;
+    let httpUrl = environment.firebaseDbUrl + `${mapType}/${mapId}.json`;
     let userId: string | null = null;
 
     return this.authService.userAuth.pipe(
@@ -65,7 +65,7 @@ export class GameMapService {
           }
           userId = userAuth.id;
           if(mapType === 'usersMaps') {
-            httpUrl = firebaseConfig.dbUrl + `usersMaps/${userAuth.id}/${mapId}.json`;
+            httpUrl = environment.firebaseDbUrl + `usersMaps/${userAuth.id}/${mapId}.json`;
           }
           return this.http.get<any>(httpUrl).pipe(
             map(gameMapObject => {
@@ -81,7 +81,7 @@ export class GameMapService {
         if(!userId || !gameMap.id) {
             return throwError(() => new Error("Error"));
         }
-        let httpUrl = firebaseConfig.dbUrl + `usersScores/${userId}/${gameMap.id}.json`;
+        let httpUrl = environment.firebaseDbUrl + `usersScores/${userId}/${gameMap.id}.json`;
         return this.http.get<any>(httpUrl).pipe(
           map(userScore => {
             if(!userScore) {
@@ -285,7 +285,7 @@ export class GameMapService {
       },
       
     ];
-    const httpUrl = firebaseConfig.dbUrl + "gameMaps.json";
+    const httpUrl = environment.firebaseDbUrl + "gameMaps.json";
     return this.http.post(httpUrl, gameMaps[8]);
  
   }
@@ -300,7 +300,7 @@ export class GameMapService {
               return throwError(() => new Error("Error"));
           }
 
-          let httpUrl = firebaseConfig.dbUrl + `usersScores/${userAuth.id}.json`;
+          let httpUrl = environment.firebaseDbUrl + `usersScores/${userAuth.id}.json`;
           return this.http.get<any>(httpUrl).pipe(
             map(userScoresObject => {
               if(userScoresObject === null) {
@@ -324,7 +324,7 @@ export class GameMapService {
               return throwError(() => new Error("Error"));
           }
 
-          let httpUrl = firebaseConfig.dbUrl + `usersScores/${userAuth.id}/${mapId}.json`;
+          let httpUrl = environment.firebaseDbUrl + `usersScores/${userAuth.id}/${mapId}.json`;
           return this.http.put<any>(httpUrl, userScore);
           
       })).subscribe();

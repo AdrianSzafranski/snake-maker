@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
-import { Subscription, take } from 'rxjs';
+import { take } from 'rxjs';
 
 import { AuthService } from 'src/app/auth/auth.service';
 import { PostData } from './post.model';
 import { PostService } from '../post.service';
-import firebaseConfig from '../../config';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
@@ -13,7 +14,7 @@ import firebaseConfig from '../../config';
 export class PostsComponent {
   postsData: PostData[] = [];
   userId: string | null = null;
-  adminId = firebaseConfig.adminId;
+  adminId = environment.firebaseAdminId;
   isLoading = false;
 
   constructor(

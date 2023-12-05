@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Subject, exhaustMap, map, mergeMap, of, take, tap, throwError } from 'rxjs';
+import { exhaustMap, map, mergeMap, take, throwError } from 'rxjs';
 
 import { AuthService } from '../auth/auth.service';
-import firebaseConfig from '../config';
 import { UserDetails } from './user-details.model';
 import { User } from '../auth/user.model';
 import { UserData } from './user-data.model';
 import { GameMap } from '../snake-game/game-maps/game-map.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class UserProfileService {
             }
             userId = userAuth.id;
             userEmail = userAuth.email;
-            const httpUrl = firebaseConfig.dbUrl + `usersDetails/${userAuth.id}.json`;
+            const httpUrl = environment.firebaseDbUrl + `usersDetails/${userAuth.id}.json`;
             return this.http.get<UserDetails>(httpUrl);
             
         }),
@@ -43,7 +43,7 @@ export class UserProfileService {
               return throwError(() => new Error("Error"));
           }
 
-          const httpUrl = firebaseConfig.dbUrl + `users/${userId}.json`;
+          const httpUrl = environment.firebaseDbUrl + `users/${userId}.json`;
           return this.http.get<User>(httpUrl).pipe(map(
             (user) => {
               return <UserData>{
@@ -68,7 +68,7 @@ export class UserProfileService {
                 return throwError(() => new Error("Error"));
             }
 
-            const httpUrl = firebaseConfig.dbUrl + `usersMaps/${userAuth.id}.json`;
+            const httpUrl = environment.firebaseDbUrl + `usersMaps/${userAuth.id}.json`;
             return this.http.get<any>(httpUrl).pipe(
               map(gameMapObject => {
                 if(!gameMapObject) {
@@ -123,7 +123,7 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         return this.http.post(
-          firebaseConfig.dbUrl + "usersMaps/" + userAuth.id + ".json",
+          environment.firebaseDbUrl + "usersMaps/" + userAuth.id + ".json",
           newMap
       )})
     );
@@ -144,11 +144,11 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         map.authorId = userAuth.id;
-        return this.http.delete(firebaseConfig.dbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json"
+        return this.http.delete(environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json"
       )}),
       mergeMap((resData) => {
         return this.http.put(
-          firebaseConfig.dbUrl + "unofficialMaps/" + mapId + ".json",
+          environment.firebaseDbUrl + "unofficialMaps/" + mapId + ".json",
           map
       )})
     );
@@ -166,7 +166,7 @@ export class UserProfileService {
         if(!userAuth) {
           return throwError(() => new Error("Error"));
         }
-        return this.http.delete(firebaseConfig.dbUrl + "usersMaps/" + userAuth.id + "/" + map.id + ".json"
+        return this.http.delete(environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + map.id + ".json"
       )})
     );
 
@@ -181,7 +181,7 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         return this.http.put(
-          firebaseConfig.dbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json",
+          environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json",
           map
       )})
     );

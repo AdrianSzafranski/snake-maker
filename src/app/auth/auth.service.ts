@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, mergeMap, of, tap, throwError } from 'rxjs';
 
-import firebaseConfig from '../config';
 import { UserDetails } from '../user-profile/user-details.model';
 import { UserAuth } from './userAuth.model';
 import { User } from './user.model';
+import { environment } from 'src/environments/environment';
 
 export interface AuthResponseData {
   kind: string;
@@ -30,7 +30,7 @@ export class AuthService {
     private router: Router) {}
 
   signIn(email: string, password: string) {
-    const httpUrl = firebaseConfig.signInUrl + firebaseConfig.apiKey;
+    const httpUrl = environment.firebaseSignInUrl + environment.firebaseApiKey;
    
     return this.http.post<AuthResponseData>(
       httpUrl,
@@ -63,7 +63,7 @@ export class AuthService {
   }
 
   signUp(email: string, password: string, username: string, avatar: string, userDetails: UserDetails) {
-    const httpUrl = firebaseConfig.signUpUrl + firebaseConfig.apiKey;
+    const httpUrl = environment.firebaseSignUpUrl + environment.firebaseApiKey;
    
     let userId: string;
 

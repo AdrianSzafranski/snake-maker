@@ -42,4 +42,4 @@ testem.log
 Thumbs.db
 
 # Firebase
-/src/app/config.ts
+/src/environments
