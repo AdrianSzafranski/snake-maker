@@ -49,7 +49,7 @@ export class GameStateModel {
   }
 
   initBoardElementsUsingFixedPositions() {
-    this._timeElapsedInSeconds = this.map.initTimeToPassOneElementInSeconds;
+    this._timeToPassOneElementInSeconds = this.map.initTimeToPassOneElementInSeconds;
 
     this._board = new BoardModel(
       400, 240, 
@@ -88,7 +88,7 @@ export class GameStateModel {
   }
 
   initBoardElementsUsingRandPositions() {
-    this._timeElapsedInSeconds = this.map.initTimeToPassOneElementInSeconds;
+    this._timeToPassOneElementInSeconds = this.map.initTimeToPassOneElementInSeconds;
 
     this._board = new BoardModel(
       400, 240, 
