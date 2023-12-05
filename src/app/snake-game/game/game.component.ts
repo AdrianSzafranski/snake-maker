@@ -52,7 +52,7 @@ export class GameComponent implements OnInit, AfterViewInit {
   }
 
   onRestart(isChangeMap: boolean) {
-    this.gameState.restartGame(isChangeMap);
+    this.gameState.restartGame();
   }
 
 

@@ -11,6 +11,7 @@ export class GameStateModel {
   private _currentScore = 0; 
   private _bestScore = 0; 
   private _isGameInterrupted = false;
+  private _isGameRestart = false;
   private _isGameOver = false;
   private _frameInterval = 1000/30;
   private _lastFrameTime = 0;
@@ -194,6 +195,11 @@ export class GameStateModel {
 
   updateGame(currentTime: DOMHighResTimeStamp) {
     if(this._isGameInterrupted) return;
+    if(this._isGameRestart) {
+      this._isGameRestart = false;
+      this.restartGameHelper();
+      return;
+    }
        
     const deltaTime = (currentTime - this._lastFrameTime) / 1000;
       
@@ -280,21 +286,19 @@ export class GameStateModel {
      : false;
   }
 
-  restartGame(isChangeMap: boolean) {
-    this._isGameInterrupted = true;
-    this.setInitGameState();
-    if(isChangeMap) {
-      this.initBoardElementsUsingRandPositions();
-    } else {
-      if(this.map.obstacles) {
-        this.initBoardElementsUsingFixedPositions();
-      } else {
-        this.setInitBoardElements();
-      }
+  restartGame() {
+    if(this._isGameInterrupted || this._isGameOver) {
+      this.restartGameHelper();
+      return;
     }
-       
-    this.changeScreenSize();
-    this.startGame();
+    this._isGameRestart = true;
+  }
+
+  restartGameHelper() {
+      this.setInitGameState();
+      this.initBoardElementsUsingFixedPositions();
+      this.changeScreenSize();
+      this.startGame();
   }
   
   updateSpeed(speedModifier: number) {
