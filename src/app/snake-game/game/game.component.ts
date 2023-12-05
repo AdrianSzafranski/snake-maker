@@ -8,7 +8,7 @@ import { GameMapService } from '../game-maps/game-map.service';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
-export class GameComponent implements OnInit, AfterViewInit {
+export class GameComponent implements OnInit {
   @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
   @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
   @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
@@ -49,16 +49,6 @@ export class GameComponent implements OnInit, AfterViewInit {
     
   }
 
-  ngAfterViewInit(): void {
-   
-  }
-
-  onRestart(isChangeMap: boolean) {
-    this.gameState.restartGame();
-  }
-
-
-
   @HostListener('window:resize', ['$event'])
   changeScreenSize(event?: Event): void {
       this.gameState.changeScreenSize();
@@ -74,6 +64,10 @@ export class GameComponent implements OnInit, AfterViewInit {
 
       if(event.key.toUpperCase() === 'P') {
         this.gameState.pauseGame();
+      }
+
+      if(event.key.toUpperCase() === 'R') {
+        this.gameState.restartGame();
       }
   }
 }

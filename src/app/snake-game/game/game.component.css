@@ -1,36 +1,32 @@
-#container {
+.container {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#bgCanvas {
+.bg-canvas {
     z-index: 0;
 }
+
 .canvas-border {
     border: 5px solid black;
 }
 
-#gameCanvas {
+.game-canvas {
     z-index: 2;
 }
 
-#gridCanvas {
+.grid-canvas {
     z-index: 1;
 }
 
-#textCanvas {
+.text-canvas {
     z-index: 3;
 }
 
-
 .canvas-container {
     position: relative;
-    /* width: 500px; Szerokość płótna 
-    height: 500px; * Wysokość płótna 
-    //background-color: red;*/
-    background-color: red;
 }
 
 .canvas-layer {
@@ -38,83 +34,23 @@
     transform: translate(-50%, 0);
 }
 
-#topPanel {
+.top-panel {
     color: white;
 
     display: flex;
     justify-content: space-between;
-    background-color: #090c1d;
-    border: 5px solid black;
-    border-bottom: 0px;
-    padding: 5px 10px;
+
+    padding: 5px 15px;
     font-size: 26px;
 
 }
 
-.bestScore {
+.best-score {
     flex: flex-start;
 }
 
-.currentScore {
+.current-score {
     flex: center;
-}
-
-.optionsContainer {
-    flex: flex-end;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    z-index: 10;
-}
-
-.optionsContainer li {
-    display: inline-block;
-    position: relative;
-    margin-right: 20px;
-}
-
-.optionsTitle {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.optionsTitleArrow {
-    position: absolute;
-    top: 0;
-    left: 100%;
-}
-
-.options .dropDownOptions {
-    position: absolute;
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s, opacity 0.3s ease-in-out;
-    background-color: #090c1d;
-    border: 2px solid black;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    /*left: -100%;*/
-}
-
-.options:hover .dropDownOptions {
-    visibility: visible;
-    opacity: 1;
-}
-
-.dropDownOptions li {
-    display: block;
-    margin: 0;
-    white-space: nowrap;
-}
-
-.option {
-    font-size: 0.8em;
-    padding: 10px;
-    display: block;
-    transition: background-color 0.3s;
-    cursor: pointer;
 }
 
 .resolution-info {

@@ -122,6 +122,11 @@ img {
 
 .pauseTitle {
     font-weight: bold;
+    color: rgb(201, 217, 148);
+}
+
+.restartTitle {
+    font-weight: bold;
     color: rgb(217, 149, 148);
 }
 

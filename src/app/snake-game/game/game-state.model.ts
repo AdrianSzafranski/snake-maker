@@ -258,7 +258,7 @@ export class GameStateModel {
     const centerX = snakeDestination.x * boardElementSizeInPixels + boardElementSizeInPixels/2;
     const centerY = snakeDestination.y * boardElementSizeInPixels + boardElementSizeInPixels/2;
 
-    this._textCanvasDrawer.drawSign(
+    this._gameCanvasDrawer.drawSign(
       sign, fontSize, fontFamily, fontColor, centerX, centerY);
   }
   
