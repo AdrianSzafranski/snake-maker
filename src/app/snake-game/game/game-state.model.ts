@@ -185,6 +185,7 @@ export class GameStateModel {
     } else {
       this._gridCanvasDrawer.clearCanvas();
       this._lastFrameTime = performance.now();
+      this.drawFoods();
       requestAnimationFrame((currentTime) => {
         this.updateGame(currentTime);
       });
