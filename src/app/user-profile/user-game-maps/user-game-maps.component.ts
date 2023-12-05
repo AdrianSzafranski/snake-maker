@@ -32,6 +32,9 @@ export class UserGameMapsComponent implements OnInit {
     this.userProfileService.fetchUserMaps().subscribe(userMaps => {
       this.userGameMaps = userMaps;
       this.pagesNumber =  Math.ceil(this.userGameMaps.length / 6);
+      if(this.pagesNumber === 0) {
+        this.pagesNumber = 1;
+      }
       this.isUserGameMapsLoading = false;
     })
 
