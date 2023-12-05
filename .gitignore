@@ -43,3 +43,6 @@ Thumbs.db
 
 # Firebase
 /src/environments
+.firebaserc
+firebase.json
+.firebase
