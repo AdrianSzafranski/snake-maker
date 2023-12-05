@@ -182,6 +182,10 @@ export class GameStateModel {
   }
   
   pauseGame() {
+    if (this._isGameOver) {
+      return;
+    }
+
     this._isGameInterrupted = !this._isGameInterrupted;
 
     if(this._isGameInterrupted) {
