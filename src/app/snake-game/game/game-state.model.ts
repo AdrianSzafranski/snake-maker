@@ -159,8 +159,10 @@ export class GameStateModel {
   }
 
   determineBestScore() {
-    if(this._currentScore <= this._bestScore) return;
-    this._bestScore = this._currentScore;
+    
+    if(this._currentScore > this._bestScore) {
+      this._bestScore = this._currentScore;
+    }
 
     const newUserScore = {
       highestScore: this._bestScore,
@@ -168,6 +170,7 @@ export class GameStateModel {
     } 
 
     if(this.map.id) {
+      this.userScore.gamesNumber++;
       this.gameMapService.editUserScore(this.map.id, newUserScore);
     }
   }
