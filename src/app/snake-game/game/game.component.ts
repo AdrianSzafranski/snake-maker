@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { GameStateModel } from './game-state.model';
 import { ActivatedRoute } from '@angular/router';
 import { GameMapService } from '../game-maps/game-map.service';
@@ -8,7 +8,7 @@ import { GameMapService } from '../game-maps/game-map.service';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
   @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
   @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
@@ -47,6 +47,10 @@ export class GameComponent implements OnInit {
     });
 
     
+  }
+
+  ngOnDestroy(): void {
+    this.gameState.isGamePaused = true;
   }
 
   @HostListener('window:resize', ['$event'])
