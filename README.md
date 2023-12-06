@@ -16,6 +16,7 @@ The source of the project is the extended game 'Snake'. Additional functionality
 ## Website hosting
 
 The project is hosted by Firebase Hosting.
+https://snake-maker-project.web.app
 
 ## Technologies
 Project is created with:
