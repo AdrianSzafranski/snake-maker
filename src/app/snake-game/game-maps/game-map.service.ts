@@ -113,6 +113,7 @@ export class GameMapService {
         obstacles: `[]`,
         snakeInitDirection: 'down',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 6}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.3
       },
       {
@@ -129,6 +130,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 5}, {"x": 6, "y": 5}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.5
       },
       {
@@ -166,6 +168,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 7}, {"x": 6, "y": 7}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.5
       },
       {
@@ -201,7 +204,8 @@ export class GameMapService {
           {"x": 19, "y": 11, "width": 3, "height": 0}
         ]`,
         snakeInitDirection: 'right',
-        snakeInitCoords:  `[{"x": 19, "y": 8}, {"x": 19, "y": 8}]`,
+        snakeInitCoords:  `[{"x": 19, "y": 8}, {"x": 20, "y": 8}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.5
       },
       {
@@ -219,6 +223,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'left',
         snakeInitCoords:  `[{"x": 5, "y": 4}, {"x": 4, "y": 4}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 1.0
       },
       {
@@ -233,6 +238,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.7
       },
       {
@@ -248,6 +254,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.7
       },
       {
@@ -263,6 +270,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 8}, {"x": 5, "y": 7}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.7
       },
       {
@@ -281,6 +289,7 @@ export class GameMapService {
         ]`,
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 5}, {"x": 6, "y": 5}]`,
+        snakeColor: "#83f56c",
         initTimeToPassOneElementInSeconds: 0.5
       },
       

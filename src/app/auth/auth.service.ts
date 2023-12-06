@@ -44,7 +44,7 @@ export class AuthService {
       mergeMap((userAuthData) => {
         const userId = userAuthData.localId;
           return this.http.get<User>(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`, {
+            environment.firebaseDbUrl + `users/${userId}.json`, {
             params: new HttpParams().set('auth', userAuthData.idToken)
           }).pipe(
           catchError(this.handleError),
@@ -88,7 +88,7 @@ export class AuthService {
       }),
       mergeMap((resData) => {
           return this.http.put(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/usersDetails/${userId}.json`,
+            environment.firebaseDbUrl + `usersDetails/${userId}.json`,
           userDetails
         ).pipe(
           catchError(this.handleError),
@@ -98,7 +98,7 @@ export class AuthService {
       }),
       mergeMap((resData) => {
           return this.http.put(
-          `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`,
+            environment.firebaseDbUrl + `users/${userId}.json`,
           {username: username, avatar: avatar}
         ).pipe(
           catchError(this.handleError),

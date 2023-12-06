@@ -95,7 +95,7 @@ export class UserProfileService {
         userId = userAuth.id;
 
         return this.http.put(
-        `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/usersDetails/${userId}.json`,
+        environment.firebaseDbUrl + `usersDetails/${userId}.json`,
         userDetails
       )}),
       mergeMap((resData) => {
@@ -105,7 +105,7 @@ export class UserProfileService {
         }
 
         return this.http.put(
-        `https://ng-snake-game-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`,
+          environment.firebaseDbUrl + `users/${userId}.json`,
         user
       )})
     );
