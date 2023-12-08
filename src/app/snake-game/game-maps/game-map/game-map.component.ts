@@ -2,7 +2,6 @@ import { Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@ang
 
 import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
 import { UserScore } from '../../user-score.model';
-import { defaultData } from 'src/app/shared/default-data';
 
 @Component({
   selector: 'app-game-map',
@@ -85,7 +84,7 @@ export class GameMapComponent implements OnInit {
 
     const img = this.renderer.createElement('img');
     this.renderer.setAttribute(img, 'src', gameMapURL);
-    this.renderer.setAttribute(img, 'alt', defaultData.defaultAvatarAlt);
+    this.renderer.setAttribute(img, 'alt', 'game map image');
 
     const gameMapNativeElement = this.gameMapContainer.nativeElement;
     this.renderer.appendChild(gameMapNativeElement, img);

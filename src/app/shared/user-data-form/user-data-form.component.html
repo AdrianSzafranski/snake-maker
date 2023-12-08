@@ -1,0 +1,119 @@
+
+<h2>{{ formData.title }}</h2>
+<div class="form-error" *ngIf="error">
+    <p>{{ error }}</p>
+</div>
+<div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+<form [formGroup]="userDataForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+    <div formGroupName="userMain" *ngIf="!isEditMode">
+        <div class="form-group">
+            <label class="default-label" for="email">E-mail</label>
+            <input type="email" id="email" class="form-control" formControlName="email">
+            <p class="input-error"
+                *ngIf="!userDataForm.get('userMain.email')?.valid && userDataForm.get('userMain.email')?.touched">
+                Please enter a valid email!
+            </p>
+        </div>
+        <div class="form-group">
+            <label class="default-label" for="password">Password</label>
+            <input type="password" id="password" class="form-control" formControlName="password">
+            <p class="input-error"
+                *ngIf="!userDataForm.get('userMain.password')?.valid && userDataForm.get('userMain.password')?.touched">
+                Please enter a valid password!
+            </p>
+        </div>
+    </div>
+    <div formGroupName="user">
+        <div class="form-group">
+            <label class="default-label" for="username">Username</label>
+            <input type="text" id="username" class="form-control" formControlName="username">
+            <p class="input-error"
+                *ngIf="!userDataForm.get('user.username')?.valid && userDataForm.get('user.username')?.touched">
+                Please enter a valid username!
+            </p>
+        </div>
+        <div class="form-group">
+            <p class="custom-label">Avatar:</p>
+            <div class="avatar-panel">
+                <div class="avatar">
+                    <div *ngFor="let avatarRow  of avatar.length; let i = index" class="avatarColumn">
+                        <div (click)="onChangeColor(i, j)"
+                            [ngStyle]="{'background-color': avatar.newContent[i][j], 'border': avatar.isShowGrid ? '1px solid black' : 'none'}"
+                            *ngFor="let avatarColumn  of avatar.length; let j = index" class="avatarElement">
+                        </div>
+                    </div>
+                </div>
+                <div class="select-color">
+                    <span> Select color:</span>
+                    <input type="color" (change)="onChangeSelectedColor($event)">
+                </div>
+                <div class="avatar-buttons">
+                    <button *ngIf="isEditMode" type="button" (click)="onSetCurrentAvatar()">Current</button>
+                    <button type="button" (click)="onSetDefaultAvatar()">Default</button>
+                    <button type="button" (click)="onResetAvatar()">Reset</button>
+                    <button type="button" (click)="onChangeGridMode()">{{ avatar.isShowGrid ? 'Hide' : 'Show' }} grid</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div formGroupName="userDetails">
+        <div class="form-group">
+            <label class="default-label" for="birthdate">Birthdate</label>
+            <input type="date" id="birthdate" class="form-control" formControlName="birthdate">
+            <p class="input-error"
+                *ngIf="!userDataForm.get('userDetails.birthdate')?.valid && userDataForm.get('userDetails.birthdate')?.touched">
+                Please enter a valid birthdate!
+            </p>
+        </div>
+        <div class="form-group">
+            <p class="custom-label">Gender:</p>
+            <div class="radio" *ngFor="let gender of formData.genders">
+                <label>
+                    <input type="radio" formControlName="gender" [value]="gender">{{ gender }}
+                </label>
+            </div>
+        </div>
+        <div class="form-group" formArrayName="roles">
+            <p class="custom-label">Roles:</p>
+            <div class="checkbox" *ngFor="let role of formData.roles; let i = index">
+                <label>
+                    <input type="checkbox" [formControlName]="i">{{ role }}
+                </label>
+            </div>
+            <p class="input-error"
+                *ngIf="!userDataForm.get('userDetails.roles')?.valid && userDataForm.get('userDetails.roles')?.touched">
+                Please select at least one role!
+            </p>
+        </div>
+        <div formArrayName="favGames">
+            <p class="custom-label">Your favourite games:</p>
+            <div class="form-group fav-game-container" *ngFor="let favGamesControl of favGamesControls; let i = index">
+                <div class="fav-game-input-div">
+                    <input type="text" class="form-control" [formControlName]="i">
+                </div>
+                <div class="fav-game-btn-div">
+                    <button type="button" class="fav-game-btn" (click)="onDeleteFavGame(i)"
+                        [disabled]="i === 0">X</button>
+                </div>
+            </div>
+            <p class="input-error"
+                *ngIf="!userDataForm.get('userDetails.favGames')?.valid && userDataForm.get('userDetails.favGames')?.touched">
+                Please enter at least one favourite game!
+            </p>
+            <div class="add-game-btn-div">
+                <button class="add-game-btn" type="button" (click)="onAddFavGame()">Add game</button>
+            </div>
+        </div>
+    </div>
+    <div class="form-buttons">
+        <button class="submit-button" type="submit" [disabled]="!userDataForm.valid">
+            {{ formData.submitButtonName }}
+        </button>
+        <div *ngIf="!isEditMode">
+            <span class="switch-text">Do you have an account?</span>
+            <a class="switch-button" routerLink="/signin">Sign in!</a>
+        </div>
+    </div>
+</form>

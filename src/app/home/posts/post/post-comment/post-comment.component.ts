@@ -13,5 +13,9 @@ export class PostCommentComponent {
   getCommentDate() {
     return formatDate(this.postComment.date, 'MM/dd/yyyy HH:mm', 'en-US');
   }
+
+  getAuthorAvatar() {
+    return this.postComment.authorAvatar as string;
+  }
 }
 

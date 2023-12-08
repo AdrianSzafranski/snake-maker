@@ -51,8 +51,6 @@ export class AuthService {
           tap(userBasicData => {
             this.handleAuthentication(  userAuthData.email, 
               userAuthData.localId, 
-              userBasicData.username,
-              userBasicData.avatar,
               userAuthData.idToken, 
               +userAuthData.expiresIn);
           })
@@ -62,13 +60,13 @@ export class AuthService {
     );
   }
 
-  signUp(email: string, password: string, username: string, avatar: string, userDetails: UserDetails) {
-    const httpUrl = environment.firebaseSignUpUrl + environment.firebaseApiKey;
-   
+  signUp(email: string, password: string, user: User, userDetails: UserDetails) {
+
+    const httpSignUpUrl = environment.firebaseSignUpUrl + environment.firebaseApiKey;
     let userId: string;
 
     return this.http.post<AuthResponseData>(
-      httpUrl,
+      httpSignUpUrl,
       {
         email: email,
         password: password,
@@ -81,8 +79,6 @@ export class AuthService {
         this.handleAuthentication(
           resData.email, 
           resData.localId, 
-          username,
-          avatar,
           resData.idToken, 
           +resData.expiresIn);
       }),
@@ -93,13 +89,11 @@ export class AuthService {
         ).pipe(
           catchError(this.handleError),
           );
-        
-         
       }),
       mergeMap((resData) => {
           return this.http.put(
             environment.firebaseDbUrl + `users/${userId}.json`,
-          {username: username, avatar: avatar}
+          user
         ).pipe(
           catchError(this.handleError),
           );
@@ -166,8 +160,6 @@ export class AuthService {
   private handleAuthentication(
     email: string, 
     userId: string, 
-    username: string,
-    avatar: string,
     token: string, 
     expiresIn: number) {
     const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);

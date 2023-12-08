@@ -2,199 +2,30 @@
     margin-left: auto;
     margin-right: auto;
     width: 30%;
-    min-height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     background-color: rgb(36, 37, 38);
     border-radius: 15px;
-    position: relative;
     font-size: 1.2rem;
     padding: 2% 2%;
 }
-h2 {
-    margin-bottom: 15px;
-    color: #d2a249;
-}
-label {
-    display: block;
-}
-form {
-    margin: 0px;
-    padding: 0px;
-    width: 100%;
-}
-.form-error {
-    width: 100%;
-    text-align: center;
-    color: black;
-    background-color: #e8acac;
-    margin-bottom: 10px;
-    padding: 10px 20px;
-    border: 3px solid rgb(160, 111, 111);
-    border-radius: 5px;
-}
-.form-group {
-    width: 100%;
-}
-.form-control {
-    width: 100%;
-    padding: 7px;
-    margin: 7px 0;
-    display: inline-block;
-    border: 2px solid black;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background-color: #cccccc;
-}
-.form-buttons {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 10px;
-}
-.submit-button {
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    padding: 7px;
-    margin: 7px 0 20px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.submit-button[disabled] {
-    background-color: gray;
-    transition: background-color 0.3s ease;
-}
-.switch-text {
-    font-size: 17px;
-}
-.switch-button {
-    color: white;
-    background-color: transparent;
-    border: 2px dashed rgb(210, 162, 73);
-    border-radius: 5px;
-    padding: 8px;
-    margin-left: 10px;
-    cursor: pointer;
 
-}
-.input-error {
-    color: #ea7272;
-    margin-bottom: 15px;
-}
-input.ng-invalid.ng-touched {
-    border: 3px solid #ea7272;
-}
-.custom-label {
-    margin: 15px 0px 5px 0;
-}
-.default-label,
-.custom-label {
-    color: #c7b89c;
-}
-input[type='checkbox'], 
-input[type='radio'] {
-   margin-right: 5px;
-}
-.fav-game-container {
-    display: flex;
-    justify-content: space-between;
-}
-.fav-game-input-div {
-    width: 85%;
-}
-.fav-game-btn {
-    
-    font-size: 23px;
-    color: #ccc;
-    background-color: rgb(100, 32, 32);
-    border: 2px solid black;
-    border-radius: 5px;
-    width: 34px;
-    height: 34px;
-    cursor: pointer;
-}
-.fav-game-btn[disabled] {
-    background-color: gray;
-    cursor: default;
-}
-.fav-game-btn-div {
-    display: flex;
-    align-items: center;
-}
-.add-game-btn-div {
-    text-align: right;
-}
-.add-game-btn { 
-    width: 40%;
-    background-color: rgb(209, 187, 147);
-    color: black;
-    padding: 7px;
-    margin: 7px 0 20px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.avatar {
-    text-align: center;
-    align-items: center;
-    border: 4px black solid;
-    margin-bottom: 10px;
-}
-.avatarColumn {
-    display: flex;
-}
-.avatarElement {
-    display: flex;
-    width: 25px;
-    height: 25px;
-}
-.select-color {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-input[type="color"] {
-    border: none;
-    margin-left: 10px;
-    width: 50px;
-    height: 30px;
-}
-.avatar-panel {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-
-}
-.avatar-buttons button {
-    background-color: rgb(209, 187, 147);
-    color: black;
-    padding: 7px 10px;
-    margin: 0px 7px 30px 7px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-a {
-    text-decoration: none;
-}
 @media only screen and (max-width: 1200px) {
     .container {
         width: 40%;
     }
 }
+
 @media only screen and (max-width: 900px) {
     .container {
         width: 50%;
     }
 }
+
 @media only screen and (max-width: 650px) {
     .container {
         width: 70%;
     }
 }
+
 @media only screen and (max-width: 500px) {
     .container {
         width: 95%;

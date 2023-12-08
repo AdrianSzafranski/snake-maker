@@ -1,30 +1,19 @@
-.container {
-    margin-top: 2%;
-    margin-bottom: 2%;
-    margin-left: auto;
-    margin-right: auto;
-    min-height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: rgb(36, 37, 38);
-    border-radius: 15px;
-    position: relative;
-    font-size: 1.2rem;
-    padding: 10px 20px;
-}
 h2 {
+    text-align: center;
     margin-bottom: 15px;
     color: #d2a249;
 }
+
 label {
     display: block;
 }
+
 form {
     margin: 0px;
     padding: 0px;
     width: 100%;
 }
+
 .form-error {
     width: 100%;
     text-align: center;
@@ -35,9 +24,11 @@ form {
     border: 3px solid rgb(160, 111, 111);
     border-radius: 5px;
 }
+
 .form-group {
     width: 100%;
 }
+
 .form-control {
     width: 100%;
     padding: 7px;
@@ -48,11 +39,13 @@ form {
     box-sizing: border-box;
     background-color: #cccccc;
 }
+
 .form-buttons {
     width: 100%;
     text-align: center;
     margin-bottom: 10px;
 }
+
 .submit-button {
     width: 100%;
     background-color: #4CAF50;
@@ -64,13 +57,16 @@ form {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 .submit-button[disabled] {
     background-color: gray;
     transition: background-color 0.3s ease;
 }
+
 .switch-text {
     font-size: 17px;
 }
+
 .switch-button {
     color: white;
     background-color: transparent;
@@ -81,33 +77,41 @@ form {
     cursor: pointer;
 
 }
+
 .input-error {
     color: #ea7272;
     margin-bottom: 15px;
 }
+
 input.ng-invalid.ng-touched {
     border: 3px solid #ea7272;
 }
+
 .custom-label {
     margin: 15px 0px 5px 0;
 }
+
 .default-label,
 .custom-label {
     color: #c7b89c;
 }
-input[type='checkbox'], 
+
+input[type='checkbox'],
 input[type='radio'] {
-   margin-right: 5px;
+    margin-right: 5px;
 }
+
 .fav-game-container {
     display: flex;
     justify-content: space-between;
 }
+
 .fav-game-input-div {
     width: 85%;
 }
+
 .fav-game-btn {
-    
+
     font-size: 23px;
     color: #ccc;
     background-color: rgb(100, 32, 32);
@@ -117,18 +121,22 @@ input[type='radio'] {
     height: 34px;
     cursor: pointer;
 }
+
 .fav-game-btn[disabled] {
     background-color: gray;
     cursor: default;
 }
+
 .fav-game-btn-div {
     display: flex;
     align-items: center;
 }
+
 .add-game-btn-div {
     text-align: right;
 }
-.add-game-btn { 
+
+.add-game-btn {
     width: 40%;
     background-color: rgb(209, 187, 147);
     color: black;
@@ -138,37 +146,44 @@ input[type='radio'] {
     border-radius: 4px;
     cursor: pointer;
 }
+
 .avatar {
     text-align: center;
     align-items: center;
     border: 4px black solid;
     margin-bottom: 10px;
 }
+
 .avatarColumn {
     display: flex;
 }
+
 .avatarElement {
     display: flex;
     width: 25px;
     height: 25px;
 }
+
 .select-color {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
+
 input[type="color"] {
     border: none;
     margin-left: 10px;
     width: 50px;
     height: 30px;
 }
+
 .avatar-panel {
     display: flex;
     align-items: center;
     flex-direction: column;
 
 }
+
 .avatar-buttons button {
     background-color: rgb(209, 187, 147);
     color: black;
@@ -178,6 +193,7 @@ input[type="color"] {
     border-radius: 4px;
     cursor: pointer;
 }
+
 a {
     text-decoration: none;
 }

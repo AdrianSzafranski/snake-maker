@@ -23,10 +23,10 @@ import { GameComponent } from './snake-game/game/game.component';
 import { GameMapsComponent } from './snake-game/game-maps/game-maps.component';
 import { GameMapComponent } from './snake-game/game-maps/game-map/game-map.component';
 import { UserAvatarComponent } from './shared/user-avatar/user-avatar.component';
-import { UserDataEditComponent } from './user-profile/user-data-edit/user-data-edit.component';
 import { UserDataComponent } from './user-profile/user-data/user-data.component';
 import { GameMapAddComponent } from './user-profile/game-map-add/game-map-add.component';
 import { UserGameMapsComponent } from './user-profile/user-game-maps/user-game-maps.component';
+import { UserDataFormComponent } from './shared/user-data-form/user-data-form.component';
 
 
 @NgModule({
@@ -48,11 +48,11 @@ import { UserGameMapsComponent } from './user-profile/user-game-maps/user-game-m
     PostComponent,
     PostCommentComponent,
     SnakeGameComponent,
-    UserDataEditComponent,
     UserDataComponent,
     UserAvatarComponent,
     GameMapAddComponent,
-    UserGameMapsComponent
+    UserGameMapsComponent,
+    UserDataFormComponent
   ],
   imports: [
     BrowserModule,

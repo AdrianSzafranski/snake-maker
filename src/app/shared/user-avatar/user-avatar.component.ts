@@ -1,6 +1,4 @@
 import { Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
-import { PostComment } from 'src/app/home/posts/post.model';
-import { defaultData } from '../default-data';
 
 @Component({
   selector: 'app-user-avatar',
@@ -8,7 +6,7 @@ import { defaultData } from '../default-data';
   styleUrls: ['./user-avatar.component.css']
 })
 export class UserAvatarComponent {
-  @Input() userAvatar?: string;
+  @Input() userAvatar!: string;
   @ViewChild('userAvatarContainer', {static: true}) userAvatarContainer!: ElementRef;
   constructor(private renderer: Renderer2) {}
 
@@ -20,10 +18,6 @@ export class UserAvatarComponent {
   }
 
   drawAvatar() {
-    if(!this.userAvatar) {
-      this.userAvatar = defaultData.defaultAvatar;
-    }
-
     const avatarCanvas = this.renderer.createElement('canvas');
     this.renderer.setAttribute(avatarCanvas, 'width', '500');
     this.renderer.setAttribute(avatarCanvas, 'height', '500');
@@ -42,7 +36,7 @@ export class UserAvatarComponent {
 
     const img = this.renderer.createElement('img');
     this.renderer.setAttribute(img, 'src', avatarURL);
-    this.renderer.setAttribute(img, 'alt', defaultData.defaultAvatarAlt);
+    this.renderer.setAttribute(img, 'alt', "user avatar");
 
     const userAvatarElement = this.userAvatarContainer.nativeElement;
     this.renderer.appendChild(userAvatarElement, img);

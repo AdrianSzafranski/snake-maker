@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { CanvasDrawer } from '../snake-game/game/canvas-drawer';
 import { CoordinateModel } from '../snake-game/game/coordinate.model';
-import { defaultData } from '../shared/default-data';
 
 @Component({
   selector: 'app-guide',
@@ -170,7 +169,7 @@ export class GuideComponent implements OnInit{
 
     const img = this.renderer.createElement('img');
     this.renderer.setAttribute(img, 'src', sampleGameMapURL);
-    this.renderer.setAttribute(img, 'alt', defaultData.defaultGameMapAlt);
+    this.renderer.setAttribute(img, 'alt', 'Sample game map');
 
     const sampleGameMapNativeElement = this.sampleGameMapContainer.nativeElement;
     this.renderer.appendChild(sampleGameMapNativeElement, img);

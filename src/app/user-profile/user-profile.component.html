@@ -2,8 +2,10 @@
     <div class="side-panel">
         <div *ngIf="!isLoading">
             <app-user-data *ngIf="!isEditMode" [userData]="userData"></app-user-data>
-            <app-user-data-edit *ngIf="isEditMode" [userData]="userData" (newUserData)="setNewUserData($event)">
-            </app-user-data-edit>
+            <div class="user-data-form">
+                <app-user-data-form *ngIf="isEditMode" [userData]="userData" (newUserData)="setNewUserData($event)">
+                </app-user-data-form>
+            </div>
         </div>
         <div *ngIf="isLoading" style="text-align: center;">
             <app-loading-spinner></app-loading-spinner>
