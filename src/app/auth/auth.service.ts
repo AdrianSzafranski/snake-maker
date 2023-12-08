@@ -175,7 +175,7 @@ export class AuthService {
     if(!errorRes.error || !errorRes.error.error) {
       return throwError(() => new Error(errorMessage));
     }
-    console.log(errorRes);
+
     switch (errorRes.error.error.message) {
       case 'EMAIL_EXISTS':
         errorMessage = 'This email exists already';
@@ -188,6 +188,9 @@ export class AuthService {
         break;
       case 'INVALID_LOGIN_CREDENTIALS':
         errorMessage = 'This email or password is not correct.';
+        break;
+      case 'INVALID_EMAIL':
+        errorMessage = 'This email is badly formatted.';
         break;
     }
     return throwError(() => new Error(errorMessage));
