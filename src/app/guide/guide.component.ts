@@ -10,7 +10,7 @@ import { CoordinateModel } from '../snake-game/game/coordinate.model';
 export class GuideComponent implements OnInit{
 
   @ViewChild('sampleGameMapContainer', {static: true}) sampleGameMapContainer!: ElementRef;
-  @ViewChild('normalFoodCanvas', {static: true}) normalFoodCanvasRef!: ElementRef;
+  @ViewChild('regularFoodCanvas', {static: true}) regularFoodCanvasRef!: ElementRef;
   @ViewChild('speedFoodCanvas', {static: true}) speedFoodCanvasRef!: ElementRef;
   @ViewChild('lengthFoodCanvas', {static: true}) lengthFoodCanvasRef!: ElementRef;
   @ViewChild('fortuneFoodCanvas', {static: true}) fortuneFoodCanvasRef!: ElementRef;
@@ -32,7 +32,7 @@ export class GuideComponent implements OnInit{
       {"x": 7, "y": 5, "width": 0, "height": 1}
   ];
   foods = [
-      {"coordinate": {"x": 1, "y": 3 }, "type": "normal", "sign": "N", "color": "rgb(243, 245, 108)"},
+      {"coordinate": {"x": 1, "y": 3 }, "type": "regular", "sign": "N", "color": "rgb(243, 245, 108)"},
       {"coordinate": {"x": 5, "y": 5 }, "type": "speed", "sign": "S", "color": "rgb(245, 108, 108)"},
       {"coordinate": {"x": 8, "y": 1 }, "type": "unknown", "sign": "?", "color": "rgb(245, 108, 238)"}
   ]; 
@@ -45,8 +45,8 @@ export class GuideComponent implements OnInit{
       this.drawSampleGameMap();
       this.changeCanvasToImg();
 
-      let normalFoodCanvasDrawer = new CanvasDrawer(this.normalFoodCanvasRef.nativeElement);
-      this.drawSampleFood(40, "rgb(243, 245, 108)", "N", normalFoodCanvasDrawer);
+      let regularFoodCanvasDrawer = new CanvasDrawer(this.regularFoodCanvasRef.nativeElement);
+      this.drawSampleFood(40, "rgb(243, 245, 108)", "R", regularFoodCanvasDrawer);
       let speedFoodCanvasDrawer = new CanvasDrawer(this.speedFoodCanvasRef.nativeElement);
       this.drawSampleFood(40, "rgb(245, 108, 108)", "S", speedFoodCanvasDrawer);
       let lengthFoodCanvasDrawer = new CanvasDrawer(this.lengthFoodCanvasRef.nativeElement);

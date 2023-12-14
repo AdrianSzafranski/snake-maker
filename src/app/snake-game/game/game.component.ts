@@ -47,6 +47,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.gameService.endGame();
     this.currentScoreSubscription.unsubscribe();
     this.bestScoreSubscription.unsubscribe();
+    this.gameMapWidthInPixelsSubscription.unsubscribe();
   }
 
   @HostListener('window:resize', ['$event'])

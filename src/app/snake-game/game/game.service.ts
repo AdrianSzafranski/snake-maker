@@ -5,7 +5,7 @@ import { GameMap } from "../game-maps/game-map.model";
 import { BoardModel } from "./board.model";
 import { CanvasDrawer } from "./canvas-drawer";
 import { CoordinateModel } from "./coordinate.model";
-import { FoodModel } from "./food.model";
+import { Food, FoodType } from "./food.model";
 import { SnakeModel } from "./snake.model";
 import { UserScore } from "../user-score.model";
 import { GameMapService } from "../game-maps/game-map.service";
@@ -31,8 +31,8 @@ export class GameService {
   private _gameObjects!: {
     gameMap: BoardModel,
     snake: SnakeModel,
-    normalFoods: FoodModel[],
-    specialFood: FoodModel | null;
+    normalFoods: Food[],
+    specialFood: Food | null;
     obstaclesCoords: CoordinateModel[]; 
   };
   private _canvasDrawers!: {
@@ -108,10 +108,10 @@ export class GameService {
 
     const normalFoods = [];
         
-    let initFoodTypes = ['normal', 'speed', 'length'];
+    let initFoodTypes = [FoodType.Regular, FoodType.Speed, FoodType.Length];
     for(let initFoodType of initFoodTypes) {
         let initFoodCoord = gameMap.setItemInRandElement('food', initSnakeCoords)[0];
-        let food = new FoodModel(initFoodCoord, initFoodType);
+        let food = new Food(initFoodCoord, initFoodType);
         normalFoods.push(food);
     }
 
@@ -603,15 +603,15 @@ export class GameService {
     
     let specialFoodType;
     if(randomNumber < 0.05) {
-      specialFoodType = 'fortune';
+      specialFoodType = FoodType.Fortune;
     } else if(randomNumber < 0.10) {
-      specialFoodType = 'curse';
+      specialFoodType = FoodType.Curse;
     } else {
-      specialFoodType = 'unknown';
+      specialFoodType = FoodType.Unknown;
     }
       
     let specialFoodCoord = this._gameObjects.gameMap.setItemInRandElement('specialFood')[0];
-    this._gameObjects.specialFood = new FoodModel(specialFoodCoord, specialFoodType);
+    this._gameObjects.specialFood = new Food(specialFoodCoord, specialFoodType);
     
     this.drawFoods();
   }
@@ -662,6 +662,7 @@ export class GameService {
   }
 
   drawFoods() {
+    console.log(this._gameObjects.normalFoods);
     this._canvasDrawers.food.clearCanvas();
     for(let food of this._gameObjects.normalFoods) {
       this.drawFood({ ...food.coordinate}, food.color, food.sign);
@@ -676,6 +677,7 @@ export class GameService {
   }
     
   drawFood(foodCoord: CoordinateModel, color: string, sign: string) {
+    console.log('f');
     let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     
     let centerX = foodCoord.x * boardElementSizeInPixels + boardElementSizeInPixels / 2;

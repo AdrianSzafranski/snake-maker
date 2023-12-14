@@ -1,123 +1,46 @@
 import { CoordinateModel } from "./coordinate.model";
 
-export class FoodModel {
+export enum FoodType {
+    Regular = 'regular',
+    Speed = 'speed',
+    Length = 'length',
+    Fortune = 'fortune',
+    Curse = 'curse',
+    Unknown = 'unknown',
+}
 
-    _speedModifier: number;
-    _elongationNumber: number;
-    _value: number;
-    _sign: string;
-    _color: string;
-    
-    constructor(private _coordinate: CoordinateModel, private _type: string){ 
-        switch(this.type) {
-            case 'normal':
-                this._speedModifier = 1;
-                this._elongationNumber = 1;
-                this._value = 1;
-                this._sign = 'N';
-                this._color = 'rgb(243, 245, 108)';
-                break;
-            case 'speed':
-                this._speedModifier = 2;
-                this._elongationNumber = 0;
-                this._value = 1;
-                this._sign = 'S';
-                this._color = 'rgb(245, 108, 108)';
-                break;
-            case 'length':
-                this._speedModifier = 0;
-                this._elongationNumber = 2;
-                this._value = 1;
-                this._sign = 'L';
-                this._color = 'rgb(245, 195, 108)';
-                break;
-            case 'fortune':
-                this._speedModifier = 0;
-                this._elongationNumber = 0;
-                this._value = 5;
-                this._sign = 'F';
-                this._color = 'rgb(245, 108, 238)';
-                break;
-            case 'curse':
-                this._speedModifier = 0;
-                this._elongationNumber = 0;
-                this._value = -5;
-                this._sign = 'C';
-                this._color = 'rgb(245, 108, 238)';
-                break;
-            case 'unknown':
-                this._speedModifier = 0;
-                this._elongationNumber = 0;
-                this._value = Math.floor(Math.random() * (21)) - 10;
-                this._sign = '?';
-                this._color = 'rgb(245, 108, 238)';
-                break;
-            default: 
-                this._speedModifier = 1;
-                this._elongationNumber = 1;
-                this._value = 1;
-                this._sign = 'N';
-                this._color = 'rgb(243, 245, 108)';
-        }
-    }
+function drawFoodValue() {
+    return Math.floor(Math.random() * (21)) - 10;
+}
 
-    get speedModifier() {
-        return this._speedModifier;
-    }
+export class Food {
 
-    get elongationNumber() {
-        return this._elongationNumber;
-    }
+    readonly speedModifier!: number;
+    readonly elongationNumber!: number;
+    readonly value!: number;
+    readonly sign!: string;
+    readonly color!: string;
 
-    get value() {
-        if(this.type === 'unknown') {
-            return Math.floor(Math.random() * (21)) - 10;
-        }
-        return this._value;
-    }
+    private static readonly Configurations = {
+        [FoodType.Regular]: { speedModifier: 1, elongationNumber: 1, value: 1, sign: 'R', color: 'rgb(243, 245, 108)' },
+        [FoodType.Speed]: { speedModifier: 2, elongationNumber: 0, value: 1, sign: 'S', color: 'rgb(245, 108, 108)' },
+        [FoodType.Length]: { speedModifier: 0, elongationNumber: 2, value: 1, sign: 'L', color: 'rgb(245, 195, 108)' },
+        [FoodType.Fortune]: { speedModifier: 0, elongationNumber: 0, value: 5, sign: 'F', color: 'rgb(245, 108, 238)' },
+        [FoodType.Curse]: { speedModifier: 0, elongationNumber: 0, value: -5, sign: 'C', color: 'rgb(245, 108, 238)' },
+        [FoodType.Unknown]: { speedModifier: 0, elongationNumber: 0, value: drawFoodValue(), sign: '?', color: 'rgb(245, 108, 238)' },
+    };
 
-    get sign() {
-        return this._sign;
-    }
-
-    get color() {
-        return this._color;
+    constructor(private _coordinate: CoordinateModel, readonly type: FoodType) {
+        const config = Food.Configurations[this.type] || Food.Configurations[FoodType.Regular];
+        Object.assign(this, config);
     }
 
     get coordinate() {
         return { ...this._coordinate };
     }
 
-    get type() {
-        return this._type;
-    }
-
-    set speedModifier(speedModifier: number) {
-        this._speedModifier = speedModifier;
-    }
-
-    set elongationNumber(elongationNumber: number) {
-        this._elongationNumber = elongationNumber;
-    }
-
-    set value(value: number) {
-        this._value = value;
-    }
-
-    set sign(sign: string) {
-        this._sign = sign;
-    }
-
-    set color(color: string) {
-        this._color = color;
-    }
-
-    set coordinate(coordinate: CoordinateModel) {
-        this._coordinate = {x: coordinate.x, y: coordinate.y};
-    }
-
-    set type(type: string) {
-        this._type = type;
+    set coordinate(newCoordinate: CoordinateModel) {
+        this._coordinate = { ...newCoordinate };
     }
 
 }
