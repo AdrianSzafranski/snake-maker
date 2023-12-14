@@ -10,6 +10,12 @@ import { SnakeModel } from "./snake.model";
 import { UserScore } from "../user-score.model";
 import { GameMapService } from "../game-maps/game-map.service";
 
+export enum GameState {
+  NotStarted = 'not started',
+  InProgress = 'in progress',
+  Paused = 'paused',
+  Ended = 'ended',
+}
 
 @Injectable()
 export class GameService {
@@ -17,7 +23,7 @@ export class GameService {
   bestScoreSubject = new Subject<number>();
   gameMapWidthInPixelsSubject = new Subject<number>();
 
-  private _gameState = "not started"; // not started/in progress/paused/require restart/ended
+  private _gameState = GameState.NotStarted;
   private _gameMetrics!: {
     currentScore: number,
     secondsPerElement: number, // snake speed
@@ -131,7 +137,7 @@ export class GameService {
     this.currentScoreSubject.next(this._gameMetrics.currentScore);
     this._gameMetrics.secondsPerElement = this.gameMap.secondsPerElement;
     this._gameMetrics.currentDirection = this.gameMap.snakeInitDirection;
-    this._gameState = "not started";
+    this._gameState = GameState.NotStarted;
     this._animationMetrics.lastFrameTime = 0;
     this._animationMetrics.timeElapsedInSeconds = 0;
     this._gameObjects.specialFood = null;
@@ -153,7 +159,11 @@ export class GameService {
   }
 
   startGame() {
-    this._gameState = "in progress";
+    if(this._gameState !== GameState.NotStarted) {
+      return;
+    }
+
+    this._gameState = GameState.InProgress;
     this.drawAllElements();
     this._animationMetrics.lastFrameTime = performance.now();
     this._gameObjects.snake.getDestination(this._gameObjects.gameMapState.widthInElements, this._gameObjects.gameMapState.heightInElements);
@@ -163,16 +173,16 @@ export class GameService {
   }
   
   pauseGame() {
-    if(this._gameState !== 'paused' && this._gameState !== 'in progress') {
+    if(this._gameState !== GameState.InProgress && this._gameState !== GameState.Paused) {
       return;
     }
 
-    this._gameState = "in progress" ? 'paused' : "in progress";
-    if (this._gameState === 'paused') {
+    this._gameState = (this._gameState === GameState.InProgress) ? GameState.Paused : GameState.InProgress;
+    if (this._gameState === GameState.Paused) {
       this.drawTextInGameMapCenter('Paused', 3);
       return;
     }
-    if (this._gameState === 'in progress') {
+    if (this._gameState === GameState.InProgress) {
       this._canvasDrawers.text.clearCanvas();
       this._animationMetrics.lastFrameTime = performance.now();
       this.drawFoods();
@@ -183,9 +193,8 @@ export class GameService {
   }
 
   updateGame(currentTime: DOMHighResTimeStamp) {
-    if(this._gameState === 'paused') return;
-    if(this._gameState === 'require restart') {
-      this._gameState = 'not started';
+    if(this._gameState === GameState.Paused) return;
+    if(this._gameState === GameState.NotStarted) {
       this.restartGameHelper();
       return;
     }
@@ -212,7 +221,7 @@ export class GameService {
       const isGameEnd = this._gameObjects.gameMapState.isGameOver(snakeDestination);
 
       if(isGameEnd) {
-        this._gameState = 'ended';
+        this._gameState = GameState.Ended;
         this.determineBestScore();
         this.displayEndGame();
         return;
@@ -277,18 +286,17 @@ export class GameService {
   }
 
   restartGame() {
-    if(this._gameState === 'paused' ||  this._gameState === 'ended') {
+    if(this._gameState === GameState.Paused ||  this._gameState === GameState.Ended) {
       this.restartGameHelper();
       return;
     }
-    this._gameState = 'require restart';
+    this._gameState = GameState.NotStarted;
   }
 
   restartGameHelper() {
       this.setInitGameState();
       this.initGame();
       this.changeScreenSize();
-      this.startGame();
   }
   
   updateSpeed(speedModifier: number) {
@@ -626,11 +634,11 @@ export class GameService {
     this.drawFoods();
     this.drawObstacles();
 
-    if(this._gameState === 'not started') {
+    if(this._gameState === GameState.NotStarted) {
       this.drawTextInGameMapCenter('Press \'s\' to start the game!', 1.2);
     }
      
-    if(this._gameState === 'ended') {
+    if(this._gameState === GameState.Ended) {
       this.drawTextInGameMapCenter('You lost!', 3);
     }
   }
@@ -777,11 +785,11 @@ export class GameService {
   }
 
   endGame() {
-    this._gameState = "paused";
+    this._gameState = GameState.Paused;
   }
     
   set currentDirection(currentDirection: string) {
-    if (this._gameState !== 'in progress') {
+    if (this._gameState !== GameState.InProgress) {
       return;
     }
     
