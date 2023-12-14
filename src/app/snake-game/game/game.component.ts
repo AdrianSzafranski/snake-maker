@@ -1,77 +1,78 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { GameStateModel } from './game-state.model';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { GameService } from './game.service';
 import { ActivatedRoute } from '@angular/router';
-import { GameMapService } from '../game-maps/game-map.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+  styleUrls: ['./game.component.css'],
+  providers: [GameService],
 })
 export class GameComponent implements OnInit, OnDestroy {
-  @ViewChild('gameCanvas', {static: true}) gameCanvasRef!: ElementRef;
-  @ViewChild('bgCanvas', {static: true}) bgCanvasRef!: ElementRef;
-  @ViewChild('gridCanvas', {static: true}) gridCanvasRef!: ElementRef;
+  @ViewChild('staticCanvas', {static: true}) staticCanvasRef!: ElementRef;
+  @ViewChild('snakeCanvas', {static: true}) snakeCanvasRef!: ElementRef;
+  @ViewChild('foodCanvas', {static: true}) foodCanvasRef!: ElementRef;
   @ViewChild('textCanvas', {static: true}) textCanvasRef!: ElementRef;
 
-  gameState!: GameStateModel;
-  isFixedMap = false;
   isLoading = true;
-  constructor(private gameMapService: GameMapService, private route: ActivatedRoute) {}
+  currentScore = 0;
+  bestScore = 0;
+  gameMapWidthInPixels = 400;
+  currentScoreSubscription!: Subscription; 
+  bestScoreSubscription!: Subscription; 
+  gameMapWidthInPixelsSubscription!: Subscription;
+
+  constructor(private gameService: GameService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    const mapType = this.route.snapshot.params['mapType'];
-    const mapId = this.route.snapshot.params['mapId'];
-    this.gameMapService.fetchMap(mapType, mapId).subscribe(mapData => {
-      let gameMap = mapData.gameMap;
-      let userScore = mapData.userScore;
-      if(gameMap.obstacles) {
-        this.isFixedMap = true;
-      }
-  
-      this.gameState = new GameStateModel(
-        gameMap,
-        userScore,
-        this.gameCanvasRef.nativeElement,
-        this.bgCanvasRef.nativeElement,
-        this.gridCanvasRef.nativeElement,
-        this.textCanvasRef.nativeElement,
-        this.gameMapService
-      );
-
-      this.changeScreenSize();
-      
+    const gameMapType = this.route.snapshot.params['mapType'];
+    const gameMapId = this.route.snapshot.params['mapId'];
+    this.gameService.loadGameData(
+      gameMapType, 
+      gameMapId,
+      this.staticCanvasRef.nativeElement,
+      this.snakeCanvasRef.nativeElement,
+      this.foodCanvasRef.nativeElement,
+      this.textCanvasRef.nativeElement).subscribe(mapData => {
       this.isLoading = false;
-
-      this.gameState.startGame();
-    });
-
-    
+    }); 
+    this.currentScoreSubscription = this.gameService.currentScoreSubject.subscribe(currentScore => this.currentScore = currentScore);
+    this.bestScoreSubscription = this.gameService.bestScoreSubject.subscribe(bestScore => this.bestScore = bestScore);
+    this.gameMapWidthInPixelsSubscription = this.gameService.gameMapWidthInPixelsSubject
+      .subscribe(gameMapWidthInPixels => this.gameMapWidthInPixels = gameMapWidthInPixels);
   }
 
   ngOnDestroy(): void {
-    this.gameState.isGamePaused = true;
+    this.gameService.endGame();
+    this.currentScoreSubscription.unsubscribe();
+    this.bestScoreSubscription.unsubscribe();
   }
 
   @HostListener('window:resize', ['$event'])
   changeScreenSize(event?: Event): void {
-      this.gameState.changeScreenSize();
+      this.gameService.changeScreenSize();
   }
 
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
       let possibleDirection = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'];
-      if(possibleDirection.includes(event.key) && !this.gameState.isGamePaused) {
+      if(possibleDirection.includes(event.key)) {
         let direction = event.key.replace("Arrow", "").toLowerCase();
-        this.gameState.currentDirection = direction;
+        this.gameService.currentDirection = direction;
+      }
+
+      if(event.key.toUpperCase() === 'S') {
+        this.gameService.startGame();
       }
 
       if(event.key.toUpperCase() === 'P') {
-        this.gameState.pauseGame();
+        this.gameService.pauseGame();
       }
 
       if(event.key.toUpperCase() === 'R') {
-        this.gameState.restartGame();
+        this.gameService.restartGame();
       }
+
   }
 }

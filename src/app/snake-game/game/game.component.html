@@ -2,14 +2,14 @@
     <div *ngIf="isLoading">
         <app-loading-spinner></app-loading-spinner>
     </div>
-    <div *ngIf="!isLoading" class='top-panel' [ngStyle]="{'width': gameState.getBoardWidthInPixels()+9+'px'}">
-        <p class='current-score'>Current Score: {{ gameState.currentScore }} </p>
-        <p class='best-score'>Best Score: {{ gameState.bestScore }} </p>
+    <div *ngIf="!isLoading" class='top-panel' [ngStyle]="{'width': gameMapWidthInPixels + 9 + 'px'}">
+        <p class='current-score'>Current Score: {{ currentScore }} </p>
+        <p class='best-score'>Best Score: {{ bestScore }} </p>
     </div>
     <div class='canvas-container'>
-        <canvas class="bg-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #bgCanvas></canvas>
-        <canvas class="game-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #gameCanvas></canvas>
-        <canvas class="grid-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #gridCanvas></canvas>
+        <canvas class="static-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #staticCanvas></canvas>
+        <canvas class="snake-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #snakeCanvas></canvas>
+        <canvas class="food-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #foodCanvas></canvas>
         <canvas class="text-canvas canvas-layer" [ngClass]="{'canvas-border': !isLoading}" #textCanvas></canvas>
     </div>
 </div>

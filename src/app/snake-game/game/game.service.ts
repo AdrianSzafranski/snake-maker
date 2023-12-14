@@ -1,3 +1,6 @@
+import { Injectable } from "@angular/core";
+import { Subject, tap } from "rxjs";
+
 import { GameMap } from "../game-maps/game-map.model";
 import { BoardModel } from "./board.model";
 import { CanvasDrawer } from "./canvas-drawer";
@@ -7,195 +10,171 @@ import { SnakeModel } from "./snake.model";
 import { UserScore } from "../user-score.model";
 import { GameMapService } from "../game-maps/game-map.service";
 
-export class GameStateModel {
-  private _currentScore = 0; 
-  private _bestScore = 0; 
-  private _isGameInterrupted = false;
-  private _isGameRestart = false;
-  private _isGameOver = false;
-  private _frameInterval = 1000/30;
-  private _lastFrameTime = 0;
-  private _timeToPassOneElementInSeconds = 0.5;
-  private _timeElapsedInSeconds = 0;
-  private _currentDirection = 'down';
-  private _specialFood: FoodModel | null = null;
-  private _board!: BoardModel;
-  private _snake!: SnakeModel;
-  private _foods!: FoodModel[];
-  private _obstacles: CoordinateModel[] = [];
-  private _bgCanvasDrawer: CanvasDrawer;
-  private _gameCanvasDrawer: CanvasDrawer;
-  private _gridCanvasDrawer: CanvasDrawer;
-  private _textCanvasDrawer: CanvasDrawer;
-  private initSnakeCoords: CoordinateModel[] = [];
-  private initFoodCoords: CoordinateModel[] = [];
+
+@Injectable()
+export class GameService {
+  currentScoreSubject = new Subject<number>();
+  bestScoreSubject = new Subject<number>();
+  gameMapWidthInPixelsSubject = new Subject<number>();
+
+  private _gameState = "not started"; // not started/in progress/paused/require restart/ended
+  private _gameMetrics!: {
+    currentScore: number,
+    secondsPerElement: number, // snake speed
+    currentDirection: string
+  }
+  private _animationMetrics = {
+    frameInterval: 1000/30,
+    lastFrameTime: 0,
+    timeElapsedInSeconds: 0
+  };
+  private _gameObjects!: {
+    gameMap: BoardModel,
+    snake: SnakeModel,
+    normalFoods: FoodModel[],
+    specialFood: FoodModel | null;
+    obstaclesCoords: CoordinateModel[]; 
+  };
+  private _canvasDrawers!: {
+    static: CanvasDrawer,
+    snake: CanvasDrawer,
+    food: CanvasDrawer,
+    text: CanvasDrawer
+  }
+  private gameMapConfig!: GameMap;
+  private userScore!: UserScore;
   private candrawBoards = true;
 
-  constructor(
-    private map: GameMap,
-    private userScore: UserScore,
-    gameCanvas: HTMLCanvasElement, 
-    bgCanvas: HTMLCanvasElement, 
-    gidCanvas: HTMLCanvasElement,
-    textCanvas: HTMLCanvasElement,
-    private gameMapService: GameMapService) {
-      this._bgCanvasDrawer = new CanvasDrawer(bgCanvas);
-      this._gameCanvasDrawer = new CanvasDrawer(gameCanvas);
-      this._gridCanvasDrawer = new CanvasDrawer(gidCanvas);
-      this._textCanvasDrawer = new CanvasDrawer(textCanvas);
+  constructor(private gameMapService: GameMapService) {}
 
-      this._bestScore = this.userScore.highestScore;
-      if(this.map.obstacles) {
-        this.initBoardElementsUsingFixedPositions();
-      } else {
-        this.initBoardElementsUsingRandPositions();
-      }
+  loadGameData(
+    gameMapId: string,
+    gameMapType: string,
+    staticCanvas: HTMLCanvasElement, 
+    snakeCanvas: HTMLCanvasElement, 
+    foodCanvas: HTMLCanvasElement,
+    textCanvas: HTMLCanvasElement
+    ) {
+    this._canvasDrawers = {
+      static: new CanvasDrawer(staticCanvas),
+      snake: new CanvasDrawer(snakeCanvas),
+      food: new CanvasDrawer(foodCanvas),
+      text: new CanvasDrawer(textCanvas),
+    }
+
+    return  this.gameMapService.fetchMap(gameMapId, gameMapType)
+    .pipe(
+      tap(mapData => {
+        this.gameMapConfig = mapData.gameMap;
+        this.userScore = mapData.userScore;
+      
+        this.initGame();
+        this.changeScreenSize();
+      })
+    );
   }
 
-  initBoardElementsUsingFixedPositions() {
-    this._timeToPassOneElementInSeconds = this.map.initTimeToPassOneElementInSeconds;
-
-    this._board = new BoardModel(
+  initGame() {
+    this._gameMetrics = {
+      currentScore: 0,
+      secondsPerElement: this.gameMapConfig.initTimeToPassOneElementInSeconds,
+      currentDirection: this.gameMapConfig.snakeInitDirection,
+    } 
+    this.currentScoreSubject.next(this._gameMetrics.currentScore);
+    this.bestScoreSubject.next(this.userScore.highestScore);
+    const gameMap = new BoardModel(
       400, 240, 
-      this.map.boardWidthInElements, this.map.boardHeightInElements, 
-      this.map.boardFirstColor, this.map.boardSecondColor,
+      this.gameMapConfig.boardWidthInElements, this.gameMapConfig.boardHeightInElements, 
+      this.gameMapConfig.boardFirstColor, this.gameMapConfig.boardSecondColor,
       0.2);
     
-    this.currentDirection = this.map.snakeInitDirection;
-    this.initSnakeCoords = JSON.parse(this.map.snakeInitCoords);
-    this._snake = new SnakeModel(this.initSnakeCoords, this.map.snakeInitDirection, this.map.snakeColor);
+    let initSnakeCoords = JSON.parse(this.gameMapConfig.snakeInitCoords);
+    const snake = new SnakeModel(initSnakeCoords, this.gameMapConfig.snakeInitDirection, this.gameMapConfig.snakeColor);
   
-    let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.map.obstacles);
+    let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.gameMapConfig.obstacles);
+    const obstaclesCoords: CoordinateModel[] = [];
     obstaclesJsonArray.forEach(obstacle => { 
       for(let i = 0; i < obstacle.width; i++) {
         const newX = obstacle.x + i;
-        this._obstacles.push({x: newX , y: obstacle.y});
-        this._board.setElement(newX, obstacle.y, 'obstacle');
+        obstaclesCoords.push({x: newX , y: obstacle.y});
+        gameMap.setElement(newX, obstacle.y, 'obstacle');
       }
       for(let i = 0; i < obstacle.height; i++) {
         const newY = obstacle.y + i;
-        this._obstacles.push({x: obstacle.x, y: newY});
-        this._board.setElement(obstacle.x, newY, 'obstacle');
+        obstaclesCoords.push({x: obstacle.x, y: newY});
+        gameMap.setElement(obstacle.x, newY, 'obstacle');
       }
     });
 
-    this._foods = [];
+    const normalFoods = [];
         
     let initFoodTypes = ['normal', 'speed', 'length'];
-    this.initFoodCoords = [];
     for(let initFoodType of initFoodTypes) {
-        let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
-        this.initFoodCoords.push({ ...initFoodCoord });
+        let initFoodCoord = gameMap.setItemInRandElement('food', initSnakeCoords)[0];
         let food = new FoodModel(initFoodCoord, initFoodType);
-        this._foods.push(food);
-    }
-  }
-
-  initBoardElementsUsingRandPositions() {
-    this._timeToPassOneElementInSeconds = this.map.initTimeToPassOneElementInSeconds;
-
-    this._board = new BoardModel(
-      400, 240, 
-      this.map.boardWidthInElements, this.map.boardHeightInElements, 
-      this.map.boardFirstColor, this.map.boardSecondColor,
-      0.2);
-    
-    this.initSnakeCoords = this._board.setItemInRandElement('', undefined, undefined, 2);
-    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection, this.map.snakeColor);
-  
-    this._foods = [];
-        
-    let initFoodTypes = ['normal', 'speed', 'length'];
-    this.initFoodCoords = [];
-    for(let initFoodType of initFoodTypes) {
-        let initFoodCoord = this._board.setItemInRandElement('food', this.initSnakeCoords)[0];
-        this.initFoodCoords.push({ ...initFoodCoord });
-        let food = new FoodModel(initFoodCoord, initFoodType);
-        this._foods.push(food);
+        normalFoods.push(food);
     }
 
-    this._obstacles = [];
-    let newObstacle = this._board.setItemInRandElement('obstacle', 
-      [ ...this.initSnakeCoords, ...this.initFoodCoords, ...this._obstacles ], 2, 5
-    );
-    this._obstacles.push(...newObstacle);    
-    
-  }
+    const specialFood = null;
 
-  setInitBoardElements() {
-    this._board = new BoardModel(
-      400, 240, 
-      this.map.boardWidthInElements, this.map.boardHeightInElements, 
-      this.map.boardFirstColor, this.map.boardSecondColor,
-      0.2);
-
-    this._snake = new SnakeModel(this.initSnakeCoords, this._currentDirection, this.map.snakeColor);
-    for(let initSnakeCoord of this.initSnakeCoords) {
-      this._board.setElement(initSnakeCoord.x, initSnakeCoord.y, '');
-    } 
-      
-    this._foods = [];
-    let initFoodTypes = ['normal', 'speed', 'length'];
-    for(let i = 0; i < initFoodTypes.length; i++) {
-          let food = new FoodModel(this.initFoodCoords[i], initFoodTypes[i]);
-          this._foods.push(food);
-          this._board.setElement(this.initFoodCoords[i].x, this.initFoodCoords[i].y, 'food');
+    this._gameObjects = {
+      gameMap: gameMap,
+      snake: snake,
+      normalFoods: normalFoods,
+      specialFood: specialFood,
+      obstaclesCoords: obstaclesCoords
     }
-    
-    for(let obstacle of this._obstacles) {
-      this._board.setElement(obstacle.x, obstacle.y, 'obstacle');
-    }    
   }
 
   setInitGameState() {
-    this._currentScore = 0;
-    this._isGameInterrupted = false;
-    this._isGameOver = false;
-    this._lastFrameTime = 0;
-    this._timeToPassOneElementInSeconds = 0.3;
-    this._timeElapsedInSeconds = 0;
-    this._specialFood = null;
-    this._currentDirection = 'down';
+    this._gameMetrics.currentScore = 0;
+    this.currentScoreSubject.next(this._gameMetrics.currentScore);
+    this._gameMetrics.secondsPerElement = this.gameMapConfig.initTimeToPassOneElementInSeconds;
+    this._gameMetrics.currentDirection = this.gameMapConfig.snakeInitDirection;
+    this._gameState = "not started";
+    this._animationMetrics.lastFrameTime = 0;
+    this._animationMetrics.timeElapsedInSeconds = 0;
+    this._gameObjects.specialFood = null;
   }
 
   determineBestScore() {
     
-    if(this._currentScore > this._bestScore) {
-      this._bestScore = this._currentScore;
+    if(this._gameMetrics.currentScore > this.userScore.highestScore) {
+      this.userScore.highestScore = this._gameMetrics.currentScore;
+      this.bestScoreSubject.next(this.userScore.highestScore);
     }
 
-    const newUserScore = {
-      highestScore: this._bestScore,
-      gamesNumber: this.userScore.gamesNumber + 1
-    } 
+    this.userScore.gamesNumber = this.userScore.gamesNumber + 1;
 
-    if(this.map.id) {
+    if(this.gameMapConfig.id) {
       this.userScore.gamesNumber++;
-      this.gameMapService.editUserScore(this.map.id, newUserScore);
+      this.gameMapService.editUserScore(this.gameMapConfig.id, this.userScore);
     }
   }
 
   startGame() {
+    this._gameState = "in progress";
     this.drawAllElements();
-    this._lastFrameTime = performance.now();
-    this._snake.getDestination(this._board.widthInElements, this._board.heightInElements);
+    this._animationMetrics.lastFrameTime = performance.now();
+    this._gameObjects.snake.getDestination(this._gameObjects.gameMap.widthInElements, this._gameObjects.gameMap.heightInElements);
     requestAnimationFrame((currentTime) => {
       this.updateGame(currentTime);
     });
   }
   
   pauseGame() {
-    if (this._isGameOver) {
+    if(this._gameState !== 'paused' && this._gameState !== 'in progress') {
       return;
     }
 
-    this._isGameInterrupted = !this._isGameInterrupted;
-
-    if(this._isGameInterrupted) {
-      this.drawTextInBoardCenter('Paused');
-    } else {
-      this._textCanvasDrawer.clearCanvas();
-      this._lastFrameTime = performance.now();
+    this._gameState = "in progress" ? 'paused' : "in progress";
+    if (this._gameState === 'paused') {
+      this.drawTextInBoardCenter('Paused', 3);
+      return;
+    }
+    if (this._gameState === 'in progress') {
+      this._canvasDrawers.text.clearCanvas();
+      this._animationMetrics.lastFrameTime = performance.now();
       this.drawFoods();
       requestAnimationFrame((currentTime) => {
         this.updateGame(currentTime);
@@ -204,55 +183,56 @@ export class GameStateModel {
   }
 
   updateGame(currentTime: DOMHighResTimeStamp) {
-    if(this._isGameInterrupted) return;
-    if(this._isGameRestart) {
-      this._isGameRestart = false;
+    if(this._gameState === 'paused') return;
+    if(this._gameState === 'require restart') {
+      this._gameState = 'not started';
       this.restartGameHelper();
       return;
     }
        
-    const deltaTime = (currentTime - this._lastFrameTime) / 1000;
+    const deltaTime = (currentTime - this._animationMetrics.lastFrameTime) / 1000;
       
-    this._timeElapsedInSeconds += deltaTime;
-    while(this._timeElapsedInSeconds >= this._timeToPassOneElementInSeconds) {
+    this._animationMetrics.timeElapsedInSeconds += deltaTime;
+    while(this._animationMetrics.timeElapsedInSeconds >= this._gameMetrics.secondsPerElement) {
           
       this.drawSnakeShift(1);
 
-      this._currentDirection = this._snake.setDirection(this._currentDirection);
-      let newSnakeSegment = this._snake.move(this._currentDirection);
-      let lastSnakeSegment = this._snake.getBodyPart(0);
+      this._gameMetrics.currentDirection = this._gameObjects.snake.setDirection(this._gameMetrics.currentDirection);
+      let newSnakeSegment = this._gameObjects.snake.move(this._gameMetrics.currentDirection);
+      let lastSnakeSegment = this._gameObjects.snake.getBodyPart(0);
 
       this.isFood(newSnakeSegment, lastSnakeSegment);
       this.isSpecialFood(newSnakeSegment);
 
-      let snakeLength = this._snake.getSnakeLength();
-      let penultimateSnakeSegment = snakeLength > 1 ? this._snake.getBodyPart(1) : null;
-      this._board.editSnakeCoordinate(lastSnakeSegment, penultimateSnakeSegment, newSnakeSegment);
+      let snakeLength = this._gameObjects.snake.getSnakeLength();
+      let penultimateSnakeSegment = snakeLength > 1 ? this._gameObjects.snake.getBodyPart(1) : null;
+      this._gameObjects.gameMap.editSnakeCoordinate(lastSnakeSegment, penultimateSnakeSegment, newSnakeSegment);
     
-      let snakeDestination = this._snake.getDestination(this._board.widthInElements, this._board.heightInElements);
-      this._isGameOver = this._board.isGameOver(snakeDestination);
+      let snakeDestination = this._gameObjects.snake.getDestination(this._gameObjects.gameMap.widthInElements, this._gameObjects.gameMap.heightInElements);
+      const isGameEnd = this._gameObjects.gameMap.isGameOver(snakeDestination);
 
-      if(this._isGameOver) {
+      if(isGameEnd) {
+        this._gameState = 'ended';
         this.determineBestScore();
         this.displayEndGame();
         return;
       }
-      this._timeElapsedInSeconds -= this._timeToPassOneElementInSeconds; 
+      this._animationMetrics.timeElapsedInSeconds -= this._gameMetrics.secondsPerElement; 
     }
         
-    this.drawSnakeShift(this._timeElapsedInSeconds / this._timeToPassOneElementInSeconds); 
+    this.drawSnakeShift(this._animationMetrics.timeElapsedInSeconds / this._gameMetrics.secondsPerElement); 
     this.triggerUpdateMethod(currentTime);   
   } 
 
   displayEndGame() {
-    this.drawSnake(this._snake.deadSnakeColor);
-    this.drawTextInBoardCenter('You lost!');
+    this.drawSnake(this._gameObjects.snake.deadSnakeColor);
+    this.drawTextInBoardCenter('You lost!', 3);
     this.markEndGameElement();
   }
     
   markEndGameElement() {
-    let boardElementSizeInPixels = this._board.elementSizeInPixels;
-    let snakeDestination = this._snake.destination;
+    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let snakeDestination = this._gameObjects.snake.destination;
 
     const sign = 'X';
     const fontSize = boardElementSizeInPixels * 1.1;
@@ -261,15 +241,15 @@ export class GameStateModel {
     const centerX = snakeDestination.x * boardElementSizeInPixels + boardElementSizeInPixels/2;
     const centerY = snakeDestination.y * boardElementSizeInPixels + boardElementSizeInPixels/2;
 
-    this._gameCanvasDrawer.drawSign(
+    this._canvasDrawers.snake.drawSign(
       sign, fontSize, fontFamily, fontColor, centerX, centerY);
   }
   
   drawSnake(color: string) {
     // dir - direction
-    let dirHistory = this._snake.directionHistory;
-    let snakeSegments = this._snake.segments;
-    let snakeLength = this._snake.segments.length;
+    let dirHistory = this._gameObjects.snake.directionHistory;
+    let snakeSegments = this._gameObjects.snake.segments;
+    let snakeLength = this._gameObjects.snake.segments.length;
     let lastSegmentDirIndex = dirHistory.length - snakeLength;
 
     for(let i = 1; i < snakeSegments.length; i++) { 
@@ -281,10 +261,10 @@ export class GameStateModel {
     }
     
     // draw snake last segment
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
-    let snakeNarrowing = this._board.getSnakeNarrowing();
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
     let snakeLastSegment = snakeSegments[0];
-    this._gameCanvasDrawer.drawRect(color, 
+    this._canvasDrawers.snake.drawRect(color, 
       snakeLastSegment.x * boardElementLenInPixels + snakeNarrowing,
       snakeLastSegment.y * boardElementLenInPixels + snakeNarrowing,
       boardElementLenInPixels - 2 * snakeNarrowing );
@@ -297,42 +277,42 @@ export class GameStateModel {
   }
 
   restartGame() {
-    if(this._isGameInterrupted || this._isGameOver) {
+    if(this._gameState === 'paused' ||  this._gameState === 'ended') {
       this.restartGameHelper();
       return;
     }
-    this._isGameRestart = true;
+    this._gameState = 'require restart';
   }
 
   restartGameHelper() {
       this.setInitGameState();
-      this.initBoardElementsUsingFixedPositions();
+      this.initGame();
       this.changeScreenSize();
       this.startGame();
   }
   
   updateSpeed(speedModifier: number) {
-    this._timeToPassOneElementInSeconds -= speedModifier * 0.005;
+    this._gameMetrics.secondsPerElement -= speedModifier * 0.005;
   }
 
   triggerUpdateMethod(currentTime: number) {
-    this._lastFrameTime = currentTime;
+    this._animationMetrics.lastFrameTime = currentTime;
     setTimeout(() => {
       requestAnimationFrame((currentTime) => {
         this.updateGame(currentTime);
       });
-    }, this._frameInterval);
+    }, this._animationMetrics.frameInterval);
   }
 
   drawSnakeShift(shiftFactor: number = 1) {
-    let snakeHistory = this._snake.directionHistory;
-    let snakeLength = this._snake.getSnakeLength();
-    let lastSnakeSegment = this._snake.segments[0];
-    let penultimateSnakeSegment = snakeLength > 1 ? this._snake.getBodyPart(1) : null;
+    let snakeHistory = this._gameObjects.snake.directionHistory;
+    let snakeLength = this._gameObjects.snake.getSnakeLength();
+    let lastSnakeSegment = this._gameObjects.snake.segments[0];
+    let penultimateSnakeSegment = snakeLength > 1 ? this._gameObjects.snake.getBodyPart(1) : null;
     let directionLastSnakeSegment = snakeHistory[snakeHistory.length - snakeLength];
-    let snakeDestination = this._snake.destination;
+    let snakeDestination = this._gameObjects.snake.destination;
     let directionSnakeDestination = snakeHistory[snakeHistory.length - 1];
-    let snakeColor = this._snake.liveSnakeColor;
+    let snakeColor = this._gameObjects.snake.liveSnakeColor;
 
     // The last two parts of the snake are the same when it has eaten the food.
     // Then the snake should grow so that it doesn't lose the last part.
@@ -350,7 +330,7 @@ export class GameStateModel {
     shiftFactor: number, 
     color: string) {
         
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     let segmentParams = {
       x: boardElCoord.x * boardElementLenInPixels,
       y: boardElCoord.y * boardElementLenInPixels,
@@ -371,7 +351,7 @@ export class GameStateModel {
     width: number,
     height: number
   }, direction: string) {
-    let snakeNarrowing = this._board.getSnakeNarrowing();
+    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
 
     switch(direction) {
       case 'up':
@@ -406,7 +386,7 @@ export class GameStateModel {
     width: number,
     height: number
   }, direction: string, shiftFactor: number) {
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     let segmentPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
     switch(direction) {
       case 'up':
@@ -434,8 +414,8 @@ export class GameStateModel {
     width: number,
     height: number
   }, boardElCoord: CoordinateModel, direction: string, color: string) {
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
-    let snakeNarrowing = this._board.getSnakeNarrowing();
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
 
     // In the narrowSnakeSegment function, the position of the snake is visually moved backwards.
     // The resulting gap in front of the snake is filled by the next element. 
@@ -446,8 +426,8 @@ export class GameStateModel {
 
     let isFirstColumn = boardElCoord.x === 0;
     let isFirstRow = boardElCoord.y === 0;
-    let isLastColumn = boardElCoord.x === (this._board.widthInElements - 1);
-    let isLastRow = boardElCoord.y === (this._board.heightInElements - 1);
+    let isLastColumn = boardElCoord.x === (this._gameObjects.gameMap.widthInElements - 1);
+    let isLastRow = boardElCoord.y === (this._gameObjects.gameMap.heightInElements - 1);
     let withLessThanNarrowing = segmentParams.width <= snakeNarrowing;
     let heigthLessThanNarrowing = segmentParams.height <= snakeNarrowing;
 
@@ -463,7 +443,7 @@ export class GameStateModel {
    
     // Changes the drawing position to a gap in front of the wall when drawing an invisible part outside the board.
     if(isOnlyDrawInvisiblePartBehindTopWall) {
-      segmentParams.y = this._board.heightInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.y = this._gameObjects.gameMap.heightInElements * boardElementLenInPixels - snakeNarrowing;
     }
     else if(isOnlyDrawInvisiblePartBehindRightWall) {
       segmentParams.x = snakeNarrowing - segmentParams.width
@@ -472,10 +452,10 @@ export class GameStateModel {
       segmentParams.y = snakeNarrowing -  segmentParams.height;
     }
     else if(isOnlyDrawInvisiblePartBehindLeftWall) {
-      segmentParams.x = this._board.widthInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.x = this._gameObjects.gameMap.widthInElements * boardElementLenInPixels - snakeNarrowing;
     }
 
-    this._gameCanvasDrawer.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
+    this._canvasDrawers.snake.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
 
     // The entire gap will be filled as the snake passes through the wall
     // if the visible part of the first element after the wall is also drawn.
@@ -491,10 +471,10 @@ export class GameStateModel {
       (direction === 'right' && isFirstColumn && !withLessThanNarrowing);
 
     if(isAlsoDrawInvisiblePartBehindLeftWall) {
-      segmentParams.x = this._board.widthInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.x = this._gameObjects.gameMap.widthInElements * boardElementLenInPixels - snakeNarrowing;
       segmentParams.width = snakeNarrowing;
     } else if(isAlsoDrawInvisiblePartBehindTopWall) { 
-      segmentParams.y = this._board.heightInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.y = this._gameObjects.gameMap.heightInElements * boardElementLenInPixels - snakeNarrowing;
       segmentParams.height = snakeNarrowing;
     } else if(isAlsoDrawInvisiblePartBehindRightWall) { 
       segmentParams.x = 0;
@@ -504,15 +484,15 @@ export class GameStateModel {
       segmentParams.height = snakeNarrowing;
     }
 
-    this._gameCanvasDrawer.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
+    this._canvasDrawers.snake.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
   }
   
   clearSnakeOldSegment(
     boardElCoord: CoordinateModel, 
     direction: string, 
     shiftFactor: number) { 
-    let boardElementSizeInPixels = this._board.elementSizeInPixels;
-    let snakeNarrowing = this._board.getSnakeNarrowing();
+    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
 
     //element with drawCoord
     let segmentParams = {
@@ -543,12 +523,12 @@ export class GameStateModel {
       segmentParams.width *= shiftFactor;
     }
 
-    this._gameCanvasDrawer.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
+    this._canvasDrawers.snake.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
     
     let isFirstColumn = boardElCoord.x === 0;
     let isFirstRow = boardElCoord.y === 0;
-    let isLastColumn = boardElCoord.x === (this._board.widthInElements - 1);
-    let isLastRow = boardElCoord.y === (this._board.heightInElements - 1);
+    let isLastColumn = boardElCoord.x === (this._gameObjects.gameMap.widthInElements - 1);
+    let isLastRow = boardElCoord.y === (this._gameObjects.gameMap.heightInElements - 1);
     let uncleanWidth =  boardElementSizeInPixels - segmentParams.width;
     let isUncleanWithLessThanNarrowing = uncleanWidth <= snakeNarrowing;
     let uncleanHeight =  boardElementSizeInPixels - segmentParams.height;
@@ -559,51 +539,53 @@ export class GameStateModel {
       segmentParams.x = - snakeNarrowing * 2;
       segmentParams.width = snakeNarrowing - uncleanWidth;
     } else if( direction === 'left'  && isFirstColumn && isUncleanWithLessThanNarrowing) {
-      segmentParams.x = boardElementSizeInPixels * this._board.widthInElements - (snakeNarrowing - uncleanWidth);
+      segmentParams.x = boardElementSizeInPixels * this._gameObjects.gameMap.widthInElements - (snakeNarrowing - uncleanWidth);
       segmentParams.width = snakeNarrowing - uncleanWidth;
     } else if(direction === 'down' && isLastRow && isUncleanHeightLessThanNarrowing) {
       segmentParams.y = -snakeNarrowing*2;
       segmentParams.height = snakeNarrowing - uncleanHeight;
     } else if(direction === 'up' && isFirstRow && isUncleanHeightLessThanNarrowing) {
-      segmentParams.y = boardElementSizeInPixels * this._board.heightInElements - (snakeNarrowing - uncleanHeight);
+      segmentParams.y = boardElementSizeInPixels * this._gameObjects.gameMap.heightInElements - (snakeNarrowing - uncleanHeight);
       segmentParams.height = snakeNarrowing - uncleanHeight;
     }
 
-    this._gameCanvasDrawer.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
+    this._canvasDrawers.snake.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
   }
 
   isFood(newSnakeSegment: CoordinateModel, lastSnakeSegment: CoordinateModel) {
-    let boardElement = this._board.getElement(newSnakeSegment.y, newSnakeSegment.x);
+    let boardElement = this._gameObjects.gameMap.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
     if(boardElement !== 'food') return;
         
-    const eatenFood = this._foods.find(food => {
+    const eatenFood = this._gameObjects.normalFoods.find(food => {
       let foodCoordinate = food.coordinate;
       return foodCoordinate.x === newSnakeSegment.x && foodCoordinate.y === newSnakeSegment.y;
     });
         
     if(eatenFood === undefined) return;
     
-    this._snake.eat(lastSnakeSegment, eatenFood.elongationNumber);
-    let newfoodCoord = this._board.setItemInRandElement('food')[0];
+    this._gameObjects.snake.eat(lastSnakeSegment, eatenFood.elongationNumber);
+    let newfoodCoord = this._gameObjects.gameMap.setItemInRandElement('food')[0];
     eatenFood.coordinate = newfoodCoord;
     this.drawFoods();
-    this._currentScore += eatenFood.value;
+    this._gameMetrics.currentScore += eatenFood.value;
+    this.currentScoreSubject.next(this._gameMetrics.currentScore);
     this.updateSpeed(eatenFood.speedModifier);
     
     this.manageSpecialFood();
   }
     
   isSpecialFood(newSnakeSegment: CoordinateModel) {
-    let boardElement = this._board.getElement(newSnakeSegment.y, newSnakeSegment.x);
+    let boardElement = this._gameObjects.gameMap.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
-    if(boardElement !== 'specialFood' || this._specialFood === null) return;
+    if(boardElement !== 'specialFood' || this._gameObjects.specialFood === null) return;
         
-    let specialFoodCoord = this._specialFood.coordinate;
+    let specialFoodCoord = this._gameObjects.specialFood.coordinate;
     if(!this.isEqualCoordinates(specialFoodCoord, newSnakeSegment)) return;
     
-    this._currentScore += this._specialFood.value;
-    this._specialFood = null;
+    this._gameMetrics.currentScore += this._gameObjects.specialFood.value;
+    this.currentScoreSubject.next(this._gameMetrics.currentScore);
+    this._gameObjects.specialFood = null;
     this.drawFoods();
   }
     
@@ -612,10 +594,10 @@ export class GameStateModel {
     const isManageSpecialFood = randomNumber < 0.15;
     if(!isManageSpecialFood) return;
     
-    if(this._specialFood !== null) {
-      let specialFoodCoord = this._specialFood.coordinate;
-      this._board.setElement(specialFoodCoord.x, specialFoodCoord.y, '');
-      this._specialFood = null;
+    if(this._gameObjects.specialFood !== null) {
+      let specialFoodCoord = this._gameObjects.specialFood.coordinate;
+      this._gameObjects.gameMap.setElement(specialFoodCoord.x, specialFoodCoord.y, '');
+      this._gameObjects.specialFood = null;
       return;
     }
     
@@ -628,43 +610,48 @@ export class GameStateModel {
       specialFoodType = 'unknown';
     }
       
-    let specialFoodCoord = this._board.setItemInRandElement('specialFood')[0];
-    this._specialFood = new FoodModel(specialFoodCoord, specialFoodType);
+    let specialFoodCoord = this._gameObjects.gameMap.setItemInRandElement('specialFood')[0];
+    this._gameObjects.specialFood = new FoodModel(specialFoodCoord, specialFoodType);
     
     this.drawFoods();
   }
 
   drawAllElements() {
-    this._bgCanvasDrawer.clearCanvas();
-    this._gameCanvasDrawer.clearCanvas();
-    this._gridCanvasDrawer.clearCanvas();
-    this._textCanvasDrawer.clearCanvas();
+    this._canvasDrawers.static.clearCanvas();
+    this._canvasDrawers.snake.clearCanvas();
+    this._canvasDrawers.food.clearCanvas();
+    this._canvasDrawers.text.clearCanvas();
     this.drawBoard();
-    this.drawSnake(this._snake.liveSnakeColor);
+    this.drawSnake(this._gameObjects.snake.liveSnakeColor);
     this.drawFoods();
     this.drawObstacles();
+
+    if(this._gameState === 'not started') {
+      this.drawTextInBoardCenter('Press \'s\' to start the game!', 1.2);
+    }
      
-    if(!this._isGameOver) return; 
-    this.drawTextInBoardCenter('You lost!');
+    if(this._gameState === 'ended') {
+      this.drawTextInBoardCenter('You lost!', 3);
+    }
   }
 
   drawBoard() {
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     let isfirstColor = true;
-    for(let rowNumber = 0; rowNumber < this._board.widthInElements; rowNumber++) {
-      if(this._board.heightInElements % 2 === 0) {
+    for(let rowNumber = 0; rowNumber < this._gameObjects.gameMap.widthInElements; rowNumber++) {
+      if(this._gameObjects.gameMap.heightInElements % 2 === 0) {
         isfirstColor = !isfirstColor;
       }
-      for(let columnNumber = 0; columnNumber < this._board.heightInElements; columnNumber++) {
-        let color = isfirstColor ? this._board.firstBgColor : this._board.secondBgColor;
+      for(let columnNumber = 0; columnNumber < this._gameObjects.gameMap.heightInElements; columnNumber++) {
+        let color = isfirstColor ? this._gameObjects.gameMap.firstBgColor : this._gameObjects.gameMap.secondBgColor;
               
-        this._bgCanvasDrawer.drawRect(
+        this._canvasDrawers.static.drawRect(
           color,
           rowNumber * boardElementLenInPixels,
           columnNumber * boardElementLenInPixels,
           boardElementLenInPixels);
 
-        this._bgCanvasDrawer.drawRectBorder(
+        this._canvasDrawers.static.drawRectBorder(
           "black",
           rowNumber * boardElementLenInPixels,
           columnNumber * boardElementLenInPixels, 
@@ -675,42 +662,42 @@ export class GameStateModel {
   }
 
   drawFoods() {
-    this._gridCanvasDrawer.clearCanvas();
-    for(let food of this._foods) {
+    this._canvasDrawers.food.clearCanvas();
+    for(let food of this._gameObjects.normalFoods) {
       this.drawFood({ ...food.coordinate}, food.color, food.sign);
     }
     
-    if(this._specialFood !== null) {
+    if(this._gameObjects.specialFood !== null) {
       this.drawFood(
-        { ...this._specialFood.coordinate}, 
-        this._specialFood.color, 
-        this._specialFood.sign);
+        { ...this._gameObjects.specialFood.coordinate}, 
+        this._gameObjects.specialFood.color, 
+        this._gameObjects.specialFood.sign);
     }
   }
     
   drawFood(foodCoord: CoordinateModel, color: string, sign: string) {
-    let boardElementSizeInPixels = this._board.elementSizeInPixels;
+    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     
     let centerX = foodCoord.x * boardElementSizeInPixels + boardElementSizeInPixels / 2;
     let centerY = foodCoord.y * boardElementSizeInPixels + boardElementSizeInPixels / 2;
     let radius =  boardElementSizeInPixels / 2 - 2.5;
        
-    this._gridCanvasDrawer.drawCircle(centerX, centerY, radius, color);
+    this._canvasDrawers.food.drawCircle(centerX, centerY, radius, color);
 
     const fontSize = boardElementSizeInPixels * 0.6;
     const fontFamily = "Kristen ITC";
-    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this._board.firstBgColor :  this._board.secondBgColor;
+    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this._gameObjects.gameMap.firstBgColor :  this._gameObjects.gameMap.secondBgColor;
         
-    this._gridCanvasDrawer.drawSign(
+    this._canvasDrawers.food.drawSign(
       sign, fontSize, fontFamily,
       fontColor, centerX, centerY,
     );
   }
 
   drawObstacles() {
-    let boardElementSizeinPixels = this._board.elementSizeInPixels;
-    for(let obstacle of this._obstacles) {
-      this._bgCanvasDrawer.drawRect(
+    let boardElementSizeinPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    for(let obstacle of this._gameObjects.obstaclesCoords) {
+      this._canvasDrawers.static.drawRect(
         "black",
         obstacle.x * boardElementSizeinPixels,
         obstacle.y * boardElementSizeinPixels,
@@ -718,19 +705,19 @@ export class GameStateModel {
     }
   }
 
-  drawTextInBoardCenter(text: string) {
-    let boardElementLenInPixels = this._board.elementSizeInPixels;
+  drawTextInBoardCenter(text: string, fontSize: number) {
+    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
     
-    this._textCanvasDrawer.drawTextInBoardCenter(
+    this._canvasDrawers.text.drawTextInBoardCenter(
       text, 
-      boardElementLenInPixels*3,
+      boardElementLenInPixels * fontSize,
       "Arial",
       "rgb(188, 192, 213)");
   }
 
   changeScreenSize() {
-    let boardWidthInElements = this._board.widthInElements;
-    let boardHeightInElements = this._board.heightInElements;
+    let boardWidthInElements = this._gameObjects.gameMap.widthInElements;
+    let boardHeightInElements = this._gameObjects.gameMap.heightInElements;
    
     const boardAspectRatio = boardWidthInElements / boardHeightInElements;
 
@@ -750,17 +737,18 @@ export class GameStateModel {
     if (awailableWidthInPixels / boardAspectRatio > awailableHeightInPixels) {
       
       boardHeightInPixels = awailableHeightInPixels;
-      this._board.elementSizeInPixels = (boardHeightInPixels / boardHeightInElements);
-      boardWidthInPixels = this._board.elementSizeInPixels * boardWidthInElements;
+      this._gameObjects.gameMap.elementSizeInPixels = (boardHeightInPixels / boardHeightInElements);
+      boardWidthInPixels = this._gameObjects.gameMap.elementSizeInPixels * boardWidthInElements;
     } else {
       boardWidthInPixels = awailableWidthInPixels;
-      this._board.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
-      boardHeightInPixels =  this._board.elementSizeInPixels * boardHeightInElements;
+      this._gameObjects.gameMap.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
+      boardHeightInPixels =  this._gameObjects.gameMap.elementSizeInPixels * boardHeightInElements;
     }
   
-    this._board.widthInPixels = boardWidthInPixels;
-    this._board.heightInPixels = boardHeightInPixels;
-    //this._board.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
+    this._gameObjects.gameMap.widthInPixels = boardWidthInPixels;
+    this.gameMapWidthInPixelsSubject.next(this._gameObjects.gameMap.widthInPixels);
+    this._gameObjects.gameMap.heightInPixels = boardHeightInPixels;
+    //this._gameObjects.gameMap.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
 
     this.changeCanvasSize();
 
@@ -769,14 +757,14 @@ export class GameStateModel {
     setTimeout(() => {
       this.drawAllElements();
       this.candrawBoards = true;
-    }, this._frameInterval);
+    }, this._animationMetrics.frameInterval);
   }
 
   changeCanvasSize() {
-    this._bgCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
-    this._gameCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
-    this._gridCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
-    this._textCanvasDrawer.changeCanvasSize(this._board.widthInPixels, this._board.heightInPixels);
+    this._canvasDrawers.static.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
+    this._canvasDrawers.snake.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
+    this._canvasDrawers.food.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
+    this._canvasDrawers.text.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
   }
 
   isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
@@ -785,76 +773,17 @@ export class GameStateModel {
     }
     return false;
   }
+
+  endGame() {
+    this._gameState = "paused";
+  }
     
-  get currentScore() {
-    return this._currentScore;
-  }
-
-  get bestScore() {
-    return this._bestScore;
-  }
-
-  get isGameInterrupted() {
-    return this._isGameInterrupted;
-  }
-
-  get isGameOver() {
-    return this._isGameOver;
-  }
-
-  get frameInterval() {
-    return this._frameInterval;
-  }
-
-  get lastFrameTime() {
-    return this._lastFrameTime;
-  }
-
-  get timeToPassOneElementInSeconds() {
-    return this._timeToPassOneElementInSeconds;
-  }
-
-  get timeElapsedInSeconds() {
-    return this._timeElapsedInSeconds;
-  }
-
-  set currentScore(currentScore: number) {
-    this._currentScore = currentScore;
-  }
-
-  set isGamePaused(isGamePaused: boolean) {
-    this._isGameInterrupted = isGamePaused;
-  }
-
-  set isGameOver(isGameOver: boolean) {
-    this._isGameOver = isGameOver;
-  }
-
-  set frameInterval(frameInterval: number) {
-    this._frameInterval = frameInterval;
-  }
-
-  set lastFrameTime(lastFrameTime: number) {
-    this._lastFrameTime = lastFrameTime;
-  }
-
-  set timeToPassOneElementInSeconds(timeToPassOneElementInSeconds: number) {
-    this._timeToPassOneElementInSeconds = timeToPassOneElementInSeconds;
-  }
-
-  set timeElapsedInSeconds(timeElapsedInSeconds: number) {
-    this._timeElapsedInSeconds = timeElapsedInSeconds;
-  }
-
   set currentDirection(currentDirection: string) {
-    this._currentDirection = currentDirection;
+    if (this._gameState !== 'in progress') {
+      return;
+    }
+    
+    this._gameMetrics.currentDirection = currentDirection;
   }
 
-  getBoardWidthInPixels () {
-    return this._board.widthInPixels;
-  }
-
-  getBoardHeightInPixels () {
-    return this._board.heightInPixels;
-  }
 }

@@ -5,19 +5,19 @@
     align-items: center;
 }
 
-.bg-canvas {
-    z-index: 0;
-}
-
 .canvas-border {
     border: 5px solid black;
 }
 
-.game-canvas {
+.static-canvas {
+    z-index: 0;
+}
+
+.snake-canvas {
     z-index: 2;
 }
 
-.grid-canvas {
+.food-canvas {
     z-index: 1;
 }
 
