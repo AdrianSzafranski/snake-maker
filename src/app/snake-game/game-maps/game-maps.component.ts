@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ViewportScroller } from '@angular/common';
 import { Router } from '@angular/router';
-import { GameMap } from './game-map.model';
+import { GameMap, GameMapType } from './game-map.model';
 import { GameMapService } from './game-map.service';
 import { UserScore } from '../user-score.model';
 
@@ -13,7 +13,7 @@ import { UserScore } from '../user-score.model';
 })
 export class GameMapsComponent implements OnInit {
 
-  gameMaps: GameMap[] = [];
+  officialGameMaps: GameMap[] = [];
   unofficialGameMaps: GameMap[] = [];
   displayedGameMapsStartIndex = 0;
   selectedGameMap?: string;
@@ -31,14 +31,14 @@ export class GameMapsComponent implements OnInit {
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.gameMapsService.fetchMaps().subscribe(gameMaps => {
-      this.gameMaps = gameMaps;
-      this.pagesNumber = Math.ceil(this.gameMaps.length / 6);
+    this.gameMapsService.fetchOfficialGameMaps().subscribe(gameMaps => {
+      this.officialGameMaps = gameMaps;
+      this.pagesNumber = Math.ceil(this.officialGameMaps.length / 6);
       this.isLoading = false;
     });
 
-    this.gameMapsService.fetchUnofficialMaps().subscribe(unofficialMaps => {
-      this.unofficialGameMaps = unofficialMaps;
+    this.gameMapsService.fetchUnofficialGameMaps().subscribe(gameMaps => {
+      this.unofficialGameMaps = gameMaps;
       this.unOfficialGameMapsPagesNumber = Math.ceil(this.unofficialGameMaps.length / 6);
     });
 
@@ -57,9 +57,9 @@ export class GameMapsComponent implements OnInit {
     }
 
     this.selectedGameMap = gameMapId;
-    let gameMapType = 'gameMaps';
+    let gameMapType = GameMapType.Official;
     if (!this.isOfficialGameMaps) {
-      gameMapType = 'unofficialMaps';
+      gameMapType = GameMapType.Unofficial;
     }
     this.router.navigate(['/snake-game', "game", gameMapType, this.selectedGameMap]);
   }
@@ -73,7 +73,7 @@ export class GameMapsComponent implements OnInit {
   onGetNextPage() {
     let gameMapsNumber = 0;
     if (this.isOfficialGameMaps) {
-      gameMapsNumber = this.gameMaps.length;
+      gameMapsNumber = this.officialGameMaps.length;
     } else {
       gameMapsNumber = this.unofficialGameMaps.length;
     }
@@ -85,7 +85,7 @@ export class GameMapsComponent implements OnInit {
 
   getDisplayedGameMaps() {
     if (this.isOfficialGameMaps) {
-      return this.gameMaps.slice(this.displayedGameMapsStartIndex, this.displayedGameMapsStartIndex + 6);
+      return this.officialGameMaps.slice(this.displayedGameMapsStartIndex, this.displayedGameMapsStartIndex + 6);
     } else {
       return this.unofficialGameMaps.slice(this.displayedGameMapsStartIndex, this.displayedGameMapsStartIndex + 6);
     }

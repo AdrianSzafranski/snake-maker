@@ -1,25 +1,23 @@
-import { CoordinateModel } from "./coordinate.model";
+import { Coordinate } from "./coordinate.model";
 
-export class BoardModel {
+export class GameMapState {
 
     private _elementSizeInPixels;
     private _elements;
+    private readonly _snakeNarrowingFactor = 0.2;
     
     constructor(
         private _widthInPixels: number,
         private _heightInPixels: number,
         private _widthInElements: number,
-        private _heightInElements: number,
-        private _firstBgColor: string,
-        private _secondBgColor: string,
-        private _snakeNarrowingFactor: number) {
+        private _heightInElements: number) {
             this._elementSizeInPixels = this._widthInPixels / this._widthInElements;
             this._elements = Array.from({ length: this._heightInElements }, () => Array(this._widthInElements).fill(''));
     }
 
     setItemInRandElement(
         item: string,
-        occupiedCoords: CoordinateModel[] = [],
+        occupiedCoords: Coordinate[] = [],
         maxWidth: number = 1,
         maxHeight: number = 1) {
     
@@ -29,7 +27,7 @@ export class BoardModel {
             return [{ ...itemCoord }];
         }
 
-        let itemCoords: CoordinateModel[] = [{ ...itemCoord }];
+        let itemCoords: Coordinate[] = [{ ...itemCoord }];
 
         for(let i = 1; i < maxWidth; i++) {
 
@@ -52,7 +50,7 @@ export class BoardModel {
         return JSON.parse(JSON.stringify(itemCoords));
     }
 
-    getConnectedElementCoord(elementCoord: CoordinateModel, isHorizontal: boolean) {
+    getConnectedElementCoord(elementCoord: Coordinate, isHorizontal: boolean) {
 
         let newElementCoord = {x: elementCoord.x, y: elementCoord.y};
 
@@ -65,7 +63,7 @@ export class BoardModel {
         return { ...newElementCoord};
     }
 
-    isAvailableElement(elementCoords: CoordinateModel, occupiedCoords: CoordinateModel[] = []) {
+    isAvailableElement(elementCoords: Coordinate, occupiedCoords: Coordinate[] = []) {
       
         let occupiedRows: number[] = []
         let occupiedColumns: number[] = [];
@@ -87,7 +85,7 @@ export class BoardModel {
     
     }
 
-    findAvailableElement(occupiedCoords: CoordinateModel[] = []) {
+    findAvailableElement(occupiedCoords: Coordinate[] = []) {
         let occupiedRows: number[] = []
         let occupiedColumns: number[] = [];
 
@@ -109,7 +107,7 @@ export class BoardModel {
         return { ...randCoord };
     }
 
-    isSuitableElementForObstacle(testCoord: CoordinateModel, snakeCoord: CoordinateModel) {
+    isSuitableElementForObstacle(testCoord: Coordinate, snakeCoord: Coordinate) {
        
         let isSnakeRow = snakeCoord.x == testCoord.x;
         let isSnakeColumn = snakeCoord.y == testCoord.y;
@@ -128,7 +126,7 @@ export class BoardModel {
         return {x: x, y: y};
     }
 
-    editSnakeCoordinate(lastPartOfSnakeBody: CoordinateModel, penultimatePartOfSnakeBody: CoordinateModel | null, newSnakeCoord: CoordinateModel) {
+    editSnakeCoordinate(lastPartOfSnakeBody: Coordinate, penultimatePartOfSnakeBody: Coordinate | null, newSnakeCoord: Coordinate) {
    
         this._elements[newSnakeCoord.y][newSnakeCoord.x] = 'snake';
         
@@ -141,14 +139,14 @@ export class BoardModel {
         this._elements[lastPartOfSnakeBody.y][lastPartOfSnakeBody.x] = '';
     }
 
-    isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
+    isEqualCoordinates(firstCoordinate: Coordinate, secondCoordinate: Coordinate) {
         if(firstCoordinate.x === secondCoordinate.x && firstCoordinate.y === secondCoordinate.y) {
             return true;
         }
         return false;
     }
 
-    isGameOver(snakeDestination: CoordinateModel) {
+    isGameOver(snakeDestination: Coordinate) {
         let destinationElement = this._elements[snakeDestination.y][snakeDestination.x];
         if(destinationElement === 'snake' || destinationElement === 'obstacle') {
             return true;
@@ -162,14 +160,6 @@ export class BoardModel {
 
     get elements() {
         return this._elements;
-    }
-
-    get firstBgColor() {
-        return this._firstBgColor;
-    }
-
-    get secondBgColor() {
-        return this._secondBgColor;
     }
 
     get widthInPixels() {
@@ -194,14 +184,6 @@ export class BoardModel {
 
     set elements(elements: string[][]) {
         this._elements = elements;
-    }
-
-    set firstBgColor(firstBgColor: string) {
-        this._firstBgColor = firstBgColor;
-    }
-
-    set secondBgColor(secondBgColor: string) {
-        this._secondBgColor = secondBgColor;
     }
 
     set widthInPixels(widthInPixels: number) {

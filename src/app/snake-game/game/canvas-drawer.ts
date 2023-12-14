@@ -54,7 +54,7 @@ export class CanvasDrawer {
             centerY + fontSize / centeringCorrection);
     }
 
-    drawTextInBoardCenter(text: string, fontSize: number, fontFamily: string, fontColor: string) {
+    drawTextInGameMapCenter(text: string, fontSize: number, fontFamily: string, fontColor: string) {
       
         this._canvasContext.font =  `${fontSize}px ${fontFamily}`;
         this._canvasContext.fillStyle = fontColor;

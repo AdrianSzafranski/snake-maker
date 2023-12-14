@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
+import { GameMap, GameMapType } from 'src/app/snake-game/game-maps/game-map.model';
 import { UserProfileService } from '../user-profile.service';
 import { GameMapService } from 'src/app/snake-game/game-maps/game-map.service';
 import { UserScore } from 'src/app/snake-game/user-score.model';
@@ -83,7 +83,7 @@ export class UserGameMapsComponent implements OnInit {
     if(!userMapId) {
       return;
     }
-    this.router.navigate(['/snake-game', "game", 'usersMaps', userMapId]);
+    this.router.navigate(['/snake-game', "game", GameMapType.Local, userMapId]);
   }
 
   onEditMap() {

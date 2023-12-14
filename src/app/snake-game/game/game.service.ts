@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Subject, tap } from "rxjs";
 
-import { GameMap } from "../game-maps/game-map.model";
-import { BoardModel } from "./board.model";
+import { GameMap, GameMapType } from "../game-maps/game-map.model";
+import { GameMapState } from "./game-map-state.model";
 import { CanvasDrawer } from "./canvas-drawer";
-import { CoordinateModel } from "./coordinate.model";
+import { Coordinate } from "./coordinate.model";
 import { Food, FoodType } from "./food.model";
 import { SnakeModel } from "./snake.model";
 import { UserScore } from "../user-score.model";
@@ -29,11 +29,11 @@ export class GameService {
     timeElapsedInSeconds: 0
   };
   private _gameObjects!: {
-    gameMap: BoardModel,
+    gameMapState: GameMapState,
     snake: SnakeModel,
     normalFoods: Food[],
     specialFood: Food | null;
-    obstaclesCoords: CoordinateModel[]; 
+    obstaclesCoords: Coordinate[]; 
   };
   private _canvasDrawers!: {
     static: CanvasDrawer,
@@ -41,15 +41,15 @@ export class GameService {
     food: CanvasDrawer,
     text: CanvasDrawer
   }
-  private gameMapConfig!: GameMap;
+  private gameMap!: GameMap;
   private userScore!: UserScore;
-  private candrawBoards = true;
+  private candrawGameMap = true;
 
   constructor(private gameMapService: GameMapService) {}
 
   loadGameData(
+    gameMapType: GameMapType,
     gameMapId: string,
-    gameMapType: string,
     staticCanvas: HTMLCanvasElement, 
     snakeCanvas: HTMLCanvasElement, 
     foodCanvas: HTMLCanvasElement,
@@ -62,10 +62,10 @@ export class GameService {
       text: new CanvasDrawer(textCanvas),
     }
 
-    return  this.gameMapService.fetchMap(gameMapId, gameMapType)
+    return  this.gameMapService.fetchGameMap(gameMapType, gameMapId)
     .pipe(
       tap(mapData => {
-        this.gameMapConfig = mapData.gameMap;
+        this.gameMap = mapData.gameMap;
         this.userScore = mapData.userScore;
       
         this.initGame();
@@ -77,32 +77,32 @@ export class GameService {
   initGame() {
     this._gameMetrics = {
       currentScore: 0,
-      secondsPerElement: this.gameMapConfig.initTimeToPassOneElementInSeconds,
-      currentDirection: this.gameMapConfig.snakeInitDirection,
+      secondsPerElement: this.gameMap.secondsPerElement,
+      currentDirection: this.gameMap.snakeInitDirection,
     } 
     this.currentScoreSubject.next(this._gameMetrics.currentScore);
-    this.bestScoreSubject.next(this.userScore.highestScore);
-    const gameMap = new BoardModel(
-      400, 240, 
-      this.gameMapConfig.boardWidthInElements, this.gameMapConfig.boardHeightInElements, 
-      this.gameMapConfig.boardFirstColor, this.gameMapConfig.boardSecondColor,
-      0.2);
+    this.bestScoreSubject.next(this.userScore.bestScore);
+    const gameMapState = new GameMapState(
+      400, 
+      240, 
+      this.gameMap.widthInElements, 
+      this.gameMap.heightInElements);
     
-    let initSnakeCoords = JSON.parse(this.gameMapConfig.snakeInitCoords);
-    const snake = new SnakeModel(initSnakeCoords, this.gameMapConfig.snakeInitDirection, this.gameMapConfig.snakeColor);
+    let initSnakeCoords = JSON.parse(this.gameMap.snakeInitCoords);
+    const snake = new SnakeModel(initSnakeCoords, this.gameMap.snakeInitDirection, this.gameMap.snakeColor);
   
-    let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.gameMapConfig.obstacles);
-    const obstaclesCoords: CoordinateModel[] = [];
+    let obstaclesJsonArray: {x: number, y: number, width: number, height: number}[] = JSON.parse(this.gameMap.obstacles);
+    const obstaclesCoords: Coordinate[] = [];
     obstaclesJsonArray.forEach(obstacle => { 
       for(let i = 0; i < obstacle.width; i++) {
         const newX = obstacle.x + i;
         obstaclesCoords.push({x: newX , y: obstacle.y});
-        gameMap.setElement(newX, obstacle.y, 'obstacle');
+        gameMapState.setElement(newX, obstacle.y, 'obstacle');
       }
       for(let i = 0; i < obstacle.height; i++) {
         const newY = obstacle.y + i;
         obstaclesCoords.push({x: obstacle.x, y: newY});
-        gameMap.setElement(obstacle.x, newY, 'obstacle');
+        gameMapState.setElement(obstacle.x, newY, 'obstacle');
       }
     });
 
@@ -110,7 +110,7 @@ export class GameService {
         
     let initFoodTypes = [FoodType.Regular, FoodType.Speed, FoodType.Length];
     for(let initFoodType of initFoodTypes) {
-        let initFoodCoord = gameMap.setItemInRandElement('food', initSnakeCoords)[0];
+        let initFoodCoord = gameMapState.setItemInRandElement('food', initSnakeCoords)[0];
         let food = new Food(initFoodCoord, initFoodType);
         normalFoods.push(food);
     }
@@ -118,7 +118,7 @@ export class GameService {
     const specialFood = null;
 
     this._gameObjects = {
-      gameMap: gameMap,
+      gameMapState: gameMapState,
       snake: snake,
       normalFoods: normalFoods,
       specialFood: specialFood,
@@ -129,8 +129,8 @@ export class GameService {
   setInitGameState() {
     this._gameMetrics.currentScore = 0;
     this.currentScoreSubject.next(this._gameMetrics.currentScore);
-    this._gameMetrics.secondsPerElement = this.gameMapConfig.initTimeToPassOneElementInSeconds;
-    this._gameMetrics.currentDirection = this.gameMapConfig.snakeInitDirection;
+    this._gameMetrics.secondsPerElement = this.gameMap.secondsPerElement;
+    this._gameMetrics.currentDirection = this.gameMap.snakeInitDirection;
     this._gameState = "not started";
     this._animationMetrics.lastFrameTime = 0;
     this._animationMetrics.timeElapsedInSeconds = 0;
@@ -139,16 +139,16 @@ export class GameService {
 
   determineBestScore() {
     
-    if(this._gameMetrics.currentScore > this.userScore.highestScore) {
-      this.userScore.highestScore = this._gameMetrics.currentScore;
-      this.bestScoreSubject.next(this.userScore.highestScore);
+    if(this._gameMetrics.currentScore > this.userScore.bestScore) {
+      this.userScore.bestScore = this._gameMetrics.currentScore;
+      this.bestScoreSubject.next(this.userScore.bestScore);
     }
 
     this.userScore.gamesNumber = this.userScore.gamesNumber + 1;
 
-    if(this.gameMapConfig.id) {
+    if(this.gameMap.id) {
       this.userScore.gamesNumber++;
-      this.gameMapService.editUserScore(this.gameMapConfig.id, this.userScore);
+      this.gameMapService.editUserScore(this.gameMap.id, this.userScore);
     }
   }
 
@@ -156,7 +156,7 @@ export class GameService {
     this._gameState = "in progress";
     this.drawAllElements();
     this._animationMetrics.lastFrameTime = performance.now();
-    this._gameObjects.snake.getDestination(this._gameObjects.gameMap.widthInElements, this._gameObjects.gameMap.heightInElements);
+    this._gameObjects.snake.getDestination(this._gameObjects.gameMapState.widthInElements, this._gameObjects.gameMapState.heightInElements);
     requestAnimationFrame((currentTime) => {
       this.updateGame(currentTime);
     });
@@ -169,7 +169,7 @@ export class GameService {
 
     this._gameState = "in progress" ? 'paused' : "in progress";
     if (this._gameState === 'paused') {
-      this.drawTextInBoardCenter('Paused', 3);
+      this.drawTextInGameMapCenter('Paused', 3);
       return;
     }
     if (this._gameState === 'in progress') {
@@ -206,10 +206,10 @@ export class GameService {
 
       let snakeLength = this._gameObjects.snake.getSnakeLength();
       let penultimateSnakeSegment = snakeLength > 1 ? this._gameObjects.snake.getBodyPart(1) : null;
-      this._gameObjects.gameMap.editSnakeCoordinate(lastSnakeSegment, penultimateSnakeSegment, newSnakeSegment);
+      this._gameObjects.gameMapState.editSnakeCoordinate(lastSnakeSegment, penultimateSnakeSegment, newSnakeSegment);
     
-      let snakeDestination = this._gameObjects.snake.getDestination(this._gameObjects.gameMap.widthInElements, this._gameObjects.gameMap.heightInElements);
-      const isGameEnd = this._gameObjects.gameMap.isGameOver(snakeDestination);
+      let snakeDestination = this._gameObjects.snake.getDestination(this._gameObjects.gameMapState.widthInElements, this._gameObjects.gameMapState.heightInElements);
+      const isGameEnd = this._gameObjects.gameMapState.isGameOver(snakeDestination);
 
       if(isGameEnd) {
         this._gameState = 'ended';
@@ -226,20 +226,20 @@ export class GameService {
 
   displayEndGame() {
     this.drawSnake(this._gameObjects.snake.deadSnakeColor);
-    this.drawTextInBoardCenter('You lost!', 3);
+    this.drawTextInGameMapCenter('You lost!', 3);
     this.markEndGameElement();
   }
     
   markEndGameElement() {
-    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let gameMapElementSizeInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     let snakeDestination = this._gameObjects.snake.destination;
 
     const sign = 'X';
-    const fontSize = boardElementSizeInPixels * 1.1;
+    const fontSize = gameMapElementSizeInPixels * 1.1;
     const fontFamily = 'Arial';
     const fontColor = 'red';
-    const centerX = snakeDestination.x * boardElementSizeInPixels + boardElementSizeInPixels/2;
-    const centerY = snakeDestination.y * boardElementSizeInPixels + boardElementSizeInPixels/2;
+    const centerX = snakeDestination.x * gameMapElementSizeInPixels + gameMapElementSizeInPixels/2;
+    const centerY = snakeDestination.y * gameMapElementSizeInPixels + gameMapElementSizeInPixels/2;
 
     this._canvasDrawers.snake.drawSign(
       sign, fontSize, fontFamily, fontColor, centerX, centerY);
@@ -261,16 +261,16 @@ export class GameService {
     }
     
     // draw snake last segment
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
-    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
+    let gameMapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMapState.getSnakeNarrowing();
     let snakeLastSegment = snakeSegments[0];
     this._canvasDrawers.snake.drawRect(color, 
-      snakeLastSegment.x * boardElementLenInPixels + snakeNarrowing,
-      snakeLastSegment.y * boardElementLenInPixels + snakeNarrowing,
-      boardElementLenInPixels - 2 * snakeNarrowing );
+      snakeLastSegment.x * gameMapElementLenInPixels + snakeNarrowing,
+      snakeLastSegment.y * gameMapElementLenInPixels + snakeNarrowing,
+      gameMapElementLenInPixels - 2 * snakeNarrowing );
   }
 
-  isEqualCoords(firstCoord: CoordinateModel, secondCoord: CoordinateModel) {
+  isEqualCoords(firstCoord: Coordinate, secondCoord: Coordinate) {
     return (firstCoord.x === secondCoord.x && firstCoord.y === secondCoord.y)
      ? true 
      : false;
@@ -325,22 +325,22 @@ export class GameService {
   }
     
   determineSnakeNewSegment(
-    boardElCoord: CoordinateModel, 
+    gameMapElCoord: Coordinate, 
     direction: string, 
     shiftFactor: number, 
     color: string) {
         
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let gameMapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     let segmentParams = {
-      x: boardElCoord.x * boardElementLenInPixels,
-      y: boardElCoord.y * boardElementLenInPixels,
-      width: boardElementLenInPixels,
-      height: boardElementLenInPixels
+      x: gameMapElCoord.x * gameMapElementLenInPixels,
+      y: gameMapElCoord.y * gameMapElementLenInPixels,
+      width: gameMapElementLenInPixels,
+      height: gameMapElementLenInPixels
     }
 
     segmentParams = this.narrowSnakeSegment({ ...segmentParams }, direction);
     segmentParams = this.trimSnakeSegment({ ...segmentParams }, direction, shiftFactor);
-    this.drawSnakeNewSegment({ ...segmentParams }, boardElCoord, direction, color);
+    this.drawSnakeNewSegment({ ...segmentParams }, gameMapElCoord, direction, color);
   }
 
   // Narrows the sides of the snake
@@ -351,7 +351,7 @@ export class GameService {
     width: number,
     height: number
   }, direction: string) {
-    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
+    let snakeNarrowing = this._gameObjects.gameMapState.getSnakeNarrowing();
 
     switch(direction) {
       case 'up':
@@ -386,8 +386,8 @@ export class GameService {
     width: number,
     height: number
   }, direction: string, shiftFactor: number) {
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
-    let segmentPart = boardElementLenInPixels - shiftFactor * boardElementLenInPixels;
+    let gameMapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
+    let segmentPart = gameMapElementLenInPixels - shiftFactor * gameMapElementLenInPixels;
     switch(direction) {
       case 'up':
         segmentParams.y += segmentPart;
@@ -413,25 +413,25 @@ export class GameService {
     y: number,
     width: number,
     height: number
-  }, boardElCoord: CoordinateModel, direction: string, color: string) {
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
-    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
+  }, gameMapElCoord: Coordinate, direction: string, color: string) {
+    let gameMapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMapState.getSnakeNarrowing();
 
     // In the narrowSnakeSegment function, the position of the snake is visually moved backwards.
     // The resulting gap in front of the snake is filled by the next element. 
     // When the snake passes through the wall, the gap is not filled because there is no next element.
     // The snake in the first element after passing through the wall also moves backwards,
     // so it draws a fragment outside the array. 
-    // The code below moves this piece of the snake outside the board to the place where the gap occurs.
+    // The code below moves this piece of the snake outside the game map to the place where the gap occurs.
 
-    let isFirstColumn = boardElCoord.x === 0;
-    let isFirstRow = boardElCoord.y === 0;
-    let isLastColumn = boardElCoord.x === (this._gameObjects.gameMap.widthInElements - 1);
-    let isLastRow = boardElCoord.y === (this._gameObjects.gameMap.heightInElements - 1);
+    let isFirstColumn = gameMapElCoord.x === 0;
+    let isFirstRow = gameMapElCoord.y === 0;
+    let isLastColumn = gameMapElCoord.x === (this._gameObjects.gameMapState.widthInElements - 1);
+    let isLastRow = gameMapElCoord.y === (this._gameObjects.gameMapState.heightInElements - 1);
     let withLessThanNarrowing = segmentParams.width <= snakeNarrowing;
     let heigthLessThanNarrowing = segmentParams.height <= snakeNarrowing;
 
-    // Invisible part is the part of the snake drawn outside the board
+    // Invisible part is the part of the snake drawn outside the game map
     let isOnlyDrawInvisiblePartBehindTopWall = 
     (direction === 'down' && isFirstRow && heigthLessThanNarrowing);
     let isOnlyDrawInvisiblePartBehindRightWall = 
@@ -441,9 +441,9 @@ export class GameService {
     let isOnlyDrawInvisiblePartBehindLeftWall = 
       (direction === 'right' && isFirstColumn && withLessThanNarrowing);
    
-    // Changes the drawing position to a gap in front of the wall when drawing an invisible part outside the board.
+    // Changes the drawing position to a gap in front of the wall when drawing an invisible part outside the game map.
     if(isOnlyDrawInvisiblePartBehindTopWall) {
-      segmentParams.y = this._gameObjects.gameMap.heightInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.y = this._gameObjects.gameMapState.heightInElements * gameMapElementLenInPixels - snakeNarrowing;
     }
     else if(isOnlyDrawInvisiblePartBehindRightWall) {
       segmentParams.x = snakeNarrowing - segmentParams.width
@@ -452,7 +452,7 @@ export class GameService {
       segmentParams.y = snakeNarrowing -  segmentParams.height;
     }
     else if(isOnlyDrawInvisiblePartBehindLeftWall) {
-      segmentParams.x = this._gameObjects.gameMap.widthInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.x = this._gameObjects.gameMapState.widthInElements * gameMapElementLenInPixels - snakeNarrowing;
     }
 
     this._canvasDrawers.snake.drawRect(color, segmentParams.x, segmentParams.y, segmentParams.width,  segmentParams.height); 
@@ -471,10 +471,10 @@ export class GameService {
       (direction === 'right' && isFirstColumn && !withLessThanNarrowing);
 
     if(isAlsoDrawInvisiblePartBehindLeftWall) {
-      segmentParams.x = this._gameObjects.gameMap.widthInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.x = this._gameObjects.gameMapState.widthInElements * gameMapElementLenInPixels - snakeNarrowing;
       segmentParams.width = snakeNarrowing;
     } else if(isAlsoDrawInvisiblePartBehindTopWall) { 
-      segmentParams.y = this._gameObjects.gameMap.heightInElements * boardElementLenInPixels - snakeNarrowing;
+      segmentParams.y = this._gameObjects.gameMapState.heightInElements * gameMapElementLenInPixels - snakeNarrowing;
       segmentParams.height = snakeNarrowing;
     } else if(isAlsoDrawInvisiblePartBehindRightWall) { 
       segmentParams.x = 0;
@@ -488,21 +488,21 @@ export class GameService {
   }
   
   clearSnakeOldSegment(
-    boardElCoord: CoordinateModel, 
+    gameMapElCoord: Coordinate, 
     direction: string, 
     shiftFactor: number) { 
-    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
-    let snakeNarrowing = this._gameObjects.gameMap.getSnakeNarrowing();
+    let gameMapElementSizeInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
+    let snakeNarrowing = this._gameObjects.gameMapState.getSnakeNarrowing();
 
     //element with drawCoord
     let segmentParams = {
-      x: boardElCoord.x * boardElementSizeInPixels,
-      y: boardElCoord.y * boardElementSizeInPixels,
-      width: boardElementSizeInPixels,
-      height: boardElementSizeInPixels
+      x: gameMapElCoord.x * gameMapElementSizeInPixels,
+      y: gameMapElCoord.y * gameMapElementSizeInPixels,
+      width: gameMapElementSizeInPixels,
+      height: gameMapElementSizeInPixels
     }
 
-    let segmentPart = boardElementSizeInPixels - shiftFactor * boardElementSizeInPixels;
+    let segmentPart = gameMapElementSizeInPixels - shiftFactor * gameMapElementSizeInPixels;
 
     // positioning and calculation of parts of the cleared segment
     if(direction === 'up') {
@@ -525,13 +525,13 @@ export class GameService {
 
     this._canvasDrawers.snake.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
     
-    let isFirstColumn = boardElCoord.x === 0;
-    let isFirstRow = boardElCoord.y === 0;
-    let isLastColumn = boardElCoord.x === (this._gameObjects.gameMap.widthInElements - 1);
-    let isLastRow = boardElCoord.y === (this._gameObjects.gameMap.heightInElements - 1);
-    let uncleanWidth =  boardElementSizeInPixels - segmentParams.width;
+    let isFirstColumn = gameMapElCoord.x === 0;
+    let isFirstRow = gameMapElCoord.y === 0;
+    let isLastColumn = gameMapElCoord.x === (this._gameObjects.gameMapState.widthInElements - 1);
+    let isLastRow = gameMapElCoord.y === (this._gameObjects.gameMapState.heightInElements - 1);
+    let uncleanWidth =  gameMapElementSizeInPixels - segmentParams.width;
     let isUncleanWithLessThanNarrowing = uncleanWidth <= snakeNarrowing;
-    let uncleanHeight =  boardElementSizeInPixels - segmentParams.height;
+    let uncleanHeight =  gameMapElementSizeInPixels - segmentParams.height;
     let isUncleanHeightLessThanNarrowing = uncleanHeight <= snakeNarrowing;
 
     // Additional cleaning when the snake passes through the wall
@@ -539,23 +539,23 @@ export class GameService {
       segmentParams.x = - snakeNarrowing * 2;
       segmentParams.width = snakeNarrowing - uncleanWidth;
     } else if( direction === 'left'  && isFirstColumn && isUncleanWithLessThanNarrowing) {
-      segmentParams.x = boardElementSizeInPixels * this._gameObjects.gameMap.widthInElements - (snakeNarrowing - uncleanWidth);
+      segmentParams.x = gameMapElementSizeInPixels * this._gameObjects.gameMapState.widthInElements - (snakeNarrowing - uncleanWidth);
       segmentParams.width = snakeNarrowing - uncleanWidth;
     } else if(direction === 'down' && isLastRow && isUncleanHeightLessThanNarrowing) {
       segmentParams.y = -snakeNarrowing*2;
       segmentParams.height = snakeNarrowing - uncleanHeight;
     } else if(direction === 'up' && isFirstRow && isUncleanHeightLessThanNarrowing) {
-      segmentParams.y = boardElementSizeInPixels * this._gameObjects.gameMap.heightInElements - (snakeNarrowing - uncleanHeight);
+      segmentParams.y = gameMapElementSizeInPixels * this._gameObjects.gameMapState.heightInElements - (snakeNarrowing - uncleanHeight);
       segmentParams.height = snakeNarrowing - uncleanHeight;
     }
 
     this._canvasDrawers.snake.clearRect(segmentParams.x, segmentParams.y, segmentParams.width, segmentParams.height);
   }
 
-  isFood(newSnakeSegment: CoordinateModel, lastSnakeSegment: CoordinateModel) {
-    let boardElement = this._gameObjects.gameMap.getElement(newSnakeSegment.y, newSnakeSegment.x);
+  isFood(newSnakeSegment: Coordinate, lastSnakeSegment: Coordinate) {
+    let gameMapElement = this._gameObjects.gameMapState.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
-    if(boardElement !== 'food') return;
+    if(gameMapElement !== 'food') return;
         
     const eatenFood = this._gameObjects.normalFoods.find(food => {
       let foodCoordinate = food.coordinate;
@@ -565,7 +565,7 @@ export class GameService {
     if(eatenFood === undefined) return;
     
     this._gameObjects.snake.eat(lastSnakeSegment, eatenFood.elongationNumber);
-    let newfoodCoord = this._gameObjects.gameMap.setItemInRandElement('food')[0];
+    let newfoodCoord = this._gameObjects.gameMapState.setItemInRandElement('food')[0];
     eatenFood.coordinate = newfoodCoord;
     this.drawFoods();
     this._gameMetrics.currentScore += eatenFood.value;
@@ -575,10 +575,10 @@ export class GameService {
     this.manageSpecialFood();
   }
     
-  isSpecialFood(newSnakeSegment: CoordinateModel) {
-    let boardElement = this._gameObjects.gameMap.getElement(newSnakeSegment.y, newSnakeSegment.x);
+  isSpecialFood(newSnakeSegment: Coordinate) {
+    let gameMapElement = this._gameObjects.gameMapState.getElement(newSnakeSegment.y, newSnakeSegment.x);
         
-    if(boardElement !== 'specialFood' || this._gameObjects.specialFood === null) return;
+    if(gameMapElement !== 'specialFood' || this._gameObjects.specialFood === null) return;
         
     let specialFoodCoord = this._gameObjects.specialFood.coordinate;
     if(!this.isEqualCoordinates(specialFoodCoord, newSnakeSegment)) return;
@@ -596,7 +596,7 @@ export class GameService {
     
     if(this._gameObjects.specialFood !== null) {
       let specialFoodCoord = this._gameObjects.specialFood.coordinate;
-      this._gameObjects.gameMap.setElement(specialFoodCoord.x, specialFoodCoord.y, '');
+      this._gameObjects.gameMapState.setElement(specialFoodCoord.x, specialFoodCoord.y, '');
       this._gameObjects.specialFood = null;
       return;
     }
@@ -610,7 +610,7 @@ export class GameService {
       specialFoodType = FoodType.Unknown;
     }
       
-    let specialFoodCoord = this._gameObjects.gameMap.setItemInRandElement('specialFood')[0];
+    let specialFoodCoord = this._gameObjects.gameMapState.setItemInRandElement('specialFood')[0];
     this._gameObjects.specialFood = new Food(specialFoodCoord, specialFoodType);
     
     this.drawFoods();
@@ -621,41 +621,41 @@ export class GameService {
     this._canvasDrawers.snake.clearCanvas();
     this._canvasDrawers.food.clearCanvas();
     this._canvasDrawers.text.clearCanvas();
-    this.drawBoard();
+    this.drawGameMap();
     this.drawSnake(this._gameObjects.snake.liveSnakeColor);
     this.drawFoods();
     this.drawObstacles();
 
     if(this._gameState === 'not started') {
-      this.drawTextInBoardCenter('Press \'s\' to start the game!', 1.2);
+      this.drawTextInGameMapCenter('Press \'s\' to start the game!', 1.2);
     }
      
     if(this._gameState === 'ended') {
-      this.drawTextInBoardCenter('You lost!', 3);
+      this.drawTextInGameMapCenter('You lost!', 3);
     }
   }
 
-  drawBoard() {
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+  drawGameMap() {
+    let gameMapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     let isfirstColor = true;
-    for(let rowNumber = 0; rowNumber < this._gameObjects.gameMap.widthInElements; rowNumber++) {
-      if(this._gameObjects.gameMap.heightInElements % 2 === 0) {
+    for(let rowNumber = 0; rowNumber < this._gameObjects.gameMapState.widthInElements; rowNumber++) {
+      if(this._gameObjects.gameMapState.heightInElements % 2 === 0) {
         isfirstColor = !isfirstColor;
       }
-      for(let columnNumber = 0; columnNumber < this._gameObjects.gameMap.heightInElements; columnNumber++) {
-        let color = isfirstColor ? this._gameObjects.gameMap.firstBgColor : this._gameObjects.gameMap.secondBgColor;
+      for(let columnNumber = 0; columnNumber < this._gameObjects.gameMapState.heightInElements; columnNumber++) {
+        let color = isfirstColor ? this.gameMap.backgroundFirstColor : this.gameMap.backgroundSecondColor;
               
         this._canvasDrawers.static.drawRect(
           color,
-          rowNumber * boardElementLenInPixels,
-          columnNumber * boardElementLenInPixels,
-          boardElementLenInPixels);
+          rowNumber * gameMapElementLenInPixels,
+          columnNumber * gameMapElementLenInPixels,
+          gameMapElementLenInPixels);
 
         this._canvasDrawers.static.drawRectBorder(
           "black",
-          rowNumber * boardElementLenInPixels,
-          columnNumber * boardElementLenInPixels, 
-          boardElementLenInPixels);
+          rowNumber * gameMapElementLenInPixels,
+          columnNumber * gameMapElementLenInPixels, 
+          gameMapElementLenInPixels);
           isfirstColor = !isfirstColor;
       }
     }
@@ -676,19 +676,19 @@ export class GameService {
     }
   }
     
-  drawFood(foodCoord: CoordinateModel, color: string, sign: string) {
+  drawFood(foodCoord: Coordinate, color: string, sign: string) {
     console.log('f');
-    let boardElementSizeInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let mapElementSizeInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     
-    let centerX = foodCoord.x * boardElementSizeInPixels + boardElementSizeInPixels / 2;
-    let centerY = foodCoord.y * boardElementSizeInPixels + boardElementSizeInPixels / 2;
-    let radius =  boardElementSizeInPixels / 2 - 2.5;
+    let centerX = foodCoord.x * mapElementSizeInPixels + mapElementSizeInPixels / 2;
+    let centerY = foodCoord.y * mapElementSizeInPixels + mapElementSizeInPixels / 2;
+    let radius =  mapElementSizeInPixels / 2 - 2.5;
        
     this._canvasDrawers.food.drawCircle(centerX, centerY, radius, color);
 
-    const fontSize = boardElementSizeInPixels * 0.6;
+    const fontSize = mapElementSizeInPixels * 0.6;
     const fontFamily = "Kristen ITC";
-    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this._gameObjects.gameMap.firstBgColor :  this._gameObjects.gameMap.secondBgColor;
+    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this.gameMap.backgroundFirstColor : this.gameMap.backgroundSecondColor;
         
     this._canvasDrawers.food.drawSign(
       sign, fontSize, fontFamily,
@@ -697,79 +697,79 @@ export class GameService {
   }
 
   drawObstacles() {
-    let boardElementSizeinPixels = this._gameObjects.gameMap.elementSizeInPixels;
+    let mapElementSizeinPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     for(let obstacle of this._gameObjects.obstaclesCoords) {
       this._canvasDrawers.static.drawRect(
         "black",
-        obstacle.x * boardElementSizeinPixels,
-        obstacle.y * boardElementSizeinPixels,
-        boardElementSizeinPixels);
+        obstacle.x * mapElementSizeinPixels,
+        obstacle.y * mapElementSizeinPixels,
+        mapElementSizeinPixels);
     }
   }
 
-  drawTextInBoardCenter(text: string, fontSize: number) {
-    let boardElementLenInPixels = this._gameObjects.gameMap.elementSizeInPixels;
+  drawTextInGameMapCenter(text: string, fontSize: number) {
+    let mapElementLenInPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     
-    this._canvasDrawers.text.drawTextInBoardCenter(
+    this._canvasDrawers.text.drawTextInGameMapCenter(
       text, 
-      boardElementLenInPixels * fontSize,
+      mapElementLenInPixels * fontSize,
       "Arial",
       "rgb(188, 192, 213)");
   }
 
   changeScreenSize() {
-    let boardWidthInElements = this._gameObjects.gameMap.widthInElements;
-    let boardHeightInElements = this._gameObjects.gameMap.heightInElements;
+    let mapWidthInElements = this._gameObjects.gameMapState.widthInElements;
+    let mapHeightInElements = this._gameObjects.gameMapState.heightInElements;
    
-    const boardAspectRatio = boardWidthInElements / boardHeightInElements;
+    const gameMapAspectRatio = mapWidthInElements / mapHeightInElements;
 
     const multiplier = (window.innerHeight < 650) ? 0.75 : 0.80;
     let awailableWidthInPixels = Math.floor((window.innerWidth < 450) ? 450 * multiplier : window.innerWidth * multiplier);
     let awailableHeightInPixels = Math.floor((window.innerHeight < 450) ? 450 * multiplier : window.innerHeight * multiplier);
-    let boardWidthInPixels;
-    let boardHeightInPixels;
+    let gameMapWidthInPixels;
+    let gameMapHeightInPixels;
 
-    while(awailableWidthInPixels % boardWidthInElements !== 0) {
+    while(awailableWidthInPixels % mapWidthInElements !== 0) {
       awailableWidthInPixels--;
     }
-    while(awailableHeightInPixels % boardHeightInElements !== 0) {
+    while(awailableHeightInPixels % mapHeightInElements !== 0) {
       awailableHeightInPixels--;
     }
   
-    if (awailableWidthInPixels / boardAspectRatio > awailableHeightInPixels) {
+    if (awailableWidthInPixels / gameMapAspectRatio > awailableHeightInPixels) {
       
-      boardHeightInPixels = awailableHeightInPixels;
-      this._gameObjects.gameMap.elementSizeInPixels = (boardHeightInPixels / boardHeightInElements);
-      boardWidthInPixels = this._gameObjects.gameMap.elementSizeInPixels * boardWidthInElements;
+      gameMapHeightInPixels = awailableHeightInPixels;
+      this._gameObjects.gameMapState.elementSizeInPixels = (gameMapHeightInPixels / mapHeightInElements);
+      gameMapWidthInPixels = this._gameObjects.gameMapState.elementSizeInPixels * mapWidthInElements;
     } else {
-      boardWidthInPixels = awailableWidthInPixels;
-      this._gameObjects.gameMap.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
-      boardHeightInPixels =  this._gameObjects.gameMap.elementSizeInPixels * boardHeightInElements;
+      gameMapWidthInPixels = awailableWidthInPixels;
+      this._gameObjects.gameMapState.elementSizeInPixels = (gameMapWidthInPixels / mapWidthInElements);
+      gameMapHeightInPixels =  this._gameObjects.gameMapState.elementSizeInPixels * mapHeightInElements;
     }
   
-    this._gameObjects.gameMap.widthInPixels = boardWidthInPixels;
-    this.gameMapWidthInPixelsSubject.next(this._gameObjects.gameMap.widthInPixels);
-    this._gameObjects.gameMap.heightInPixels = boardHeightInPixels;
-    //this._gameObjects.gameMap.elementSizeInPixels = (boardWidthInPixels / boardWidthInElements);
+    this._gameObjects.gameMapState.widthInPixels = gameMapWidthInPixels;
+    this.gameMapWidthInPixelsSubject.next(this._gameObjects.gameMapState.widthInPixels);
+    this._gameObjects.gameMapState.heightInPixels = gameMapHeightInPixels;
+    //this._gameObjects.gameMapState.elementSizeInPixels = (gameMapWidthInPixels / gameMapWidthInElements);
 
     this.changeCanvasSize();
 
-    if(!this.candrawBoards) return;
-    this.candrawBoards = false;
+    if(!this.candrawGameMap) return;
+    this.candrawGameMap = false;
     setTimeout(() => {
       this.drawAllElements();
-      this.candrawBoards = true;
+      this.candrawGameMap = true;
     }, this._animationMetrics.frameInterval);
   }
 
   changeCanvasSize() {
-    this._canvasDrawers.static.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
-    this._canvasDrawers.snake.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
-    this._canvasDrawers.food.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
-    this._canvasDrawers.text.changeCanvasSize(this._gameObjects.gameMap.widthInPixels, this._gameObjects.gameMap.heightInPixels);
+    this._canvasDrawers.static.changeCanvasSize(this._gameObjects.gameMapState.widthInPixels, this._gameObjects.gameMapState.heightInPixels);
+    this._canvasDrawers.snake.changeCanvasSize(this._gameObjects.gameMapState.widthInPixels, this._gameObjects.gameMapState.heightInPixels);
+    this._canvasDrawers.food.changeCanvasSize(this._gameObjects.gameMapState.widthInPixels, this._gameObjects.gameMapState.heightInPixels);
+    this._canvasDrawers.text.changeCanvasSize(this._gameObjects.gameMapState.widthInPixels, this._gameObjects.gameMapState.heightInPixels);
   }
 
-  isEqualCoordinates(firstCoordinate: CoordinateModel, secondCoordinate: CoordinateModel) {
+  isEqualCoordinates(firstCoordinate: Coordinate, secondCoordinate: Coordinate) {
     if(firstCoordinate.x === secondCoordinate.x && firstCoordinate.y === secondCoordinate.y) {
       return true;
     }

@@ -1,16 +1,22 @@
+export enum GameMapType {
+    Official = 'official',
+    Unofficial = 'unofficial',
+    Local = 'local',
+}
+
 export interface GameMap {
     id?: string;
     authorId?: string;
     authorUsername?: string;
     name: string;
-    boardWidthInElements: number;
-    boardHeightInElements: number;
-    boardFirstColor: string;
-    boardSecondColor: string;
+    widthInElements: number;
+    heightInElements: number;
+    backgroundFirstColor: string;
+    backgroundSecondColor: string;
     obstacleColor: string;
     obstacles: string;
     snakeInitDirection: string;
     snakeInitCoords: string;
     snakeColor: string;
-    initTimeToPassOneElementInSeconds: number;
+    secondsPerElement: number; //snake speed
 }

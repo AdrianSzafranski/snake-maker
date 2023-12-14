@@ -16,7 +16,7 @@ export class GameMapComponent implements OnInit {
 
   gameMapCanvas!: HTMLCanvasElement
   gameMapContext!: CanvasRenderingContext2D;
-  boardElementSizeInPixels!: number;
+  gameMapElementSizeInPixels!: number;
 
   constructor(private renderer: Renderer2) {}
 
@@ -27,7 +27,7 @@ export class GameMapComponent implements OnInit {
   drawMap() {
 
     this.initGameMapCanvas();
-    this.drawBoard();
+    this.drawGameMapBackground();
     this.drawObstacles();
     this.changeCanvasToImg();
   }
@@ -36,8 +36,8 @@ export class GameMapComponent implements OnInit {
     this.gameMapCanvas = this.renderer.createElement('canvas');
 
     this.renderer.setAttribute(this.gameMapCanvas, 'width', '1000');
-    this.boardElementSizeInPixels = this.gameMapCanvas.width / this.gameMap.boardWidthInElements;
-    const gameMapHeight = this.boardElementSizeInPixels * this.gameMap.boardHeightInElements;
+    this.gameMapElementSizeInPixels = this.gameMapCanvas.width / this.gameMap.widthInElements;
+    const gameMapHeight = this.gameMapElementSizeInPixels * this.gameMap.heightInElements;
     this.renderer.setAttribute(this.gameMapCanvas, 'height', gameMapHeight.toString());
 
     let canvasContext = this.gameMapCanvas.getContext('2d');
@@ -47,20 +47,20 @@ export class GameMapComponent implements OnInit {
     this.gameMapContext = canvasContext;
   }
 
-  drawBoard() {
+  drawGameMapBackground() {
     let isfirstColor = true;
-    for(let x = 0; x < this.gameMap.boardWidthInElements; x++) {
-      if(this.gameMap.boardHeightInElements % 2 === 0) {
+    for(let x = 0; x < this.gameMap.widthInElements; x++) {
+      if(this.gameMap.heightInElements % 2 === 0) {
         isfirstColor = !isfirstColor;
       }
-      for(let y = 0; y < this.gameMap.boardHeightInElements; y++) {
-        let color = isfirstColor ? this.gameMap.boardFirstColor : this.gameMap.boardSecondColor;
+      for(let y = 0; y < this.gameMap.heightInElements; y++) {
+        let color = isfirstColor ? this.gameMap.backgroundFirstColor : this.gameMap.backgroundSecondColor;
         isfirstColor = !isfirstColor;
         this.drawRect(
           color,
-          x * this.boardElementSizeInPixels,
-          y *this.boardElementSizeInPixels,
-          this.boardElementSizeInPixels);
+          x * this.gameMapElementSizeInPixels,
+          y *this.gameMapElementSizeInPixels,
+          this.gameMapElementSizeInPixels);
       }
     }
   }
@@ -69,8 +69,8 @@ export class GameMapComponent implements OnInit {
     let obstaclesJsonArray:{x: number, y: number, width: number, height: number}[] 
       = JSON.parse(this.gameMap.obstacles);
     obstaclesJsonArray.forEach(obstacle => {
-      this.drawRect(this.gameMap.obstacleColor, obstacle.x * this.boardElementSizeInPixels, obstacle.y * this.boardElementSizeInPixels, obstacle.width * this.boardElementSizeInPixels, this.boardElementSizeInPixels);
-      this.drawRect(this.gameMap.obstacleColor, obstacle.x * this.boardElementSizeInPixels, obstacle.y * this.boardElementSizeInPixels, this.boardElementSizeInPixels, obstacle.height * this.boardElementSizeInPixels);
+      this.drawRect(this.gameMap.obstacleColor, obstacle.x * this.gameMapElementSizeInPixels, obstacle.y * this.gameMapElementSizeInPixels, obstacle.width * this.gameMapElementSizeInPixels, this.gameMapElementSizeInPixels);
+      this.drawRect(this.gameMap.obstacleColor, obstacle.x * this.gameMapElementSizeInPixels, obstacle.y * this.gameMapElementSizeInPixels, this.gameMapElementSizeInPixels, obstacle.height * this.gameMapElementSizeInPixels);
     });
   }
 

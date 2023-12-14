@@ -1,4 +1,4 @@
-import { CoordinateModel } from "./coordinate.model";
+import { Coordinate } from "./coordinate.model";
 
 export enum FoodType {
     Regular = 'regular',
@@ -30,7 +30,7 @@ export class Food {
         [FoodType.Unknown]: { speedModifier: 0, elongationNumber: 0, value: drawFoodValue(), sign: '?', color: 'rgb(245, 108, 238)' },
     };
 
-    constructor(private _coordinate: CoordinateModel, readonly type: FoodType) {
+    constructor(private _coordinate: Coordinate, readonly type: FoodType) {
         const config = Food.Configurations[this.type] || Food.Configurations[FoodType.Regular];
         Object.assign(this, config);
     }
@@ -39,7 +39,7 @@ export class Food {
         return { ...this._coordinate };
     }
 
-    set coordinate(newCoordinate: CoordinateModel) {
+    set coordinate(newCoordinate: Coordinate) {
         this._coordinate = { ...newCoordinate };
     }
 

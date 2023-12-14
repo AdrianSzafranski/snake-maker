@@ -1,7 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { UserProfileService } from '../user-profile.service';
-import { Coordinate } from 'src/app/shared/coordinate-model';
-import { GameMap } from 'src/app/snake-game/game-maps/game-map.model';
+import { GameMap} from 'src/app/snake-game/game-maps/game-map.model';
 
 @Component({
   selector: 'app-game-map-add',
@@ -91,14 +90,14 @@ export class GameMapAddComponent implements OnInit {
       return;
     }
     this.mapName = this.editMap.name;
-    this.mapWidthInElements = this.editMap.boardWidthInElements;
-    this.mapHeightInElements = this.editMap.boardHeightInElements;
-    this.mapBackgroundColors.firstColor = this.editMap.boardFirstColor;
-    this.mapBackgroundColors.secondColor = this.editMap.boardSecondColor;
+    this.mapWidthInElements = this.editMap.widthInElements;
+    this.mapHeightInElements = this.editMap.heightInElements;
+    this.mapBackgroundColors.firstColor = this.editMap.backgroundFirstColor;
+    this.mapBackgroundColors.secondColor = this.editMap.backgroundSecondColor;
     this.snakeColor = this.editMap.snakeColor,
       this.obstacleColor = this.editMap.obstacleColor,
       this.snakeDirection = this.editMap.snakeInitDirection
-    this.snakeSpeed = this.editMap.initTimeToPassOneElementInSeconds / 0.3;
+    this.snakeSpeed = this.editMap.secondsPerElement / 0.3;
 
     this.createMapArray();
     this.createObstacleArray();
@@ -471,16 +470,16 @@ export class GameMapAddComponent implements OnInit {
 
     const map = {
       name: this.mapName,
-      boardWidthInElements: this.mapWidthInElements,
-      boardHeightInElements: this.mapHeightInElements,
-      boardFirstColor: this.mapBackgroundColors.firstColor,
-      boardSecondColor: this.mapBackgroundColors.secondColor,
+      widthInElements: this.mapWidthInElements,
+      heightInElements: this.mapHeightInElements,
+      backgroundFirstColor: this.mapBackgroundColors.firstColor,
+      backgroundSecondColor: this.mapBackgroundColors.secondColor,
       obstacleColor: this.obstacleColor,
       obstacles: obstaclesString,
       snakeInitDirection: this.snakeDirection,
       snakeInitCoords: snakeCoordsString,
       snakeColor: this.snakeColor,
-      initTimeToPassOneElementInSeconds: this.snakeSpeed * 0.3
+      secondsPerElement: this.snakeSpeed * 0.3
     }
 
     if (this.editMap) {

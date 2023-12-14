@@ -2,6 +2,7 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
 import { GameService } from './game.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { GameMapType } from '../game-maps/game-map.model';
 
 @Component({
   selector: 'app-game',
@@ -29,7 +30,7 @@ export class GameComponent implements OnInit, OnDestroy {
     const gameMapType = this.route.snapshot.params['mapType'];
     const gameMapId = this.route.snapshot.params['mapId'];
     this.gameService.loadGameData(
-      gameMapType, 
+      gameMapType as GameMapType, 
       gameMapId,
       this.staticCanvasRef.nativeElement,
       this.snakeCanvasRef.nativeElement,

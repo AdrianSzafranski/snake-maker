@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { CanvasDrawer } from '../snake-game/game/canvas-drawer';
-import { CoordinateModel } from '../snake-game/game/coordinate.model';
+import { Coordinate } from '../snake-game/game/coordinate.model';
 
 @Component({
   selector: 'app-guide',
@@ -16,13 +16,13 @@ export class GuideComponent implements OnInit{
   @ViewChild('fortuneFoodCanvas', {static: true}) fortuneFoodCanvasRef!: ElementRef;
   @ViewChild('curseFoodCanvas', {static: true}) curseFoodCanvasRef!: ElementRef;
   @ViewChild('unknownFoodCanvas', {static: true}) unknownFoodCanvasRef!: ElementRef;
-  mapCanvasDrawer!: CanvasDrawer;
+  gameMapDrawer!: CanvasDrawer;
 
-  boardWidthInElements = 9;
-  boardHeightInElements = 6;
-  boardElementSizeInPixels !: number;
-  boardFirstColor = "#212c6d";
-  boardSecondColor = "#111738";
+  mapWidthInElements = 9;
+  mapHeightInElements = 6;
+  mapElementSizeInPixels !: number;
+  backgroundFirstColor = "#212c6d";
+  backgroundSecondColor = "#111738";
   obstacleColor = "#000000";
   snakeInitCoord = {x: 5, y: 1};
   obstacles = [
@@ -40,7 +40,6 @@ export class GuideComponent implements OnInit{
   constructor(private renderer: Renderer2) {}
   
   ngOnInit(): void {
-     
       this.initSampleGameMapCanvas();
       this.drawSampleGameMap();
       this.changeCanvasToImg();
@@ -63,40 +62,40 @@ export class GuideComponent implements OnInit{
     const sampleGameMapCanvas = this.renderer.createElement('canvas');
 
     this.renderer.setAttribute(sampleGameMapCanvas, 'width', '1000');
-    this.boardElementSizeInPixels = sampleGameMapCanvas.width / this.boardWidthInElements;
-    const gameMapHeight = this.boardElementSizeInPixels * this.boardHeightInElements;
+    this.mapElementSizeInPixels = sampleGameMapCanvas.width / this.mapWidthInElements;
+    const gameMapHeight = this.mapElementSizeInPixels * this.mapHeightInElements;
     this.renderer.setAttribute(sampleGameMapCanvas, 'height', gameMapHeight.toString());
 
-    this.mapCanvasDrawer = new CanvasDrawer(sampleGameMapCanvas);
+    this.gameMapDrawer = new CanvasDrawer(sampleGameMapCanvas);
   }
 
   drawSampleGameMap() {
-    this.drawBoard();
+    this.drawmap();
     this.drawObstacles();
     this.drawSnake();
     this.drawFoods();
   }
 
-  drawBoard() {
+  drawmap() {
     let isfirstColor = true;
-    for(let rowNumber = 0; rowNumber < this.boardWidthInElements; rowNumber++) {
-      if(this.boardHeightInElements % 2 === 0) {
+    for(let rowNumber = 0; rowNumber < this.mapWidthInElements; rowNumber++) {
+      if(this.mapHeightInElements % 2 === 0) {
         isfirstColor = !isfirstColor;
       }
-      for(let columnNumber = 0; columnNumber < this.boardHeightInElements; columnNumber++) {
-        let color = isfirstColor ? this.boardFirstColor : this.boardSecondColor;
+      for(let columnNumber = 0; columnNumber < this.mapHeightInElements; columnNumber++) {
+        let color = isfirstColor ? this.backgroundFirstColor : this.backgroundSecondColor;
               
-        this.mapCanvasDrawer.drawRect(
+        this.gameMapDrawer.drawRect(
           color,
-          rowNumber * this.boardElementSizeInPixels,
-          columnNumber * this.boardElementSizeInPixels,
-          this.boardElementSizeInPixels);
+          rowNumber * this.mapElementSizeInPixels,
+          columnNumber * this.mapElementSizeInPixels,
+          this.mapElementSizeInPixels);
 
-        this.mapCanvasDrawer.drawRectBorder(
+        this.gameMapDrawer.drawRectBorder(
           this.obstacleColor,
-          rowNumber * this.boardElementSizeInPixels,
-          columnNumber * this.boardElementSizeInPixels, 
-          this.boardElementSizeInPixels);
+          rowNumber * this.mapElementSizeInPixels,
+          columnNumber * this.mapElementSizeInPixels, 
+          this.mapElementSizeInPixels);
           isfirstColor = !isfirstColor;
       }
     }
@@ -104,20 +103,20 @@ export class GuideComponent implements OnInit{
 
   drawObstacles() {
     this.obstacles.forEach(obstacle => {
-      this.mapCanvasDrawer.drawRect(this.obstacleColor, obstacle.x * this.boardElementSizeInPixels, obstacle.y * this.boardElementSizeInPixels, obstacle.width * this.boardElementSizeInPixels, this.boardElementSizeInPixels);
-      this.mapCanvasDrawer.drawRect(this.obstacleColor, obstacle.x * this.boardElementSizeInPixels, obstacle.y * this.boardElementSizeInPixels, this.boardElementSizeInPixels, obstacle.height * this.boardElementSizeInPixels);
+      this.gameMapDrawer.drawRect(this.obstacleColor, obstacle.x * this.mapElementSizeInPixels, obstacle.y * this.mapElementSizeInPixels, obstacle.width * this.mapElementSizeInPixels, this.mapElementSizeInPixels);
+      this.gameMapDrawer.drawRect(this.obstacleColor, obstacle.x * this.mapElementSizeInPixels, obstacle.y * this.mapElementSizeInPixels, this.mapElementSizeInPixels, obstacle.height * this.mapElementSizeInPixels);
     });
   }
 
   drawSnake() {
-    let snakeNarrowing = this.boardElementSizeInPixels * 0.15;
+    let snakeNarrowing = this.mapElementSizeInPixels * 0.15;
 
-    this.mapCanvasDrawer.drawRect(
+    this.gameMapDrawer.drawRect(
       'rgb(131, 245, 108)', 
-      this.snakeInitCoord.x * this.boardElementSizeInPixels + snakeNarrowing, 
-      this.snakeInitCoord.y * this.boardElementSizeInPixels + snakeNarrowing, 
-      this.boardElementSizeInPixels - 2*snakeNarrowing,
-      2 * this.boardElementSizeInPixels - 2*snakeNarrowing);
+      this.snakeInitCoord.x * this.mapElementSizeInPixels + snakeNarrowing, 
+      this.snakeInitCoord.y * this.mapElementSizeInPixels + snakeNarrowing, 
+      this.mapElementSizeInPixels - 2*snakeNarrowing,
+      2 * this.mapElementSizeInPixels - 2*snakeNarrowing);
   }
 
   drawFoods() {
@@ -128,20 +127,20 @@ export class GuideComponent implements OnInit{
       
   }
 
-  drawFood(foodCoord: CoordinateModel, color: string, sign: string) {
-    let boardElementSizeInPixels = this.boardElementSizeInPixels;
+  drawFood(foodCoord: Coordinate, color: string, sign: string) {
+    let mapElementSizeInPixels = this.mapElementSizeInPixels;
     
-    let centerX = foodCoord.x * boardElementSizeInPixels + boardElementSizeInPixels / 2;
-    let centerY = foodCoord.y * boardElementSizeInPixels + boardElementSizeInPixels / 2;
-    let radius =  boardElementSizeInPixels / 2 - 2.5;
+    let centerX = foodCoord.x * mapElementSizeInPixels + mapElementSizeInPixels / 2;
+    let centerY = foodCoord.y * mapElementSizeInPixels + mapElementSizeInPixels / 2;
+    let radius =  mapElementSizeInPixels / 2 - 2.5;
        
-    this.mapCanvasDrawer.drawCircle(centerX, centerY, radius, color);
+    this.gameMapDrawer.drawCircle(centerX, centerY, radius, color);
 
-    const fontSize = boardElementSizeInPixels * 0.6;
+    const fontSize = mapElementSizeInPixels * 0.6;
     const fontFamily = "Kristen ITC";
-    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this.boardFirstColor :  this.boardSecondColor;
+    const fontColor = (foodCoord.x + foodCoord.y) % 2 == 0 ? this.backgroundFirstColor :  this.backgroundSecondColor;
         
-    this.mapCanvasDrawer.drawSign(
+    this.gameMapDrawer.drawSign(
       sign, fontSize, fontFamily,
       fontColor, centerX, centerY,
     );
@@ -165,7 +164,7 @@ export class GuideComponent implements OnInit{
   }
 
   changeCanvasToImg() {
-    const sampleGameMapURL = this.mapCanvasDrawer.canvas.toDataURL();
+    const sampleGameMapURL = this.gameMapDrawer.canvas.toDataURL();
 
     const img = this.renderer.createElement('img');
     this.renderer.setAttribute(img, 'src', sampleGameMapURL);

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { exhaustMap, map, mergeMap, take, tap, throwError } from 'rxjs';
 
-import { GameMap } from './game-map.model';
+import { GameMap, GameMapType } from './game-map.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { UserScore } from '../user-score.model';
 import { environment } from 'src/environments/environment';
@@ -15,8 +15,8 @@ export class GameMapService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  fetchMaps() {
-    const httpUrl = environment.firebaseDbUrl + "gameMaps.json";
+  fetchOfficialGameMaps() {
+    const httpUrl = environment.firebaseDbUrl + GameMapType.Official + "GameMaps.json";
     return this.http.get<any>(httpUrl).pipe(
       map(gameMapsObject => {
         return Object.keys(gameMapsObject).map(key => ({ id: key, ...gameMapsObject[key] }));
@@ -24,27 +24,27 @@ export class GameMapService {
     );
   }
 
-  fetchUnofficialMaps() {
-    const httpUrl = environment.firebaseDbUrl + "unofficialMaps.json";
+  fetchUnofficialGameMaps() {
+    const httpUrlGameMaps = environment.firebaseDbUrl + GameMapType.Unofficial + "GameMaps.json";
     const httpUrlUsers = environment.firebaseDbUrl + `users/.json`;
 
-    let unofficialMaps: GameMap[]; 
+    let gameMaps: GameMap[]; 
 
-    return this.http.get<any>(httpUrl).pipe(
-      map(unofficialMapsObject => {
-        if(!unofficialMapsObject) {
+    return this.http.get<any>(httpUrlGameMaps).pipe(
+      map(gameMapsObject => {
+        if(!gameMapsObject) {
           return [];
         }
-        return Object.keys(unofficialMapsObject).map(key => ({ id: key, ...unofficialMapsObject[key] }));
+        return Object.keys(gameMapsObject).map(key => ({ id: key, ...gameMapsObject[key] }));
       }),
-      tap((localunofficialMaps: GameMap[]) => {
-        unofficialMaps = localunofficialMaps;
+      tap((localGameMaps: GameMap[]) => {
+        gameMaps = localGameMaps;
       }),
-      mergeMap((localUnofficialMaps) => {
+      mergeMap((localGameMaps) => {
         return this.http.get<any>(httpUrlUsers);
       }),
       map(users => {
-        return unofficialMaps.map(key => {
+        return gameMaps.map(key => {
           key.authorUsername = users[''+key.authorId].username;
           return key;
         })
@@ -52,8 +52,8 @@ export class GameMapService {
     );
   }
 
-  fetchMap(mapType: string, mapId: string) {
-    let httpUrl = environment.firebaseDbUrl + `${mapType}/${mapId}.json`;
+  fetchGameMap(gameMapType: GameMapType, gameMapId: string) {
+    let httpUrl = environment.firebaseDbUrl + `${gameMapType}GameMaps/${gameMapId}.json`;
     let userId: string | null = null;
 
     return this.authService.userAuth.pipe(
@@ -64,13 +64,13 @@ export class GameMapService {
               return throwError(() => new Error("Error"));
           }
           userId = userAuth.id;
-          if(mapType === 'usersMaps') {
-            httpUrl = environment.firebaseDbUrl + `usersMaps/${userAuth.id}/${mapId}.json`;
+          if(gameMapType === GameMapType.Local) {
+            httpUrl = environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/${userAuth.id}/${gameMapId}.json`;
           }
           return this.http.get<any>(httpUrl).pipe(
             map(gameMapObject => {
               return <GameMap>{
-                id: mapId,
+                id: gameMapId,
                 ...gameMapObject
               };
             })
@@ -86,42 +86,40 @@ export class GameMapService {
           map(userScore => {
             if(!userScore) {
               userScore = {
-                highestScore: 0,
+                bestScore: 0,
                 gamesNumber: 0,
               }
             }
             return {
               gameMap: gameMap,
-              userScore: { idMap: mapId, ...userScore }
+              userScore: { idMap: gameMapId, ...userScore }
           }})
         );
         
     }));
   }
 
- 
-
-  addMap() {
+  addGameMap() {
     const gameMaps = [
       {
         name: 'Open',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#182719",
-        boardSecondColor: "#324a33",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#182719",
+        backgroundSecondColor: "#324a33",
         obstacleColor: "#000000",
         obstacles: `[]`,
         snakeInitDirection: 'down',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 6}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.3
+        secondsPerElement: 0.3
       },
       {
         name: 'Close',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#464261",
-        boardSecondColor: "#181b27",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#464261",
+        backgroundSecondColor: "#181b27",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 24, "height": 15},
@@ -131,14 +129,14 @@ export class GameMapService {
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 5}, {"x": 6, "y": 5}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.5
+        secondsPerElement: 0.5
       },
       {
         name: 'Mines', 
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#614242",
-        boardSecondColor: "#27181d",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#614242",
+        backgroundSecondColor: "#27181d",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 1, "height": 0},
@@ -169,14 +167,14 @@ export class GameMapService {
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 7}, {"x": 6, "y": 7}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.5
+        secondsPerElement: 0.5
       },
       {
         name: 'Columns',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#785d2a",
-        boardSecondColor: "#372a13",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#785d2a",
+        backgroundSecondColor: "#372a13",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 24, "height": 6},
@@ -206,14 +204,14 @@ export class GameMapService {
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 19, "y": 8}, {"x": 20, "y": 8}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.5
+        secondsPerElement: 0.5
       },
       {
         name: 'Flappy Bird',
-        boardWidthInElements: 17,
-        boardHeightInElements: 10,
-        boardFirstColor: "#785d2a",
-        boardSecondColor: "#372a13",
+        widthInElements: 17,
+        heightInElements: 10,
+        backgroundFirstColor: "#785d2a",
+        backgroundSecondColor: "#372a13",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 4, "y": 0, "width": 0, "height": 3},
@@ -224,14 +222,14 @@ export class GameMapService {
         snakeInitDirection: 'left',
         snakeInitCoords:  `[{"x": 5, "y": 4}, {"x": 4, "y": 4}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 1.0
+        secondsPerElement: 1.0
       },
       {
         name: 'Barrier',
-        boardWidthInElements: 17,
-        boardHeightInElements: 10,
-        boardFirstColor: "#182719",
-        boardSecondColor: "#324a33",
+        widthInElements: 17,
+        heightInElements: 10,
+        backgroundFirstColor: "#182719",
+        backgroundSecondColor: "#324a33",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 8, "y": 0, "width": 0, "height": 10}
@@ -239,14 +237,14 @@ export class GameMapService {
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.7
+        secondsPerElement: 0.7
       },
       {
         name: 'Street',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#785d2a",
-        boardSecondColor: "#372a13",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#785d2a",
+        backgroundSecondColor: "#372a13",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 0, "height": 15},
@@ -255,14 +253,14 @@ export class GameMapService {
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 5}, {"x": 5, "y": 4}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.7
+        secondsPerElement: 0.7
       },
       {
         name: 'Pipe',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#182719",
-        boardSecondColor: "#324a33",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#182719",
+        backgroundSecondColor: "#324a33",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 25, "height": 0},
@@ -271,14 +269,14 @@ export class GameMapService {
         snakeInitDirection: 'up',
         snakeInitCoords: `[{"x": 5, "y": 8}, {"x": 5, "y": 7}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.7
+        secondsPerElement: 0.7
       },
       {
         name: 'Arena',
-        boardWidthInElements: 25,
-        boardHeightInElements: 15,
-        boardFirstColor: "#614242",
-        boardSecondColor: "#27181d",
+        widthInElements: 25,
+        heightInElements: 15,
+        backgroundFirstColor: "#614242",
+        backgroundSecondColor: "#27181d",
         obstacleColor: "#000000",
         obstacles: `[
           {"x": 0, "y": 0, "width": 24, "height": 6},
@@ -290,11 +288,11 @@ export class GameMapService {
         snakeInitDirection: 'right',
         snakeInitCoords:  `[{"x": 5, "y": 5}, {"x": 6, "y": 5}]`,
         snakeColor: "#83f56c",
-        initTimeToPassOneElementInSeconds: 0.5
+        secondsPerElement: 0.5
       },
       
     ];
-    const httpUrl = environment.firebaseDbUrl + "gameMaps.json";
+    const httpUrl = environment.firebaseDbUrl + "officialGameMaps.json";
     return this.http.post(httpUrl, gameMaps[8]);
  
   }

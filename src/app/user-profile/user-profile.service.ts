@@ -7,7 +7,7 @@ import { AuthService } from '../auth/auth.service';
 import { UserDetails } from './user-details.model';
 import { User } from '../auth/user.model';
 import { UserData } from './user-data.model';
-import { GameMap } from '../snake-game/game-maps/game-map.model';
+import { GameMap, GameMapType } from '../snake-game/game-maps/game-map.model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -68,7 +68,7 @@ export class UserProfileService {
                 return throwError(() => new Error("Error"));
             }
 
-            const httpUrl = environment.firebaseDbUrl + `usersMaps/${userAuth.id}.json`;
+            const httpUrl = environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/${userAuth.id}.json`;
             return this.http.get<any>(httpUrl).pipe(
               map(gameMapObject => {
                 if(!gameMapObject) {
@@ -123,7 +123,7 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         return this.http.post(
-          environment.firebaseDbUrl + "usersMaps/" + userAuth.id + ".json",
+          environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/` + userAuth.id + ".json",
           newMap
       )})
     );
@@ -144,11 +144,11 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         map.authorId = userAuth.id;
-        return this.http.delete(environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json"
+        return this.http.delete(environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/` + userAuth.id + "/" + mapId + ".json"
       )}),
       mergeMap((resData) => {
         return this.http.put(
-          environment.firebaseDbUrl + "unofficialMaps/" + mapId + ".json",
+          environment.firebaseDbUrl + "unofficialGameMaps/" + mapId + ".json",
           map
       )})
     );
@@ -166,7 +166,7 @@ export class UserProfileService {
         if(!userAuth) {
           return throwError(() => new Error("Error"));
         }
-        return this.http.delete(environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + map.id + ".json"
+        return this.http.delete(environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/` + userAuth.id + "/" + map.id + ".json"
       )})
     );
 
@@ -181,7 +181,7 @@ export class UserProfileService {
           return throwError(() => new Error("Error"));
         }
         return this.http.put(
-          environment.firebaseDbUrl + "usersMaps/" + userAuth.id + "/" + mapId + ".json",
+          environment.firebaseDbUrl + `${GameMapType.Local}GameMaps/` + userAuth.id + "/" + mapId + ".json",
           map
       )})
     );
