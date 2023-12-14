@@ -700,7 +700,7 @@ export class GameService {
     let mapElementSizeinPixels = this._gameObjects.gameMapState.elementSizeInPixels;
     for(let obstacle of this._gameObjects.obstaclesCoords) {
       this._canvasDrawers.static.drawRect(
-        "black",
+        this.gameMap.obstacleColor,
         obstacle.x * mapElementSizeinPixels,
         obstacle.y * mapElementSizeinPixels,
         mapElementSizeinPixels);
