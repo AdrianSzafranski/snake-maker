@@ -1,0 +1,55 @@
+<div class="container">
+    <h2>Sign in</h2>
+    <div class="form-error" *ngIf="error?.['account'] || error?.['error']">
+        <p>{{ getServerErrorMessage() }}</p>
+    </div>
+    <form 
+        #signInForm="ngForm"
+        (ngSubmit)="onSignIn(signInForm)"
+        >
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input
+                type="email"
+                id="email"
+                class="form-control"
+                ngModel
+                name="email"
+                required
+                email
+                maxlength="254"
+                #email="ngModel">
+            <p class="input-error" *ngIf="(!email.valid && email.touched) || error?.['email']">
+                {{ getErrorMessage('email', email) }}
+            </p>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                class="form-control"
+                ngModel
+                name="password"
+                required
+                minlength="8"
+                maxlength="20"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#@$!%*?&])[A-Za-z\d#@$!%*?&]*"
+                #password="ngModel">
+            <p class="input-error" *ngIf="(!password.valid && password.touched) || error?.['password'] ">
+                {{ getErrorMessage('password', password) }}
+            </p>
+        </div>
+        <div class="form-buttons">
+            <button 
+                class="submit-button"
+                type="submit"
+                [disabled]="!signInForm.valid">
+                <span *ngIf="!isLoading">Login</span>
+                <div *ngIf="isLoading" style="text-align: center;"><app-loading-spinner></app-loading-spinner></div>
+            </button>
+            <span class="switch-text">You do not have an account?</span>
+            <a class="switch-button" routerLink="/signup">Sign up!</a>
+        </div>
+    </form>
+</div>

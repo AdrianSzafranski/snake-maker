@@ -1,0 +1,22 @@
+<div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+<div class="container" *ngIf="!isLoading">
+    <div class="nav">
+        <button class="nav-element" [ngClass]="{'selected-official-nav-element': isOfficialGameMaps}"
+            (click)="onShowOfficialGameMaps()">Official maps</button>
+        <button class="nav-element" [ngClass]="{'selected-users-nav-element': !isOfficialGameMaps}"
+            (click)="onShowUsersGameMaps()">Users maps</button>
+    </div>
+    <div class="game-maps-container">
+        <app-game-map *ngFor="let currentGameMap of getDisplayedGameMaps()" [gameMap]="currentGameMap"
+            class="game-map"
+            (click)="onStartGame(currentGameMap.id)"></app-game-map>
+    </div>
+    <div class="game-map-nav">
+        <div class="left-arrow" (click)="onGetPreviousPage()"></div>
+        <span>{{ displayedGameMapsStartIndex / 6 + 1 }}/{{ isOfficialGameMaps ? pagesNumber :
+            unOfficialGameMapsPagesNumber }}</span>
+        <div class="right-arrow" (click)="onGetNextPage()"></div>
+    </div>
+</div>
