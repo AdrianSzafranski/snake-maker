@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -32,49 +32,43 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    GameComponent,
-    GameMapsComponent,
-    GameMapComponent,
-    GuideComponent,
-    LoadingSpinnerComponent,
-    HomeComponent,
-    HeaderComponent,
-    UserProfileComponent,
-    SignInComponent,
-    SignUpComponent,
-    PostsComponent,
-    PostFormComponent,
-    PostPreviewComponent,
-    PostComponent,
-    PostCommentComponent,
-    SnakeGameComponent,
-    UserDataComponent,
-    UserAvatarComponent,
-    GameMapAddComponent,
-    UserGameMapsComponent,
-    UserDataFormComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    MatCardModule, 
-    MatButtonModule,
-    MatIconModule
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS, 
-      useClass: AuthInterceptorService, 
-      multi: true
-    }
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        GameComponent,
+        GameMapsComponent,
+        GameMapComponent,
+        GuideComponent,
+        LoadingSpinnerComponent,
+        HomeComponent,
+        HeaderComponent,
+        UserProfileComponent,
+        SignInComponent,
+        SignUpComponent,
+        PostsComponent,
+        PostFormComponent,
+        PostPreviewComponent,
+        PostComponent,
+        PostCommentComponent,
+        SnakeGameComponent,
+        UserDataComponent,
+        UserAvatarComponent,
+        GameMapAddComponent,
+        UserGameMapsComponent,
+        UserDataFormComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule], providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptorService,
+            multi: true
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }
