@@ -1,25 +1,29 @@
-import { Component, Input } from '@angular/core';
-import { PostData } from '../post.model';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PostPreviewResponseDto } from '@shared/dto/post/external/post-preview-response.dto';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
 
 @Component({
   selector: 'app-post-preview',
   templateUrl: './post-preview.component.html',
-  styleUrls: ['./post-preview.component.css']
+  styleUrls: ['./post-preview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PostPreviewComponent {
-  @Input() postData!: PostData;
+  @Input() postData!: PostPreviewResponseDto;
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   onShowContentPreview() {
-    if(this.postData.content.length <= 50) {
-      return this.postData.content;
+    if(this.postData.contentPreview.length <= 50) {
+      return this.postData.contentPreview;
     }
-    return this.postData.content.substring(0, 50) + "...";
+    return this.postData.contentPreview.substring(0, 50) + "...";
   }
 
   onRedirectToPostDetails() {
+    console.log(this.postData);
     if(!this.postData.id) {
       return;
     }

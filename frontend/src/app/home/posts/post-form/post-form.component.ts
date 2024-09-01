@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { PostService } from '../../post.service';
-import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { PostData } from '../post.model';
+import { PostPreviewResponseDto } from '@shared/dto/post/external/post-preview-response.dto';
+import { CreateOrUpdatePost } from '@shared/dto/post/internal/create-or-update-post';
 
 @Component({
   selector: 'app-post-form',
@@ -10,16 +10,13 @@ import { PostData } from '../post.model';
   styleUrls: ['./post-form.component.css']
 })
 export class PostFormComponent {
-  @Output() postsData = new EventEmitter<PostData[]>();
+  @Output() postsData = new EventEmitter<PostPreviewResponseDto[]>();
 
   isLoading = false;
   error: string | null = null;
   isShowForm = true;
 
-  constructor(
-    private postService: PostService,
-    private router: Router
-    ) {}
+  constructor(private postService: PostService) {}
 
     onAddPost(form: NgForm) {
     if(!form.valid) {
@@ -29,19 +26,22 @@ export class PostFormComponent {
     const title = form.value.title;
     const imageUrl = form.value.imageUrl;
     const content = form.value.content;
-    const postData = {
+    const post: CreateOrUpdatePost = {
       title: title,
       imageUrl: imageUrl,
       content: content,
-      date: new Date().toISOString()
+      imageAlt: 'It is imageAlt',
+      hashtags: ['nothing', 'nothing', 'nothing']
+      
     };
 
     this.isLoading = true;
-    this.postService.addPostData(postData)
+    this.postService.createPost(post)
       .subscribe({
-        next: postsData => {
-          this.postsData.emit(postsData);
+        next: post => {
+          this.postsData.emit(post);
           this.isLoading = false;
+          form.reset();
         },
         error: errorMessage => {
           this.error = errorMessage.message;
@@ -49,7 +49,6 @@ export class PostFormComponent {
         }
       });
 
-    form.reset();
   }
 
   onShowForm() {

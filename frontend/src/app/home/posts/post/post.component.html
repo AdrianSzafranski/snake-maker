@@ -4,13 +4,13 @@
     </div>
     <div *ngIf="!isLoading" class="post">
         <div class="title">
-            <h1>{{ postData.title }}</h1>
+            <h1>{{ post.title }}</h1>
         </div>
         <div class="image">
-            <img src="{{ postData.imageUrl }}" alt="message image" />
+            <img src="{{ post.imageUrl }}" alt="message image" />
         </div>
         <div class="content">
-            <p>{{ postData.content }}</p>
+            <p>{{ post.content }}</p>
         </div>
         <hr>
         <div class="comments">
@@ -18,10 +18,10 @@
                 <h2>Comments</h2>
             </div>
             <div class="comments-window">
-                <div class="post-comment" *ngFor="let currentPostComment of postComments">
+                <div class="post-comment" *ngFor="let currentPostComment of post.comments">
                     <app-post-comment [postComment]="currentPostComment"></app-post-comment>
                 </div>
-                <div class="post-no-comments" *ngIf="postComments.length === 0">
+                <div class="post-no-comments" *ngIf="post.comments.length === 0">
                     <p>No comments!</p>
                 </div>
             </div>

@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Subject, exhaustMap, map, mergeMap, of, take, tap, throwError } from 'rxjs';
 
-import { PostComment, PostData } from './posts/post.model';
 import { AuthService } from '../auth/auth.service';
 import { environment } from '../../environments/environment';
-
+import { PostPreviewResponseDto } from '@shared/dto/post/external/post-preview-response.dto'
+import { PostResponseDto } from '@shared/dto/post/external/post-response.dto'
+import { CreateOrUpdatePost } from '@shared/dto/post/internal/create-or-update-post'
 @Injectable({
   providedIn: 'root'
 })
@@ -17,31 +18,22 @@ export class PostService {
     private router: Router,
     private authService: AuthService) { }
 
-
-  fetchPostsData() {
-    const httpUrl = environment.apiUrl + 'posts';
-    return this.http.get<any>(httpUrl).pipe(
-      map(postsDataObject => {
-        return Object.keys(postsDataObject).map(key => ({ id: key, ...postsDataObject[key] }));
-      }),
-      map(postsData => {
-        return postsData.reverse();
-      }),
-     
-    );
+  fetchPostPreviews() {
+    const httpUrl = environment.apiUrl + 'posts/previews';
+    return this.http.get<PostPreviewResponseDto[]>(httpUrl);
   }
  
-  fetchPostData(postId: string) {
+  fetchPost(postId: string) {
     const httpUrl = environment.apiUrl + `posts/${postId}`;
-    return this.http.get<any>(httpUrl);
+    return this.http.get<PostResponseDto>(httpUrl);
   }
 
-  addPostData(postData: PostData) {
+  createPost(post: CreateOrUpdatePost) {
 
     const httpUrl = environment.apiUrl + "posts";
-    return this.http.post(httpUrl, postData).pipe(
+    return this.http.post(httpUrl, post).pipe(
         mergeMap((resData) => {
-            return this.fetchPostsData();
+            return this.fetchPostPreviews();
         }),
     );
  
@@ -57,7 +49,7 @@ export class PostService {
     console.log
     return this.http.post(httpUrl, newComment).pipe(
                 mergeMap((resData) => {
-                    return this.fetchPostData(postId);
+                    return this.fetchPost(postId);
                    
                 }),
         );

@@ -27,7 +27,10 @@ import { UserDataComponent } from './user-profile/user-data/user-data.component'
 import { GameMapAddComponent } from './user-profile/game-map-add/game-map-add.component';
 import { UserGameMapsComponent } from './user-profile/user-game-maps/user-game-maps.component';
 import { UserDataFormComponent } from './shared/user-data-form/user-data-form.component';
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -59,7 +62,11 @@ import { UserDataFormComponent } from './shared/user-data-form/user-data-form.co
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule,
+    MatCardModule, 
+    MatButtonModule,
+    MatIconModule
   ],
   providers: [
     {

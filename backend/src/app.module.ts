@@ -7,6 +7,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { ValidationExceptionFilter } from './common/utils/validation.utils';
 import { GameMapModule } from './game-map/game-map.module';
 import { UserScoreModule } from './user-score/user-score.module';
+import { PostCommentModule } from './post/comment/post-comment.module';
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'sqlite',
@@ -15,6 +16,7 @@ import { UserScoreModule } from './user-score/user-score.module';
     synchronize: true
   }),
   PostModule,
+  PostCommentModule,
   AuthModule,
   GameMapModule,
   UserScoreModule],

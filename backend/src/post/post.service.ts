@@ -1,109 +1,132 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Post } from './post.entity';
-import { CreatePostDto } from './create-post.dto';
-import { AddPostCommentDto } from './add-post-comment.dto';
-import { UserCredentials } from 'src/auth/user/user-credentials.entity';
-import { UserController } from 'src/auth/user/user.controller';
-import { PostComment } from './post-comment.entity';
+import { PostResponseDto } from '@shared/dto/post/external/post-response.dto';
+import { PostPreviewResponseDto } from '@shared/dto/post/external/post-preview-response.dto';
+import { CreateOrUpdatePostDto } from './dto/internal/create-or-update-post.dto';
 
 @Injectable()
 export class PostService {
+
     private readonly logger = new Logger(PostService.name);
     constructor(
         @InjectRepository(Post)
-        private postRepository: Repository<Post>,
-        @InjectRepository(PostComment)
-        private commentRepository: Repository<PostComment>,
-        @InjectRepository(UserCredentials)
-        private userCredentialsRepository: Repository<UserCredentials>
-
+        private postRepository: Repository<Post>
     ){}
 
-    findAll() {
-        return this.postRepository.find();
+    async findPostPreviews(): Promise<PostPreviewResponseDto[]> {
+
+        const postPreviews =  await this.postRepository
+            .createQueryBuilder('post')
+            .leftJoin('post.userId', 'userCredentials')
+            .leftJoinAndSelect('userCredentials.userData', 'userData')
+            .leftJoin('post.comments', 'postComment')
+            .select([
+                'post.id AS id', 
+                'post.title AS title', 
+                'post.imageUrl AS imageUrl', 
+                'post.imageAlt AS imageAlt', 
+                'post.hashtags AS hashtags', 
+                'post.likesCount AS likesCount', 
+                'post.date AS date', 
+                'substr(post.content, 1, 100) AS contentPreview',
+                'userCredentials.userCredentialsId AS authorId',
+                'userData.username AS authorUsername',
+                'COUNT(postComment.id) AS commentsCount'])
+            .addGroupBy('post.title')
+            .addGroupBy('post.imageUrl')
+            .addGroupBy('post.imageAlt')
+            .addGroupBy('post.hashtags')
+            .addGroupBy('post.likesCount')
+            .addGroupBy('post.date')
+            .addGroupBy('substr(post.content, 1, 100)')
+            .addGroupBy('userCredentials.userCredentialsId')
+            .addGroupBy('userData.username')
+            .getRawMany();
+
+        postPreviews.forEach(post => {
+            post.hashtags = post.hashtags ? post.hashtags.split(',') : [];
+        });
+
+        if (!postPreviews) {
+            throw new NotFoundException(`postPreview.notExists`);
+        }
+        console.log(postPreviews);
+        return postPreviews;
     }
 
-    async findById(id: number): Promise<any> {
+    async findPostWithComments(postId: number): Promise<PostResponseDto> {
+
         const post =  await this.postRepository.createQueryBuilder('post')
           .leftJoinAndSelect('post.comments', 'comment')
           .leftJoin('comment.userId', 'userCredentials')
           .leftJoinAndSelect('userCredentials.userData', 'userData')
           .select([
-            'post.id',
+            'post',
             'post.title',
+            'post.imageUrl',
             'post.content',
             'comment.id',
             'comment.content',
             'comment.date',
-            'userCredentials.email',
+            'userCredentials.userCredentialsId',
             'userData.username',
             'userData.avatar'
           ])
-          .where('post.id = :id', { id })
+          .where('post.id = :id', { id: postId })
           .getOne();
+          
+        if (!post) {
+            throw new NotFoundException(`post.notExists`);
+        }
 
-
-        const newPost: any = post;
-          // Mapowanie komentarzy, aby przekształcić strukturę
-        if (newPost && newPost.comments) {
-            newPost.comments = newPost.comments.map(comment => ({
-            id: comment.id,
-            content: comment.content,
-            date: comment.date,
-            authorUsername: comment.userId?.userData?.username,
-            authorAvatar: comment.userId?.userData?.avatar,
-            }));
-
-        return newPost;
+        const postResponse: PostResponseDto = {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            imageUrl: post.imageUrl,
+            date: new Date(post.date),
+            comments: (post?.comments ?? []).map(comment => ({
+              id: comment.id,
+              content: comment.content,
+              date: new Date(comment.date),
+              authorUsername: comment.userId?.userData?.username || '',
+              authorAvatar: comment.userId?.userData?.avatar || [],
+            })),
+          };
+        
+        return postResponse;
      }
-    }
     
+    create(createOrUpdatePostDto: CreateOrUpdatePostDto): Promise<Post> {
 
-    create(createPostDto: CreatePostDto): Promise<Post> {
-        const post = this.postRepository.create(createPostDto);
+        const post = this.postRepository.create(
+            {
+                ...createOrUpdatePostDto,
+                likesCount: 0,
+                date: (new Date()).toISOString()
+            }
+        );
         return this.postRepository.save(post);
     }
 
-    async addComment(postId: number, userCredentialsId: number, addPostCommentDto: AddPostCommentDto): Promise<PostComment> {
-        
-        const post = await this.postRepository.findOneBy({
-            id: postId 
-        });
-      
-        if (!post) {
-        throw new NotFoundException('Post not found');
-        }
+    async update(id: number, createOrUpdatePostDto: CreateOrUpdatePostDto): Promise<Post | null> {
 
-                // Pobierz użytkownika
-            const userCredentials = await this.userCredentialsRepository.findOneBy({ userCredentialsId: userCredentialsId });
-            if (!userCredentials) {
-            throw new NotFoundException('User not found');
-            }
-
-        const comment = this.commentRepository.create({
-            ...addPostCommentDto,
-            userId: userCredentials,// Odniesienie do użytkownika za pomocą ID
-            postId: post
-           
-        });
-
-        return this.commentRepository.save(comment);
-    }
-
-    async update(id: number, isCompleted: boolean) {
         const post = await this.postRepository.findOne({where: {id: id}})
-        if(post) {
-            //post.isCompleted = isCompleted;
-            return this.postRepository.save(post);
+
+        if (!post) {
+            throw new NotFoundException(`post.notExists`);
         }
-        return null;
+
+        post.title = createOrUpdatePostDto.title;
+        post.content = createOrUpdatePostDto.content;
+        post.imageUrl = createOrUpdatePostDto.imageUrl;
+        return this.postRepository.save(post);
     }
 
-    delete(id: number) {
-        return this.postRepository.delete(id).then(() => {})
+    async delete(id: number): Promise<DeleteResult> {
+        return await this.postRepository.delete(id);
     }
-
 
 }

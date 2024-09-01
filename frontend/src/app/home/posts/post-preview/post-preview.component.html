@@ -1,14 +1,35 @@
-<div class="post">
-    <div class="title">
-        <h1>{{ postData.title }}</h1>
-    </div>
+<mat-card class="card" appearance="outlined">
+  <div class="horizontal-layout">
     <div class="image">
-        <img [src]="postData.imageUrl" alt="post image" />
+      <img mat-card-image [src]="postData.imageUrl" [alt]="postData.imageAlt">
     </div>
-    <div class="content">
-        <p>{{ onShowContentPreview() }}</p>
+    <div class="main">
+      <div> 
+        <button mat-button  *ngFor="let postHashtag of postData.hashtags">#{{ postHashtag }}</button>
+      </div>
+      <mat-card-header class="card-header">
+        <mat-card-title class="header-title">{{ postData.title }}</mat-card-title>
+        <mat-card-subtitle class="header-subtitle">{{ postData.authorUsername }} {{ postData.date }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="card-content">
+        <p>
+          {{ postData.contentPreview }}
+        </p>
+      </mat-card-content>
     </div>
-    <div class="post-btn-container">
-        <button type="button" (click)="onRedirectToPostDetails()">Read</button>
+  </div>
+  <mat-card-actions class="card-actions">
+    <div>
+      <div class="stats">
+        <span class="text">{{ postData.likesCount }}</span>
+        <mat-icon class="icon" aria-hidden="false" aria-label="Like icon" fontIcon="thumb_up"></mat-icon>
+      </div>
+        <div class="stats">
+          <span class="text">{{ postData.commentsCount }}</span>
+          <mat-icon class="icon" aria-hidden="false" aria-label="Comment icon" fontIcon="comment"></mat-icon>
+        </div>
     </div>
-</div>
+    <button mat-flat-button (click)="onRedirectToPostDetails()">Read more</button>
+  </mat-card-actions>
+ 
+</mat-card>

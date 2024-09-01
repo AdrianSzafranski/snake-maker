@@ -1,6 +1,6 @@
 import { UserCredentials } from "src/auth/user/user-credentials.entity";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
-import { Post } from "./post.entity";
+import { Post } from "../post.entity";
 
 @Entity()
 export class PostComment {

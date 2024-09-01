@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { take } from 'rxjs';
 
 import { AuthService } from 'src/app/auth/auth.service';
-import { PostData } from './post.model';
 import { PostService } from '../post.service';
 import { environment } from '../../../environments/environment';
+import { PostPreviewResponseDto } from '@shared/dto/post/external/post-preview-response.dto';
 
 @Component({
   selector: 'app-posts',
@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./posts.component.css']
 })
 export class PostsComponent {
-  postsData: PostData[] = [];
+  postsData: PostPreviewResponseDto[] = [];
   userCredentialId: number | null = null;
   accountRoles: string[] = [];
   adminId = environment.firebaseAdminId;
@@ -23,6 +23,7 @@ export class PostsComponent {
     private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.accountRoles = ['user']
     this.authService.userAuth.pipe(take(1)).subscribe((userAuth) => {
       if(userAuth) {
         this.userCredentialId = userAuth.id;
@@ -33,13 +34,14 @@ export class PostsComponent {
     );
 
     this.isLoading = true;
-    this.postService.fetchPostsData().subscribe(postsData => {
-      this.postsData = postsData;
+    this.postService.fetchPostPreviews().subscribe(postPreviews => {
+      this.postsData = postPreviews;
+      
       this.isLoading = false;
     });
   }
 
-  receiveActualPostsData(postsData: PostData[]) {
+  receiveActualPostsData(postsData: PostPreviewResponseDto[]) {
     this.postsData = postsData;
   }
 }

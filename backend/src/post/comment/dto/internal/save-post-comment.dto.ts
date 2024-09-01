@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsOptional, IsDateString } from 'class-validator';
 
-export class AddPostCommentDto {
+export class SavePostCommentDto {
+  
   @IsNotEmpty()
   content: string;
   @IsNotEmpty()

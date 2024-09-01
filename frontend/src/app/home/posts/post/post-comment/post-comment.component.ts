@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { PostComment } from '../../post.model';
 import { formatDate } from '@angular/common';
+import { CommentResponseDto } from '@shared/dto/post/external/post-response.dto';
 @Component({
   selector: 'app-post-comment',
   templateUrl: './post-comment.component.html',
@@ -8,7 +8,7 @@ import { formatDate } from '@angular/common';
 })
 export class PostCommentComponent {
 
-  @Input() postComment!: PostComment;
+  @Input() postComment!: CommentResponseDto;
   
   getCommentDate() {
     console.log(this.postComment);

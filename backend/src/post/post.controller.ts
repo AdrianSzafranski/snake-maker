@@ -1,12 +1,10 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Req, UnauthorizedException } from '@nestjs/common';
 import { PostService } from './post.service';
-import { Post as PostEntity} from './post.entity';
 import { Logger } from '@nestjs/common';
-import { CreatePostDto } from './create-post.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
-import { AddPostCommentDto } from './add-post-comment.dto';
+import { CreateOrUpdatePostDto } from './dto/internal/create-or-update-post.dto';
 
 @Controller('posts')
 export class PostController {
@@ -14,47 +12,32 @@ export class PostController {
     constructor(private readonly postService: PostService){}
 
     @Public()
-    @Get()
-    findAll() {
-        return this.postService.findAll();
+    @Get('previews')
+    findPostPreviews() {
+        return this.postService.findPostPreviews();
     }
 
     @Public()
-    @Get(':id')
-    findOne(@Param('id') id: number) {
-        return this.postService.findById(id);
+    @Get(':postId')
+    findPostWithComments(@Param('postId') postId: number) {
+        return this.postService.findPostWithComments(postId);
     }
 
     @Post()
     @Roles(Role.Admin)
-    create(@Body() dto: CreatePostDto) {
-        return this.postService.create(dto);
+    create(@Body() createOrUpdatePostDto: CreateOrUpdatePostDto) {
+        return this.postService.create(createOrUpdatePostDto);
     }
 
-    @Post(':id/comments')
-    addComment(@Param('id') postId: number, @Body() comment: AddPostCommentDto, @Req() req: any) {
-        console.log(comment)
-        const userCredentialsId = req.user?.userId;
-      
-        if (!userCredentialsId) {
-          throw new UnauthorizedException('User not authenticated');
-        }
-
-        return this.postService.addComment(postId, userCredentialsId, comment);
-    }
-
-
-    @Put(':id') 
+    @Put(':postId') 
     @Roles(Role.Admin)
-    update(@Param('id') id: number, @Body('isCompleted') isCompleted: boolean) {
-        return this.postService.update(id, isCompleted)
+    update(@Param('postId') id: number, @Body() createOrUpdatePostDto: CreateOrUpdatePostDto) {
+        return this.postService.update(id, createOrUpdatePostDto)
     }
 
-    @Delete(':id')
+    @Delete(':postId')
     @Roles(Role.Admin)
-    delete(@Param('id') id: number) {
+    delete(@Param('postId') id: number) {
         return this.postService.delete(id);
     }
-
-
 }

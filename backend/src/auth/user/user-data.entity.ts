@@ -1,8 +1,5 @@
-import { Role } from "src/auth/enums/role.enum";
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm"
 import { UserCredentials } from "./user-credentials.entity";
-import { PostComment } from "src/post/post-comment.entity";
-import { GameMap } from "src/game-map/game-map.entity";
 
 @Entity()
 export class UserData {
@@ -23,7 +20,6 @@ export class UserData {
 
     @Column()
     gender: string
-
 
     @Column('simple-array', { default: '' })
     joinReasons: string[]

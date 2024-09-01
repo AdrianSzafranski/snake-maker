@@ -34,6 +34,7 @@ export class UserService {
               .getOne(); // Zwraca pełne obiekty encji, w tym powiązane dane
           
         const { userDataId, ...userDataWithoutId } = user.userData; // Usuwamy id z userData
+        
         return {
             email: user.email,
             ...userDataWithoutId

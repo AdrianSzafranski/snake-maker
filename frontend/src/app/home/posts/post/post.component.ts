@@ -1,9 +1,9 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { PostComment, PostData } from '../post.model';
 import { PostService } from '../../post.service';
 import { ActivatedRoute } from '@angular/router';
 import { map, mergeMap, switchMap, take, tap } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
+import { PostResponseDto } from '@shared/dto/post/external/post-response.dto';
 
 @Component({
   selector: 'app-post',
@@ -12,8 +12,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class PostComponent implements OnInit {
 
-  postData!: PostData;
-  postComments!: PostComment[];
+  post!: PostResponseDto;
   postId!: string;
   userCredentialId: number | null = null;
   isLoading = false;
@@ -42,16 +41,10 @@ export class PostComponent implements OnInit {
         this.postId = postId;
       }),
       switchMap(postId => {
-        return this.postsService.fetchPostData(postId);
+        return this.postsService.fetchPost(postId);
       }),
-      tap((postData: any) => {
-       
-        const { comments, ...postWithoutComments } = postData;
-        
-        this.postData = postWithoutComments
-        this.postComments = comments;
-
-     
+      tap((post: any) => {
+        this.post = post;     
       }),
     ).subscribe((postComments) => {
       this.isLoading = false;
@@ -63,10 +56,8 @@ export class PostComponent implements OnInit {
  onAddNewComment() {
 
     this.postsService.addPostComment(this.postId, this.currentComment)
-      .subscribe(postData => {
-        const { comments, ...postWithoutComments } = postData;
-        this.postData = postWithoutComments
-        this.postComments = comments;
+      .subscribe(post => {
+        this.post = post;   
         this.currentComment = "";
       }
     );
